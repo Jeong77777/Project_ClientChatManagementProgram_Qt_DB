@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/Blue-Circle.png</file>
+        <file>images/chat.png</file>
+        <file>images/client.png</file>
+        <file>images/erase.png</file>
+        <file>images/Green-Circle.png</file>
+        <file>images/order.png</file>
+        <file>images/product.png</file>
+        <file>images/quit.png</file>
+        <file>images/Red-Circle.png</file>
+        <file>images/search.png</file>
+        <file>ManagementProgram_ko_KR.qm</file>
+    </qresource>
+</RCC>
