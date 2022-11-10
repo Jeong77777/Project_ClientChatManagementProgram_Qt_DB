@@ -1,6 +1,5 @@
 #include "clientdialog.h"
 #include "ui_clientdialog.h"
-#include "clientitem.h"
 
 /**
 * @brief 생성자, dialog 초기화
@@ -17,8 +16,7 @@ ClientDialog::ClientDialog(QWidget *parent) :
     connect(ui->lineEdit, SIGNAL(returnPressed()),
             this, SLOT(on_searchPushButton_clicked()));
 
-    //ui->searchPushButton->setFocus();
-    ui->searchPushButton->setDefault(true);
+    ui->searchPushButton->setFocus();
 }
 
 /**

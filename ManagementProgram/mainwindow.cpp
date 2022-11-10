@@ -9,8 +9,6 @@
 
 #include <QMdiSubWindow>
 #include <QSqlDatabase>
-#include <QSqlError>
-#include <QSqlQuery>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -18,32 +16,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    // initializeDataBase
-    QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE" );
-    db.setDatabaseName("./database.db" );
-    if( !db.open() )
-        qDebug() << db.lastError();
-
-    // creationTable
-    QSqlQuery qry;
-    qry.prepare( "CREATE TABLE IF NOT EXISTS Client_list "
-                 "("
-                 "  c_id NUMBER(20), "
-                 "  c_name varchar2(100) NOT NULL, "
-                 "  c_phone varchar2(100), "
-                 "  c_addr varchar2(100), "
-                 " PRIMARY KEY(c_id) "
-                 ")" );
-
-//    qry.prepare( "INSERT INTO Client_list "
-//                 "(c_id, c_name, c_phone, c_addr) "
-//                 "VALUES "
-//                 "(10003, '1111', '22222', '33333')" );
-
-    if( !qry.exec() )
-        qDebug() << qry.lastError();
-
 
     setWindowTitle(tr("Client/Product/Order/Chat Management Program"));
 
@@ -120,15 +92,26 @@ MainWindow::MainWindow(QWidget *parent)
     productForm->loadData();
     orderForm->loadData();
 
-    //ui->statusbar->hide();
-
     connect(clientForm, SIGNAL(sendStatusMessage(QString,int)), \
-            this->statusBar(), SLOT(showMessage(const QString &,int)));
+                this->statusBar(), SLOT(showMessage(const QString &,int)));
+    connect(productForm, SIGNAL(sendStatusMessage(QString,int)), \
+                this->statusBar(), SLOT(showMessage(const QString &,int)));
+    connect(orderForm, SIGNAL(sendStatusMessage(QString,int)), \
+                this->statusBar(), SLOT(showMessage(const QString &,int)));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete clientForm;
+    delete productForm;
+    delete orderForm;
+    delete chatForm;
+
+    QStringList list = QSqlDatabase::connectionNames();
+    for(int i = 0; i < list.count(); ++i) {
+        QSqlDatabase::removeDatabase(list[i]);
+    }
 }
 
 

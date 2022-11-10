@@ -3,7 +3,6 @@
 
 #include <QDialog>
 
-class ClientItem;
 class QTreeWidgetItem;
 
 namespace Ui {
