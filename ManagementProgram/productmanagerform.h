@@ -2,11 +2,10 @@
 #define PRODUCTMANAGERFORM_H
 
 #include <QWidget>
-#include <QMap>
-
-#include "productitem.h"
 
 class QMenu;
+class QTreeWidgetItem;
+class QSqlTableModel;
 
 namespace Ui {
 class ProductManagerForm;
@@ -33,8 +32,8 @@ private slots:
     void on_addPushButton_clicked();     // 제품 추가 버튼 슬롯
     void on_modifyPushButton_clicked();  // 제품 정보 변경 버튼 슬롯
     void on_cleanPushButton_clicked();   // 입력 창 클리어 버튼 슬롯
-    // tree widget에서 제품을 클릭(선택)했을 때의 슬롯
-    void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
+    // tree view에서 제품을 클릭(선택)했을 때의 슬롯
+    //void on_treeView_clicked(const QModelIndex &index);
 
     void showContextMenu(const QPoint &); // tree widget의 context 메뉴 출력
     void removeItem();                    // 제품 정보 삭제
@@ -45,17 +44,18 @@ private slots:
 
 signals:
     // 제품 검색 Dialog로 검색된 제품 정보를 보내주는 시그널
-    void sendProductToDialog(ProductItem*);
+    void sendProductToDialog(QTreeWidgetItem*);
     // 주문 정보 관리 객체로 검색된 제품 정보를 보내주는 시그널
-    void sendProductToManager(ProductItem*);
+    void sendProductToManager(QTreeWidgetItem*);
+    void sendStatusMessage(QString, int);
 
 private:
     int makeId();              // Id를 자동으로 생성
     void cleanInputLineEdit(); // 입력 창 클리어
 
-    QMap<int, ProductItem*> productList; // 제품 리스트
     Ui::ProductManagerForm *ui;          // ui
     QMenu* menu;                         // tree widget context 메뉴
+    QSqlTableModel* productModel;
 };
 
 #endif // PRODUCTMANAGERFORM_H

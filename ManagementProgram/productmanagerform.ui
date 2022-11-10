@@ -266,35 +266,13 @@
      <widget class="QWidget" name="verticalLayoutWidget">
       <layout class="QVBoxLayout" name="listVerticalLayout">
        <item>
-        <widget class="QTreeWidget" name="treeWidget">
+        <widget class="QTreeView" name="treeView">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
          <property name="rootIsDecorated">
           <bool>false</bool>
          </property>
-         <column>
-          <property name="text">
-           <string>ID</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Type</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Unit Price</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Quantities in stock</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>

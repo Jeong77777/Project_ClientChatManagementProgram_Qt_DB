@@ -19,7 +19,6 @@ SOURCES += \
     orderitem.cpp \
     ordermanagerform.cpp \
     productdialog.cpp \
-    productitem.cpp \
     productmanagerform.cpp
 
 HEADERS += \
@@ -32,7 +31,6 @@ HEADERS += \
     orderitem.h \
     ordermanagerform.h \
     productdialog.h \
-    productitem.h \
     productmanagerform.h
 
 FORMS += \

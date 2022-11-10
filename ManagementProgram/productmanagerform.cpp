@@ -1,11 +1,14 @@
 #include "productmanagerform.h"
 #include "ui_productmanagerform.h"
-#include "productitem.h"
 
 #include <QFile>
 #include <QMenu>
 #include <QMessageBox>
 #include <QIntValidator>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlTableModel>
+#include <QTreeWidgetItem>
 
 /**
 * @brief 생성자, split 사이즈 설정, 입력 칸 설정, context 메뉴 설정, 검색 관련 초기 설정
@@ -31,8 +34,8 @@ ProductManagerForm::ProductManagerForm(QWidget *parent) :
     connect(removeAction, SIGNAL(triggered()), SLOT(removeItem()));
     menu = new QMenu; // context 메뉴
     menu->addAction(removeAction);
-    ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->treeWidget, SIGNAL(customContextMenuRequested(QPoint)),\
+    ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)),\
             this, SLOT(showContextMenu(QPoint)));
 
     /* 검색 창에서 enter 키를 누르면 검색 버튼이 클릭되도록 connect */
@@ -49,58 +52,53 @@ ProductManagerForm::ProductManagerForm(QWidget *parent) :
 */
 void ProductManagerForm::loadData()
 {
-    /* productList.txt 파일을 연다. */
-    QFile file("productList.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "productConnection");
+    db.setDatabaseName("productlist.db");
+    if (db.open( )) {
+        QSqlQuery query(db);
+        query.exec( "CREATE TABLE IF NOT EXISTS Product_list ("
+                    "id          INTEGER          PRIMARY KEY, "
+                    "type        VARCHAR(30)      NOT NULL,"
+                    "name        VARCHAR(20)      NOT NULL,"
+                    "price       INTEGER          NOT NULL,"
+                    "stock       INTEGER          NOT NULL"
+                    " )"
+                    );
 
-    /* parsing 후 제품 정보를 tree widget에 추가 */
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QList<QString> row = line.split(", ");
-        if(row.size()) {
-            int id = row[0].toInt();
-            ProductItem* c = new ProductItem(id, row[1], row[2], \
-                    row[3].toInt(), row[4].toInt());
-            ui->treeWidget->addTopLevelItem(c);
-            productList.insert(id, c);
-        }
+        productModel = new QSqlTableModel(this, db);
+        productModel->setTable("Product_list");
+        productModel->select();
+        productModel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+        productModel->setHeaderData(1, Qt::Horizontal, tr("Type"));
+        productModel->setHeaderData(2, Qt::Horizontal, tr("Name"));
+        productModel->setHeaderData(3, Qt::Horizontal, tr("Unit Price"));
+        productModel->setHeaderData(4, Qt::Horizontal, tr("Quantities in stock"));
+        ui->treeView->setModel(productModel);
     }
-    file.close( );
 }
 
 /**
-* @brief 소멸자, 제품 리스트를 productList.txt에 저장
+* @brief 소멸자,
 */
 ProductManagerForm::~ProductManagerForm()
 {
     delete ui;
-
-    /* productList.txt 파일을 연다. */
-    QFile file("productList.txt");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-
-    /* 구분자를 ", "로 해서 제품 정보를 파일에 저장 */
-    QTextStream out(&file);
-    for (const auto& v : qAsConst(productList)) {
-        ProductItem* c = v;
-        out << c->id() << ", " << c->getType() << ", ";
-        out << c->getName() << ", " << c->getPrice() << ", ";
-        out << c->getStock() << "\n";
+    QSqlDatabase db = QSqlDatabase::database("productConnection");
+    if(db.isOpen()) {
+        productModel->submitAll();
+        delete productModel;
+        db.commit();
+        db.close();
     }
-    file.close( );
 }
 
 /**
-* @brief 전체 제품 리스트 출력 버튼 슬롯, tree widget에 전체 제품 리스트를 출력해 준다.
+* @brief 전체 제품 리스트 출력 버튼 슬롯, tree view에 전체 제품 리스트를 출력해 준다.
 */
 void ProductManagerForm::on_showAllPushButton_clicked()
 {
-    for (const auto& v : qAsConst(productList)) {
-        v->setHidden(false);
-    }
+    productModel->setFilter("");
+    productModel->select();
     ui->searchLineEdit->clear(); // 검색 창 클리어
 }
 
@@ -121,7 +119,7 @@ void ProductManagerForm::on_searchComboBox_currentIndexChanged(int index)
 }
 
 /**
-* @brief 검색 버튼 슬롯, tree widget에 검색 결과를 출력해 준다.
+* @brief 검색 버튼 슬롯, tree view에 검색 결과를 출력해 준다.
 */
 void ProductManagerForm::on_searchPushButton_clicked()
 {
@@ -130,10 +128,6 @@ void ProductManagerForm::on_searchPushButton_clicked()
     int i = ui->searchComboBox->currentIndex();
 
     /* 검색 수행 */
-    // 2: 대소문자 구분, 부분 일치 검색, 0 1: 대소문자 구분 검색
-    auto flag = (i == 2)? Qt::MatchCaseSensitive|Qt::MatchContains
-                        : Qt::MatchCaseSensitive;
-
     QString str; // 검색어
     if(i == 1) // Type
         str = ui->searchTypeComboBox->currentText();
@@ -146,14 +140,30 @@ void ProductManagerForm::on_searchPushButton_clicked()
         }
     }
 
-    // 검색
-    auto items = ui->treeWidget->findItems(str, flag, i);
+    switch (i) {
+    case 0: productModel->setFilter(QString("id = '%1'").arg(str));
+        break;
+    case 1: productModel->setFilter(QString("type = '%1'").arg(str));
+        break;
+    case 2: productModel->setFilter(QString("name LIKE '%%1%'").arg(str));
+        break;
+    default:
+        break;
+    }
+    productModel->select();
+    emit sendStatusMessage(tr("%1 search results were found").arg(productModel->rowCount()), 3000);
 
-    /* 검색된 결과만 tree widget에 보여 주기*/
-    for (const auto& v : qAsConst(productList))
-        v->setHidden(true);
-    foreach(auto i, items)
-        i->setHidden(false);
+    QString filterStr = "id in (";
+    for(int i = 0; i < productModel->rowCount(); i++) {
+        int id = productModel->data(productModel->index(i, 0)).toInt();
+        if(i != productModel->rowCount()-1)
+            filterStr += QString("%1, ").arg(id);
+        else
+            filterStr += QString("%1").arg(id);
+    }
+    filterStr += ");";
+    qDebug() << filterStr;
+    productModel->setFilter(filterStr);
 }
 
 
@@ -170,18 +180,29 @@ void ProductManagerForm::on_addPushButton_clicked()
     price = ui->priceLineEdit->text();
     stock = ui->stockLineEdit->text();
 
-    /* 입력된 정보로 tree widget item을 생성하고 tree widget에 추가 */
-    if(name.length() && price.length() && stock.length()) {
-        ProductItem* p = new ProductItem(id, type, name, \
-                                         price.toInt(), stock.toInt());
-        productList.insert(id, p);          // 제품 리스트에 추가
-        ui->treeWidget->addTopLevelItem(p); // tree widget에 추가
+    /* 입력된 정보를 DB에 추가 */
+    QSqlDatabase db = QSqlDatabase::database("productConnection");
+    if(db.isOpen() && name.length() && price.length() && stock.length()) {
+        QSqlQuery query(productModel->database());
+        query.prepare( "INSERT INTO Product_list "
+                       "(id, type, name, price, stock) "
+                       "VALUES "
+                       "(:ID, :TYPE, :NAME, :PRICE, :STOCK)" );
+        query.bindValue(":ID",        id);
+        query.bindValue(":TYPE",      type);
+        query.bindValue(":NAME",      name);
+        query.bindValue(":PRICE",     price);
+        query.bindValue(":STOCK",     stock);
+        query.exec();
+        productModel->select();
 
         cleanInputLineEdit(); // 입력 창 클리어
+
+        emit sendStatusMessage(tr("Add completed (ID: %1, Name: %2)").arg(id).arg(name), 3000);
     }
     else { // 비어있는 입력 창이 있을 때
         QMessageBox::warning(this, tr("Add error"),
-           QString(tr("Some items have not been entered.")), QMessageBox::Ok);
+                             QString(tr("Some items have not been entered.")), QMessageBox::Ok);
     }
 }
 
@@ -190,15 +211,10 @@ void ProductManagerForm::on_addPushButton_clicked()
 */
 void ProductManagerForm::on_modifyPushButton_clicked()
 {
-    /* tree widget에서 현재 선택된 item 가져오기 */
-    QTreeWidgetItem* item = ui->treeWidget->currentItem();
+    QModelIndex index = ui->treeView->currentIndex();
 
-    /* 입력 창에 입력된 정보에 따라 제품 정보를 변경 */
-    if(item != nullptr) {
-        // ID를 이용하여 제품 리스트에서 제품 가져오기
-        int key = item->text(0).toInt();
-        ProductItem* p = productList[key];
-
+    if(index.isValid()) {
+        int id = productModel->data(index.siblingAtColumn(0)).toInt();
         // 입력 창에 입력된 정보 가져오기
         QString type, name, price, stock;
         type = ui->typeComboBox->currentText();
@@ -208,16 +224,24 @@ void ProductManagerForm::on_modifyPushButton_clicked()
 
         // 입력 창에 입력된 정보에 따라 제품 정보를 변경
         if(name.length() && price.length() && stock.length()) {
-            p->setType(type);
-            p->setName(name);
-            p->setPrice(price.toInt());
-            p->setStock(stock.toInt());
-            productList[key] = p;
+            QSqlQuery query(productModel->database());
+            query.prepare("UPDATE Client_list SET type = ?, name = ?, price = ?, stock = ?, WHERE id = ?");
+            query.bindValue(0, type);
+            query.bindValue(1, name);
+            query.bindValue(2, price);
+            query.bindValue(3, stock);
+            query.bindValue(4, id);
+            query.exec();
+            productModel->select();
+
+            cleanInputLineEdit(); // 입력 창 클리어
+
+            emit sendStatusMessage(tr("Modify completed (ID: %1, Name: %2)").arg(id).arg(name), 3000);
         }
         else { // 비어있는 입력 창이 있을 때
             QMessageBox::warning(this, tr("Modify error"), \
-               QString(tr("Some items have not been entered.")), \
-                                     QMessageBox::Ok);
+                                 QString(tr("Some items have not been entered.")), \
+                                 QMessageBox::Ok);
         }
     }
 }
@@ -230,32 +254,18 @@ void ProductManagerForm::on_cleanPushButton_clicked()
     cleanInputLineEdit();
 }
 
-/**
-* @brief tree widget에서 제품을 클릭(선택)했을 때 실행되는 슬롯, 클릭된 제품의 정보를 입력 창에 표시
-* @Param QTreeWidgetItem *item 클릭된 item
-* @Param int column 클릭된 item의 열
-*/
-void ProductManagerForm::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
-{
-    Q_UNUSED(column);
 
-    /* 클릭된 제품의 정보를 입력 창에 표시해줌 */
-    ui->idLineEdit->setText(item->text(0));
-    ui->typeComboBox->setCurrentText(item->text(1));
-    ui->nameLineEdit->setText(item->text(2));
-    ui->priceLineEdit->setText(item->text(3));
-    ui->stockLineEdit->setText(item->text(4));
-}
 
 /**
-* @brief tree widget의 context 메뉴 출력
+* @brief tree view의 context 메뉴 출력
 * @param const QPoint &pos 우클릭한 위치
 */
 void ProductManagerForm::showContextMenu(const QPoint &pos)
 {
-    /* tree widget 위에서 우클릭한 위치에서 context menu 출력 */
-    QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
-    menu->exec(globalPos);
+    /* tree view 위에서 우클릭한 위치에서 context menu 출력 */
+    QPoint globalPos = ui->treeView->mapToGlobal(pos);
+    if(ui->treeView->indexAt(pos).isValid())
+        menu->exec(globalPos);
 }
 
 /**
@@ -263,16 +273,14 @@ void ProductManagerForm::showContextMenu(const QPoint &pos)
 */
 void ProductManagerForm::removeItem()
 {
-    /* tree widget에서 현재 선택된 item 가져오기 */
-    QTreeWidgetItem* item = ui->treeWidget->currentItem();
+    QModelIndex index = ui->treeView->currentIndex();
 
-    /* 제품 정보 삭제 */
-    if(item != nullptr) {
-        productList.remove(item->text(0).toInt()); // 리스트에서 제품 정보 삭제
-        // tree widget에서 제품 정보 삭제
-        ui->treeWidget->takeTopLevelItem(ui->treeWidget->indexOfTopLevelItem(item));
-        delete item;
-        ui->treeWidget->update(); // tree widget update
+    if(index.isValid()) {
+        int id = productModel->data(index.siblingAtColumn(0)).toInt();
+        QString name = productModel->data(index.siblingAtColumn(1)).toString();
+        productModel->removeRow(index.row());
+        productModel->select();
+        emit sendStatusMessage(tr("delete completed (ID: %1, Name: %2)").arg(id).arg(name), 3000);
     }
 }
 
@@ -282,12 +290,27 @@ void ProductManagerForm::removeItem()
 */
 void ProductManagerForm::receiveId(int id)
 {
-    for (const auto& v : qAsConst(productList)) {
-        ProductItem* p = v;
-        if(p->id() == id) {
-            // 검색 결과를 주문 정보 관리 객체로 보냄
-            emit sendProductToManager(p);
-        }
+    QSqlQuery query(QString("select * "
+                            "from Product_list "
+                            "where id = '%1';").arg(id),
+                    productModel->database());
+    query.exec();
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString type = query.value(1).toString();
+        QString name = query.value(2).toString();
+        QString price = query.value(3).toString();
+        QString stock = query.value(4).toString();
+
+        QTreeWidgetItem* item  = new QTreeWidgetItem;
+        item->setText(0, QString::number(id));
+        item->setText(1, type);
+        item->setText(2, name);
+        item->setText(3, price);
+        item->setText(4, stock);
+
+        //검색 결과를 주문 정보 관리 객체로 보냄
+        emit sendProductToManager(item);
     }
 }
 
@@ -296,31 +319,28 @@ void ProductManagerForm::receiveId(int id)
 * @Param QString word 검색어(id 또는 이름)
 */
 void ProductManagerForm::receiveWord(QString word)
-{
-    /* 검색 결과를 저장할 map */
-    QMap<int, ProductItem*> searchList;
-
-    /* 대소문자를 구분하고 부분 일치 검색으로 설정 */
-    auto flag = Qt::MatchCaseSensitive|Qt::MatchContains;
-
-    /* id에서 검색 */
-    auto items1 = ui->treeWidget->findItems(word, flag, 0);
-    foreach(auto i, items1) {
-        ProductItem* p = static_cast<ProductItem*>(i);
-        searchList.insert(p->id(), p); // 검색 결과를 map에 저장
-    }
-
-    /* 이름에서 검색 */
-    auto items2 = ui->treeWidget->findItems(word, flag, 2);
-    foreach(auto i, items2) {
-        ProductItem* p = static_cast<ProductItem*>(i);
-        searchList.insert(p->id(), p); // 검색 결과를 map에 저장
-    }
-
-    /* 검색 결과를 제품 검색 Dialog로 보냄 */
-    for (const auto& v : qAsConst(searchList)) {
-        ProductItem* p = v;
-        emit sendProductToDialog(p);
+{ // 여기서부터 하기
+    QSqlQuery query(QString("select * "
+                            "from Product_list "
+                            "where id = '%1' "
+                            "or name LIKE '%%1%' "
+                            "or phoneNumber LIKE '%%1%' "
+                            "or address LIKE '%%1%';").arg(word),
+                    productModel->database());
+    query.exec();
+    while (query.next()) {
+        qDebug() << query.value(0).toInt();
+        int id = query.value(0).toInt();
+        QString name = query.value(1).toString();
+        QString phone = query.value(2).toString();
+        QString address = query.value(3).toString();
+        qDebug() << id << name;
+        QTreeWidgetItem* item  = new QTreeWidgetItem;
+        item->setText(0, QString::number(id));
+        item->setText(1, name);
+        item->setText(2, phone);
+        item->setText(3, address);
+        emit sendProductToDialog(item);
     }
 }
 
@@ -330,12 +350,13 @@ void ProductManagerForm::receiveWord(QString word)
 */
 int ProductManagerForm::makeId()
 {
-    if(productList.size( ) == 0) {
-        return 1001; // id는 1001부터 시작
-    } else {
-        auto id = productList.lastKey();
-        return ++id; // 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
-    }
+//    if(productList.size( ) == 0) {
+//        return 1001; // id는 1001부터 시작
+//    } else {
+//        auto id = productList.lastKey();
+//        return ++id; // 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
+//    }
+    return 0;
 }
 
 /**

@@ -107,7 +107,7 @@ void ClientManagerForm::on_showAllPushButton_clicked()
 }
 
 /**
-* @brief 검색 버튼 슬롯, tree widget에 검색 결과를 출력해 준다.
+* @brief 검색 버튼 슬롯, tree view에 검색 결과를 출력해 준다.
 */
 void ClientManagerForm::on_searchPushButton_clicked()
 {
@@ -242,7 +242,7 @@ void ClientManagerForm::on_cleanPushButton_clicked()
 }
 
 /**
-* @brief tree widget의 context 메뉴 출력
+* @brief tree view의 context 메뉴 출력
 * @param const QPoint &pos 우클릭한 위치
 */
 void ClientManagerForm::showContextMenu(const QPoint &pos)

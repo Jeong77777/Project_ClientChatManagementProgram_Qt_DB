@@ -3,7 +3,6 @@
 #include "orderitem.h"
 #include "clientdialog.h"
 #include "productdialog.h"
-#include "productitem.h"
 
 #include <QFile>
 #include <QMenu>
@@ -192,18 +191,18 @@ void OrderManagerForm::on_inputClientPushButton_clicked()
 */
 void OrderManagerForm::on_inputProductPushButton_clicked()
 {
-    /* 제품을 검색, 입력하기 위한 다이얼로그 실행 */
-    productDialog->show();
+//    /* 제품을 검색, 입력하기 위한 다이얼로그 실행 */
+//    productDialog->show();
 
-    if (productDialog->exec() == QDialog::Accepted) { // OK 버튼을 누르면
-        // 다이얼로그에서 선택한 제품을 가져온다.
-        ProductItem* p = dynamic_cast<ProductItem*>(productDialog->getCurrentItem());
-        if(p!=nullptr) {
-            // 주문 정보 입력 칸에 제품 ID와 이름을 입력한다.
-            ui->productLineEdit->setText(QString::number(p->id()) + " (" + p->getName() + ")");
-        }
-    }
-    productDialog->clearDialog(); // 다이얼로그 초기화
+//    if (productDialog->exec() == QDialog::Accepted) { // OK 버튼을 누르면
+//        // 다이얼로그에서 선택한 제품을 가져온다.
+//        ProductItem* p = dynamic_cast<ProductItem*>(productDialog->getCurrentItem());
+//        if(p!=nullptr) {
+//            // 주문 정보 입력 칸에 제품 ID와 이름을 입력한다.
+//            ui->productLineEdit->setText(QString::number(p->id()) + " (" + p->getName() + ")");
+//        }
+//    }
+//    productDialog->clearDialog(); // 다이얼로그 초기화
 }
 
 /**

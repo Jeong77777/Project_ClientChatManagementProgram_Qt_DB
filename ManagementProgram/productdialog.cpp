@@ -1,6 +1,5 @@
 #include "productdialog.h"
 #include "ui_productdialog.h"
-#include "productitem.h"
 
 /**
 * @brief 생성자, dialog 초기화
@@ -34,11 +33,11 @@ ProductDialog::~ProductDialog()
 */
 void ProductDialog::receiveProductInfo(ProductItem * p)
 {
-    /* 검색 결과를 tree widget에 추가 */
-    ProductItem* product = new ProductItem(p->id(), p->getType(), \
-                                           p->getName(), p->getPrice(), \
-                                           p->getStock());
-    ui->treeWidget->addTopLevelItem(product);
+//    /* 검색 결과를 tree widget에 추가 */
+//    ProductItem* product = new ProductItem(p->id(), p->getType(), \
+//                                           p->getName(), p->getPrice(), \
+//                                           p->getStock());
+//    ui->treeWidget->addTopLevelItem(product);
 }
 
 /**
