@@ -74,22 +74,7 @@ void ClientManagerForm::loadData()
 */
 ClientManagerForm::~ClientManagerForm()
 {
-//    delete ui;
 
-//    /* clientlist.txt 파일을 연다. */
-//    QFile file("clientlist.txt");
-//    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-//        return;
-
-//    /* 구분자를 ", "로 해서 고객 정보를 파일에 저장 */
-//    QTextStream out(&file);
-//    for (const auto& v : qAsConst(clientList)) {
-//        ClientItem* c = v;
-//        out << c->id() << ", " << c->getName() << ", ";
-//        out << c->getPhoneNumber() << ", ";
-//        out << c->getAddress() << "\n";
-//    }
-//    file.close( );
 }
 
 /**
@@ -118,34 +103,22 @@ void ClientManagerForm::on_searchPushButton_clicked()
     }
 
     int i = ui->searchComboBox->currentIndex(); //무엇으로 검색할지 콤보박스의 인덱스를 가져옴
-    switch (i){
-    case 0:
-        clientModel->setFilter(QString("c_id = '%1'").arg(str));
-        clientModel->select();
-//        QMessageBox::information(this, tr("Search Info"),
-//                                 QString( tr("%1 search results were found") ).arg(model->rowCount()));
+
+    switch (i) {
+    case 0: clientModel->setFilter(QString("c_id = '%1'").arg(str));
         break;
-    case 1:
-        clientModel->setFilter(QString("c_name LIKE '%%1%'").arg(str));
-        clientModel->select();
-//        QMessageBox::information(this, tr("Search Info"),
-//                                 QString( tr("%1 search results were found") ).arg(model->rowCount()));
+    case 1: clientModel->setFilter(QString("c_name LIKE '%%1%'").arg(str));
         break;
-    case 2:
-        clientModel->setFilter(QString("c_phone LIKE '%%1%'").arg(str));
-        clientModel->select();
-//        QMessageBox::information(this, tr("Search Info"),
-//                                 QString( tr("%1 search results were found") ).arg(model->rowCount()));
+    case 2: clientModel->setFilter(QString("c_phone LIKE '%%1%'").arg(str));
         break;
-    case 3:
-        clientModel->setFilter(QString("c_addr LIKE '%%1%'").arg(str));
-        clientModel->select();
-//        QMessageBox::information(this, tr("Search Info"),
-//                                 QString( tr("%1 search results were found") ).arg(model->rowCount()));
+    case 3: clientModel->setFilter(QString("c_addr LIKE '%%1%'").arg(str));
         break;
     default:
         break;
     }
+    clientModel->select();
+    emit sendStatusMessage(tr("%1 search results were found").arg(clientModel->rowCount()), 3000);
+
 
     QString filterStr = "c_id in (";
     for(int i = 0; i < clientModel->rowCount(); i++) {
@@ -153,9 +126,9 @@ void ClientManagerForm::on_searchPushButton_clicked()
         if(i != clientModel->rowCount()-1)
             filterStr += QString("%1, ").arg(id);
         else
-            filterStr += QString("%1").arg(id);
+            filterStr += QString("%1);").arg(id);
     }
-    filterStr += ");";
+    if(clientModel->rowCount()==0) filterStr = "";
     qDebug() << filterStr;
     clientModel->setFilter(filterStr);
 }
@@ -189,19 +162,14 @@ void ClientManagerForm::on_addPushButton_clicked()
         if( !qry.exec() )
           qDebug() << qry.lastError();
 
-        //model->setTable("Client_list");
         clientModel->select();
-        //ui->treeView->setModel(model);
-        //model->setQuery("SELECT * FROM Client_list");
-        //ui->treeView->setModel(model);
-        //ui->treeView->update();
 
         cleanInputLineEdit(); // 입력 창 클리어
 
         // 채팅 서버로 신규 고객 정보(id, 이름) 보냄
         emit sendClientToChatServer(id, name); // 채팅 서버로
 
-        emit sendStatusMessage("등록 완료", 3000);
+        emit sendStatusMessage(tr("Add completed"), 3000);
     }
     else { // 비어있는 입력 창이 있을 때
         QMessageBox::warning(this, tr("Add error"),
@@ -233,12 +201,11 @@ void ClientManagerForm::on_modifyPushButton_clicked()
             query.bindValue(3, id);
             query.exec();
             clientModel->select();
-            //ui->treeView->resizeColumnsToContents();
 
             //채팅 서버로 변경된 고객 정보(id, 이름) 보냄
             emit sendClientToChatServer(id, name);
 
-            emit sendStatusMessage("수정 완료", 3000);
+            emit sendStatusMessage(tr("Modify completed"), 3000);
         }
         else { // 비어있는 입력 창이 있을 때
             QMessageBox::warning(this, tr("Modify error"),\
@@ -246,38 +213,6 @@ void ClientManagerForm::on_modifyPushButton_clicked()
                                  QMessageBox::Ok);
         }
     }
-
-    //    /* tree widget에서 현재 선택된 item 가져오기 */
-    //    QTreeWidgetItem* item = ui->treeWidget->currentItem();
-
-    //    /* 입력 창에 입력된 정보에 따라 고객 정보를 변경 */
-    //    if(item != nullptr) {
-    //        // ID를 이용하여 고객 리스트에서 고객 가져오기
-    //        int key = item->text(0).toInt();
-    //        ClientItem* c = clientList[key];
-
-    //        // 입력 창에 입력된 정보 가져오기
-    //        QString name, number, address;
-    //        name = ui->nameLineEdit->text();
-    //        number = ui->phoneNumberLineEdit->text();
-    //        address = ui->addressLineEdit->text();
-
-    //        // 입력 창에 입력된 정보에 따라 고객 정보를 변경
-    //        if(name.length() && number.length() && address.length()) {
-    //            c->setName(name);
-    //            c->setPhoneNumber(number);
-    //            c->setAddress(address);
-    //            clientList[key] = c;
-
-    //            // 채팅 서버로 변경된 고객 정보(id, 이름) 보냄
-    //            emit sendClientToChatServer(c->id(), name);
-    //        }
-    //        else { // 비어있는 입력 창이 있을 때
-    //            QMessageBox::warning(this, tr("Modify error"),\
-    //                                 QString(tr("Some items have not been entered.")),\
-    //                                 QMessageBox::Ok);
-    //        }
-    //    }
 }
 
 /**
@@ -325,6 +260,7 @@ void ClientManagerForm::removeItem()
     if(index.isValid()) {
         clientModel->removeRow(index.row());
         clientModel->select();
+        emit sendStatusMessage(tr("delete completed"), 3000);
     }
 }
 
@@ -334,16 +270,26 @@ void ClientManagerForm::removeItem()
 */
 void ClientManagerForm::receiveId(int id)
 {
-    //QSqlQueryModel model;
-    //model.setQuery("Select ");
+    QSqlQueryModel model;
+    model.setQuery(QString("select * "
+                           "from Client_list "
+                           "where c_id = '%1';").arg(id));
 
-    //    for (const auto& v : qAsConst(clientList)) {
-//        ClientItem* c = v;
-//        if(c->id() == id) {
-//            // 검색 결과를 주문 정보 관리 객체로 보냄
-//            emit sendClientToOrderManager(c);
-//        }
-//    }
+    if(model.rowCount() != 0) {
+        int id = model.data(model.index(0, 0)).toInt();
+        QString name = model.data(model.index(0, 1)).toString();
+        QString phone = model.data(model.index(0, 2)).toString();
+        QString address = model.data(model.index(0, 3)).toString();
+
+        QTreeWidgetItem* item  = new QTreeWidgetItem;
+        item->setText(0, QString::number(id));
+        item->setText(1, name);
+        item->setText(2, phone);
+        item->setText(3, address);
+
+        //검색 결과를 주문 정보 관리 객체로 보냄
+        emit sendClientToOrderManager(item);
+    }
 }
 
 /**

@@ -88,21 +88,21 @@ MainWindow::MainWindow(QWidget *parent)
     connect(productDialog, SIGNAL(sendWord(QString)), \
             productForm, SLOT(receiveWord(QString)));
     // 제품 관리 객체에서 검색 결과를 제품 검색 다이얼로그로 전달해줌
-    connect(productForm, SIGNAL(sendProductToDialog(ProductItem*)), \
-            productDialog, SLOT(receiveProductInfo(ProductItem*)));
+    connect(productForm, SIGNAL(sendProductToDialog(QTreeWidgetItem*)), \
+            productDialog, SLOT(receiveProductInfo(QTreeWidgetItem*)));
 
     // 주문 관리 객체에서 정보를 받아올 고객의 id를 고객 관리 객체로 전달해줌
     connect(orderForm, SIGNAL(sendClientId(int)), \
             clientForm, SLOT(receiveId(int)));
     // 고객 관리 객체에서 고객의 정보를 주문 관리 객체로 전달해줌
-    connect(clientForm, SIGNAL(sendClientToOrderManager(ClientItem*)), \
-            orderForm, SLOT(receiveClientInfo(ClientItem*)));
+    connect(clientForm, SIGNAL(sendClientToOrderManager(QTreeWidgetItem*)), \
+            orderForm, SLOT(receiveClientInfo(QTreeWidgetItem*)));
     // 주문 관리 객체에서 정보를 받아올 제품의 id를 제품 관리 객체로 전달해줌
     connect(orderForm, SIGNAL(sendProductId(int)), \
             productForm, SLOT(receiveId(int)));
     // 제품 관리 객체에서 제품의 정보를 주문 관리 객체로 전달해줌
-    connect(productForm, SIGNAL(sendProductToManager(ProductItem*)), \
-            orderForm, SLOT(receiveProductInfo(ProductItem*)));
+    connect(productForm, SIGNAL(sendProductToManager(QTreeWidgetItem*)), \
+            orderForm, SLOT(receiveProductInfo(QTreeWidgetItem*)));
 
     // 고객 관리 객체에서 고객의 정보를 채팅 서버 객체로 전달해줌
     connect(clientForm, SIGNAL(sendClientToChatServer(int,QString)), \
