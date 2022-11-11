@@ -2,14 +2,12 @@
 #define ORDERMANAGERFORM_H
 
 #include <QWidget>
-#include <QMap>
-
-#include "orderitem.h"
 
 class QMenu;
 class ClientDialog;
 class ProductDialog;
-class ProductItem;
+class QTreeWidgetItem;
+class QSqlTableModel;
 
 namespace Ui {
 class OrderManagerForm;
@@ -24,7 +22,8 @@ class OrderManagerForm : public QWidget
 
 public:
     explicit OrderManagerForm(QWidget *parent = nullptr,
-                              ClientDialog *clientDialog = nullptr, ProductDialog *productDialog = nullptr);
+                              ClientDialog *clientDialog = nullptr,
+                              ProductDialog *productDialog = nullptr);
     ~OrderManagerForm();
 
     void loadData();  // 저장되어 있는 주문 리스트 불러오기
@@ -39,8 +38,8 @@ private slots:
     void on_addPushButton_clicked();          // 주문 추가 버튼 슬롯
     void on_modifyPushButton_clicked();       // 주문 정보 변경 버튼 슬롯
     void on_cleanPushButton_clicked();        // 입력 창 클리어 버튼 슬롯
-    // tree widget에서 주문을 클릭(선택)했을 때의 슬롯
-    void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
+    // tree view에서 제품을 클릭(선택)했을 때의 슬롯
+    void on_treeView_clicked(const QModelIndex &index);
 
     void showContextMenu(const QPoint &); // tree widget의 context 메뉴 출력
     void removeItem();                    // 주문 정보 삭제
@@ -54,6 +53,8 @@ signals:
     void sendClientId(int);
     // 제품 정보 관리 객체로 가져올 제품 정보에 대한 ID를 보내는 시그널
     void sendProductId(int);
+    void sendStatusMessage(QString, int);
+    void sendStock(int, int);
 
 private:
     int makeId();              // Id를 자동으로 생성
@@ -62,9 +63,9 @@ private:
     ClientDialog *clientDialog;   // 고객을 검색, 입력하기 위한 다이얼로그
     ProductDialog *productDialog; // 제품을 검색, 입력하기 위한 다이얼로그
 
-    QMap<int, OrderItem*> orderList; // 주문 리스트
     Ui::OrderManagerForm *ui;        // ui
     QMenu* menu;                     // tree widget context 메뉴
+    QSqlTableModel* orderModel;
 
     QTreeWidgetItem *searchedClient;   // 고객 정보 관리 객체로부터 가져온 고객
     QTreeWidgetItem *searchedProduct; // 제품 정보 관리 객체로부터 가져온 제품

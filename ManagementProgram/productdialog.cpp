@@ -16,7 +16,7 @@ ProductDialog::ProductDialog(QWidget *parent) :
     connect(ui->lineEdit, SIGNAL(returnPressed()),
             this, SLOT(on_searchPushButton_clicked()));
 
-    ui->searchPushButton->setFocus();
+    ui->searchPushButton->setDefault(true);
 }
 
 /**
@@ -31,13 +31,10 @@ ProductDialog::~ProductDialog()
 * @brief 제품 관리 객체로부터 검색 결과를 받는 슬롯
 * @param c 검색된 제품
 */
-void ProductDialog::receiveProductInfo(ProductItem * p)
+void ProductDialog::receiveProductInfo(QTreeWidgetItem * item)
 {
-//    /* 검색 결과를 tree widget에 추가 */
-//    ProductItem* product = new ProductItem(p->id(), p->getType(), \
-//                                           p->getName(), p->getPrice(), \
-//                                           p->getStock());
-//    ui->treeWidget->addTopLevelItem(product);
+    /* 검색 결과를 tree widget에 추가 */
+    ui->treeWidget->addTopLevelItem(item);
 }
 
 /**
@@ -67,5 +64,11 @@ void ProductDialog::on_searchPushButton_clicked()
     /* 검색을 위해 제품 관리 객체로 검색어를 전달하는 시그널 emit */
     ui->treeWidget->clear();
     emit sendWord(ui->lineEdit->text());
+}
+
+
+void ProductDialog::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    accept();
 }
 

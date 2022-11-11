@@ -1,7 +1,6 @@
 #include "clientmanagerform.h"
 #include "ui_clientmanagerform.h"
 
-#include <QFile>
 #include <QMenu>
 #include <QMessageBox>
 #include <QValidator>
@@ -59,7 +58,7 @@ void ClientManagerForm::loadData()
                     "id          INTEGER          PRIMARY KEY, "
                     "name        VARCHAR(30)      NOT NULL,"
                     "phoneNumber VARCHAR(20)      NOT NULL,"
-                    "address     VARCHAR(50)"
+                    "address     VARCHAR(100)"
                     " )"
                     );
 

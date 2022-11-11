@@ -27,6 +27,8 @@ private slots:
     void on_searchPushButton_clicked();   // 검색 버튼에 대한 슬롯
     void receiveClientInfo(QTreeWidgetItem *); // 고객 관리 객체로부터 검색 결과를 받는 슬롯
 
+    void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
 signals:
     // 검색을 위해 고객 관리 객체로 검색어를 전달하는 시그널
     void sendWord(QString);

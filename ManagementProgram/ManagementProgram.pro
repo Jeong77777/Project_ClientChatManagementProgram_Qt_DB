@@ -16,7 +16,6 @@ SOURCES += \
     logthread.cpp \
     main.cpp \
     mainwindow.cpp \
-    orderitem.cpp \
     ordermanagerform.cpp \
     productdialog.cpp \
     productmanagerform.cpp
@@ -28,7 +27,6 @@ HEADERS += \
     clientmanagerform.h \
     logthread.h \
     mainwindow.h \
-    orderitem.h \
     ordermanagerform.h \
     productdialog.h \
     productmanagerform.h

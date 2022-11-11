@@ -16,7 +16,7 @@ ClientDialog::ClientDialog(QWidget *parent) :
     connect(ui->lineEdit, SIGNAL(returnPressed()),
             this, SLOT(on_searchPushButton_clicked()));
 
-    ui->searchPushButton->setFocus();
+    ui->searchPushButton->setDefault(true);
 }
 
 /**
@@ -64,5 +64,11 @@ void ClientDialog::on_searchPushButton_clicked()
     /* 검색을 위해 고객 관리 객체로 검색어를 전달하는 시그널 emit */
     ui->treeWidget->clear();
     emit sendWord(ui->lineEdit->text());
+}
+
+
+void ClientDialog::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    accept();
 }
 

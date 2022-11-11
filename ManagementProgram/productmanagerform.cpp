@@ -1,7 +1,6 @@
 #include "productmanagerform.h"
 #include "ui_productmanagerform.h"
 
-#include <QFile>
 #include <QMenu>
 #include <QMessageBox>
 #include <QIntValidator>
@@ -58,8 +57,8 @@ void ProductManagerForm::loadData()
         QSqlQuery query(db);
         query.exec( "CREATE TABLE IF NOT EXISTS Product_list ("
                     "id          INTEGER          PRIMARY KEY, "
-                    "type        VARCHAR(30)      NOT NULL,"
-                    "name        VARCHAR(20)      NOT NULL,"
+                    "type        VARCHAR(20)      NOT NULL,"
+                    "name        VARCHAR(30)      NOT NULL,"
                     "price       INTEGER          NOT NULL,"
                     "stock       INTEGER          NOT NULL"
                     " )"
@@ -225,7 +224,7 @@ void ProductManagerForm::on_modifyPushButton_clicked()
         // 입력 창에 입력된 정보에 따라 제품 정보를 변경
         if(name.length() && price.length() && stock.length()) {
             QSqlQuery query(productModel->database());
-            query.prepare("UPDATE Client_list SET type = ?, name = ?, price = ?, stock = ?, WHERE id = ?");
+            query.prepare("UPDATE Product_list SET type = ?, name = ?, price = ?, stock = ? WHERE id = ?");
             query.bindValue(0, type);
             query.bindValue(1, name);
             query.bindValue(2, price);
@@ -277,7 +276,7 @@ void ProductManagerForm::removeItem()
 
     if(index.isValid()) {
         int id = productModel->data(index.siblingAtColumn(0)).toInt();
-        QString name = productModel->data(index.siblingAtColumn(1)).toString();
+        QString name = productModel->data(index.siblingAtColumn(2)).toString();
         productModel->removeRow(index.row());
         productModel->select();
         emit sendStatusMessage(tr("delete completed (ID: %1, Name: %2)").arg(id).arg(name), 3000);
@@ -319,27 +318,25 @@ void ProductManagerForm::receiveId(int id)
 * @Param QString word 검색어(id 또는 이름)
 */
 void ProductManagerForm::receiveWord(QString word)
-{ // 여기서부터 하기
+{
     QSqlQuery query(QString("select * "
                             "from Product_list "
                             "where id = '%1' "
-                            "or name LIKE '%%1%' "
-                            "or phoneNumber LIKE '%%1%' "
-                            "or address LIKE '%%1%';").arg(word),
+                            "or name LIKE '%%1%';").arg(word),
                     productModel->database());
     query.exec();
     while (query.next()) {
-        qDebug() << query.value(0).toInt();
         int id = query.value(0).toInt();
-        QString name = query.value(1).toString();
-        QString phone = query.value(2).toString();
-        QString address = query.value(3).toString();
-        qDebug() << id << name;
+        QString type = query.value(1).toString();
+        QString name = query.value(2).toString();
+        QString price = query.value(3).toString();
+        QString stock = query.value(4).toString();
         QTreeWidgetItem* item  = new QTreeWidgetItem;
         item->setText(0, QString::number(id));
-        item->setText(1, name);
-        item->setText(2, phone);
-        item->setText(3, address);
+        item->setText(1, type);
+        item->setText(2, name);
+        item->setText(3, price);
+        item->setText(4, stock);
         emit sendProductToDialog(item);
     }
 }
@@ -350,13 +347,18 @@ void ProductManagerForm::receiveWord(QString word)
 */
 int ProductManagerForm::makeId()
 {
-//    if(productList.size( ) == 0) {
-//        return 1001; // id는 1001부터 시작
-//    } else {
-//        auto id = productList.lastKey();
-//        return ++id; // 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
-//    }
-    return 0;
+    QSqlQuery query("select count(*), max(id) from Product_list;",
+                    productModel->database());
+    query.exec();
+    while (query.next()) {
+        if(query.value(0).toInt() == 0)
+            return 1001; // id는 1001부터 시작
+        else {
+            auto id = query.value(1).toInt();
+            return ++id; // 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
+        }
+    }
+    return 1;
 }
 
 /**
@@ -368,4 +370,33 @@ void ProductManagerForm::cleanInputLineEdit()
     ui->nameLineEdit->clear();
     ui->priceLineEdit->clear();
     ui->stockLineEdit->clear();
+}
+
+void ProductManagerForm::on_treeView_clicked(const QModelIndex &index)
+{
+    QString id = productModel->data(index.siblingAtColumn(0)).toString();
+    QString type = productModel->data(index.siblingAtColumn(1)).toString();
+    QString name = productModel->data(index.siblingAtColumn(2)).toString();
+    QString price = productModel->data(index.siblingAtColumn(3)).toString();
+    QString stock = productModel->data(index.siblingAtColumn(4)).toString();
+
+    /* 클릭된 제품의 정보를 입력 창에 표시해줌 */
+    ui->idLineEdit->setText(id);
+    ui->typeComboBox->setCurrentText(type);
+    ui->nameLineEdit->setText(name);
+    ui->priceLineEdit->setText(price);
+    ui->stockLineEdit->setText(stock);
+}
+
+void ProductManagerForm::setStock(int id, int stock)
+{
+    qDebug() << id<<stock<<"셋스톡";
+    if(stock >= 0) {
+    QSqlQuery query(productModel->database());
+    query.prepare("UPDATE Product_list SET stock = ? WHERE id = ?");
+    query.bindValue(0, stock);
+    query.bindValue(1, id);
+    query.exec();
+    productModel->select();
+    }
 }

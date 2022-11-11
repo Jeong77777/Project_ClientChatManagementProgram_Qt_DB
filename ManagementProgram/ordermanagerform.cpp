@@ -1,18 +1,21 @@
 #include "ordermanagerform.h"
 #include "ui_ordermanagerform.h"
-#include "orderitem.h"
 #include "clientdialog.h"
 #include "productdialog.h"
 
-#include <QFile>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlTableModel>
+//#include <QTreeWidgetItem>
 
 /**
 * @brief 생성자, split 사이즈 설정, 입력 칸 초기화, context 메뉴 설정, 검색 관련 초기 설정
 */
 OrderManagerForm::OrderManagerForm(QWidget *parent, \
-                                   ClientDialog *clientDialog, ProductDialog *productDialog) :
+                                   ClientDialog *clientDialog, \
+                                   ProductDialog *productDialog) :
     QWidget(parent), clientDialog(clientDialog), productDialog(productDialog),
     ui(new Ui::OrderManagerForm)
 {
@@ -36,8 +39,8 @@ OrderManagerForm::OrderManagerForm(QWidget *parent, \
     connect(removeAction, SIGNAL(triggered()), SLOT(removeItem()));
     menu = new QMenu; // context 메뉴
     menu->addAction(removeAction);
-    ui->treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->treeWidget, SIGNAL(customContextMenuRequested(QPoint)), \
+    ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), \
             this, SLOT(showContextMenu(QPoint)));
 
     /* 검색 창에서 enter 키를 누르면 검색 버튼이 클릭되도록 connect */
@@ -54,25 +57,31 @@ OrderManagerForm::OrderManagerForm(QWidget *parent, \
 */
 void OrderManagerForm::loadData()
 {
-    /* orderlist.txt 파일을 연다. */
-    QFile file("orderlist.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "orderConnection");
+    db.setDatabaseName("orderlist.db");
+    if (db.open( )) {
+        QSqlQuery query(db);
+        query.exec( "CREATE TABLE IF NOT EXISTS Order_list ("
+                    "id          INTEGER          PRIMARY KEY, "
+                    "date        DATE             NOT NULL,"
+                    "client      VARCHAR(50)      NOT NULL,"
+                    "product     VARCHAR(50)      NOT NULL,"
+                    "quantity    INTEGER          NOT NULL,"
+                    "total       INTEGER          NOT NULL"
+                    " )"
+                    );
 
-    /* parsing 후 주문 정보를 tree widget에 추가 */
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QList<QString> row = line.split(", ");
-        if(row.size()) {
-            int id = row[0].toInt();
-            OrderItem* o = new OrderItem(id, row[1], row[2].toInt(), row[3],
-                    row[4].toInt(), row[5], row[6].toInt(), row[7]);
-            ui->treeWidget->addTopLevelItem(o);
-            orderList.insert(id, o);
-        }
+        orderModel = new QSqlTableModel(this, db);
+        orderModel->setTable("Order_list");
+        orderModel->select();
+        orderModel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+        orderModel->setHeaderData(1, Qt::Horizontal, tr("Date"));
+        orderModel->setHeaderData(2, Qt::Horizontal, tr("Client"));
+        orderModel->setHeaderData(3, Qt::Horizontal, tr("Product"));
+        orderModel->setHeaderData(4, Qt::Horizontal, tr("Quantity"));
+        orderModel->setHeaderData(5, Qt::Horizontal, tr("Total"));
+        ui->treeView->setModel(orderModel);
     }
-    file.close( );
 }
 
 /**
@@ -81,22 +90,13 @@ void OrderManagerForm::loadData()
 OrderManagerForm::~OrderManagerForm()
 {
     delete ui;
-
-    /* orderlist.txt 파일을 연다. */
-    QFile file("orderlist.txt");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return;
-
-    /* 구분자를 ", "로 해서 주문 정보를 파일에 저장 */
-    QTextStream out(&file);
-    for (const auto& v : qAsConst(orderList)) {
-        OrderItem* o = v;
-        out << o->id() << ", " << o->getDate() << ", ";
-        out << o->getClinetId() << ", " << o->getClientName() << ", ";
-        out << o->getProductId() << ", " << o->getProductName() << ", ";
-        out << o->getQuantity() << ", " << o->getTotal() << "\n";
+    QSqlDatabase db = QSqlDatabase::database("orderConnection");
+    if(db.isOpen()) {
+        orderModel->submitAll();
+        delete orderModel;
+        db.commit();
+        db.close();
     }
-    file.close( );
 }
 
 
@@ -105,9 +105,8 @@ OrderManagerForm::~OrderManagerForm()
 */
 void OrderManagerForm::on_showAllPushButton_clicked()
 {
-    for (const auto& v : qAsConst(orderList)) {
-        v->setHidden(false);
-    }
+    orderModel->setFilter("");
+    orderModel->select();
     ui->searchLineEdit->clear(); // 검색 창 클리어
 }
 
@@ -137,10 +136,6 @@ void OrderManagerForm::on_searchPushButton_clicked()
     int i = ui->searchComboBox->currentIndex();
 
     /* 검색 수행 */
-    // 2 3: 대소문자 구분, 부분 일치 검색, 0 1: 대소문자 구분 검색
-    auto flag = (i >= 2)? Qt::MatchCaseSensitive|Qt::MatchContains
-                        : Qt::MatchCaseSensitive;
-
     QString str; // 검색어
     if(i != 1) { // ID, Client, Product
         str = ui->searchLineEdit->text();
@@ -154,14 +149,32 @@ void OrderManagerForm::on_searchPushButton_clicked()
     else         // Date
         str = ui->searchDateEdit->date().toString("yyyy-MM-dd");
 
-    // 검색
-    auto items = ui->treeWidget->findItems(str, flag, i);
+    switch (i) {
+    case 0: orderModel->setFilter(QString("id = '%1'").arg(str));
+        break;
+    case 1: orderModel->setFilter(QString("date = '%1'").arg(str));
+        break;
+    case 2: orderModel->setFilter(QString("client LIKE '%%1%'").arg(str));
+        break;
+    case 3: orderModel->setFilter(QString("product LIKE '%%1%'").arg(str));
+        break;
+    default:
+        break;
+    }
+    orderModel->select();
+    emit sendStatusMessage(tr("%1 search results were found").arg(orderModel->rowCount()), 3000);
 
-    /* 검색된 결과만 tree widget에 보여 주기*/
-    for (const auto& v : qAsConst(orderList))
-        v->setHidden(true);
-    foreach(auto i, items)
-        i->setHidden(false);
+    QString filterStr = "id in (";
+    for(int i = 0; i < orderModel->rowCount(); i++) {
+        int id = orderModel->data(orderModel->index(i, 0)).toInt();
+        if(i != orderModel->rowCount()-1)
+            filterStr += QString("%1, ").arg(id);
+        else
+            filterStr += QString("%1").arg(id);
+    }
+    filterStr += ");";
+    qDebug() << filterStr;
+    orderModel->setFilter(filterStr);
 
     ui->clientTreeWidget->clear();  // 고객 상세 정보 클리어
     ui->productTreeWidget->clear(); // 제품 상세 정보 클리어
@@ -191,18 +204,18 @@ void OrderManagerForm::on_inputClientPushButton_clicked()
 */
 void OrderManagerForm::on_inputProductPushButton_clicked()
 {
-//    /* 제품을 검색, 입력하기 위한 다이얼로그 실행 */
-//    productDialog->show();
+    /* 제품을 검색, 입력하기 위한 다이얼로그 실행 */
+    productDialog->show();
 
-//    if (productDialog->exec() == QDialog::Accepted) { // OK 버튼을 누르면
-//        // 다이얼로그에서 선택한 제품을 가져온다.
-//        ProductItem* p = dynamic_cast<ProductItem*>(productDialog->getCurrentItem());
-//        if(p!=nullptr) {
-//            // 주문 정보 입력 칸에 제품 ID와 이름을 입력한다.
-//            ui->productLineEdit->setText(QString::number(p->id()) + " (" + p->getName() + ")");
-//        }
-//    }
-//    productDialog->clearDialog(); // 다이얼로그 초기화
+    if (productDialog->exec() == QDialog::Accepted) { // OK 버튼을 누르면
+        // 다이얼로그에서 선택한 제품을 가져온다.
+        QTreeWidgetItem* p = productDialog->getCurrentItem();
+        if(p!=nullptr) {
+            // 주문 정보 입력 칸에 제품 ID와 이름을 입력한다.
+            ui->productLineEdit->setText(p->text(0) + " (" + p->text(2) + ")");
+        }
+    }
+    productDialog->clearDialog(); // 다이얼로그 초기화
 }
 
 /**
@@ -210,54 +223,67 @@ void OrderManagerForm::on_inputProductPushButton_clicked()
 */
 void OrderManagerForm::on_addPushButton_clicked()
 {
-//    /* 입력 창에 입력된 정보 가져오기 */
-//    QString date, clientName, productName, total;
-//    int id = makeId(); // 자동으로 ID 생성
-//    int clientId, productId, quantity;
-//    clientId = ui->clientLineEdit->text().split(" ")[0].toInt();
-//    productId = ui->productLineEdit->text().split(" ")[0].toInt();
-//    quantity = ui->quantitySpinBox->text().toInt();
-//    clientName = ui->clientLineEdit->text();
-//    productName = ui->productLineEdit->text();
-//    date = ui->dateEdit->date().toString("yyyy-MM-dd");
+    /* 입력 창에 입력된 정보 가져오기 */
+    QString date, clientName, productName, total;
+    int id = makeId(); // 자동으로 ID 생성
+    int clientId, productId, quantity;
+    clientId = ui->clientLineEdit->text().split(" ")[0].toInt();
+    productId = ui->productLineEdit->text().split(" ")[0].toInt();
+    quantity = ui->quantitySpinBox->text().toInt();
+    clientName = ui->clientLineEdit->text();
+    productName = ui->productLineEdit->text();
+    date = ui->dateEdit->date().toString("yyyy-MM-dd");
 
-//    // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
-//    emit sendClientId(clientId);
-//    // 제품ID를 이용해서 제품 정보 관리 객체로부터 제품 가져오기
-//    emit sendProductId(productId);
+    // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
+    emit sendClientId(clientId);
+    // 제품ID를 이용해서 제품 정보 관리 객체로부터 제품 가져오기
+    emit sendProductId(productId);
 
-//    /* 입력된 정보로 tree widget item을 생성하고 tree widget에 추가 */
-//    try {
-//        if(searchedClientFlag == false)                // 고객 정보가 존재하지 않을 때
-//            throw tr("Customer information does not exist.");
-//        else if(searchedProductFlag == false)          // 제품 정보가 존재하지 않을 때
-//            throw tr("Product information does not exist.");
-//        else if(quantity == 0)                         // 올바른 수량을 입력하지 않았을 때
-//            throw tr("Please enter a valid quantity.");
-//        else if(searchedProduct->getStock() < quantity) // 재고가 부족할 때
-//            throw tr("There is a shortage of stock.");
+    /* 입력된 정보를 DB에 추가 */
+    QSqlDatabase db = QSqlDatabase::database("orderConnection");
+    if(db.isOpen()) {
+        try {
+            if(searchedClientFlag == false)                // 고객 정보가 존재하지 않을 때
+                throw tr("Customer information does not exist.");
+            else if(searchedProductFlag == false)          // 제품 정보가 존재하지 않을 때
+                throw tr("Product information does not exist.");
+            else if(quantity == 0)                         // 올바른 수량을 입력하지 않았을 때
+                throw tr("Please enter a valid quantity.");
+            else if(searchedProduct->text(4).toInt() < quantity) // 재고가 부족할 때
+                throw tr("There is a shortage of stock.");
 
-//        // 주문 금액 계산
-//        total = QString::number(quantity * searchedProduct->getPrice());
+            // 주문 금액 계산
+            total = QString::number(quantity * searchedProduct->text(3).toInt());
 
-//        // order tree widget item 객체 생성
-//        OrderItem* o = new OrderItem(id, date, clientId, clientName,
-//                                     productId, productName, quantity, total);
-//        orderList.insert(id, o);            // 주문 리스트에 추가
-//        ui->treeWidget->addTopLevelItem(o); // tree widget에 추가
+            QSqlQuery query(orderModel->database());
+            query.prepare( "INSERT INTO Order_list "
+                           "(id, date, client, product, quantity, total) "
+                           "VALUES "
+                           "(:ID, :DATE, :CLIENT, :PRODUCT, :QUANTITY, :TOTAL)" );
+            query.bindValue(":ID",        id);
+            query.bindValue(":DATE",      date);
+            query.bindValue(":CLIENT",    clientName);
+            query.bindValue(":PRODUCT",   productName);
+            query.bindValue(":QUANTITY",  quantity);
+            query.bindValue(":TOTAL",     total);
+            query.exec();
+            orderModel->select();
 
-//        // 주문 수량만큼 제품의 재고 차감
-//        searchedProduct->setStock(searchedProduct->getStock() - quantity);
+            // 주문 수량만큼 제품의 재고 차감
+            emit sendStock(productId, searchedProduct->text(4).toInt() - quantity);
 
-//        cleanInputLineEdit(); // 입력 창 클리어
+            cleanInputLineEdit(); // 입력 창 클리어
 
-//    } catch (QString msg) { // 비어있는 입력 창이 있을 때
-//        QMessageBox::warning(this, tr("Add error"),
-//                                 QString(msg), QMessageBox::Ok);
-//    }
+            emit sendStatusMessage(tr("Modify completed (ID: %1, Client: %2, Product: %3)").arg(id).arg(clientName).arg(productName), 3000);
 
-//    searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
-//    searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
+        } catch (QString msg) { // 비어있는 입력 창이 있을 때
+            QMessageBox::warning(this, tr("Add error"),
+                                 QString(msg), QMessageBox::Ok);
+        }
+
+        searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
+        searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
+    }
 }
 
 /**
@@ -265,75 +291,76 @@ void OrderManagerForm::on_addPushButton_clicked()
 */
 void OrderManagerForm::on_modifyPushButton_clicked()
 {
-//    /* tree widget에서 현재 선택된 item 가져오기 */
-//    QTreeWidgetItem* item = ui->treeWidget->currentItem();
+    QModelIndex index = ui->treeView->currentIndex();
 
-//    /* 입력 창에 입력된 정보에 따라 주문 정보를 변경 */
-//    if(item != nullptr) {
-//        // ID를 이용하여 주문 리스트에서 주문 가져오기
-//        int key = item->text(0).toInt();
-//        OrderItem* o = orderList[key];
+    if(index.isValid()) {
+        int id = orderModel->data(index.siblingAtColumn(0)).toInt();
+        // 입력 창에 입력된 정보 가져오기
+        QString date, clientName, productName, total;
+        int clientId, productId, oldQuantity, newQuantity;
+        clientId = ui->clientLineEdit->text().split(" ")[0].toInt();
+        productId = ui->productLineEdit->text().split(" ")[0].toInt();
+        oldQuantity = orderModel->data(index.siblingAtColumn(4)).toInt();       // 변경 전 주문 수량
+        newQuantity = ui->quantitySpinBox->text().toInt(); // 변경 후 주문 수량
+        clientName = ui->clientLineEdit->text();
+        productName = ui->productLineEdit->text();
+        date = ui->dateEdit->date().toString("yyyy-MM-dd");
 
-//        // 입력 창에 입력된 정보 가져오기
-//        QString date, clientName, productName, total;
-//        int clientId, productId, oldQuantity, newQuantity;
-//        clientId = ui->clientLineEdit->text().split(" ")[0].toInt();
-//        productId = ui->productLineEdit->text().split(" ")[0].toInt();
-//        oldQuantity = o->getQuantity();                    // 변경 전 주문 수량
-//        newQuantity = ui->quantitySpinBox->text().toInt(); // 변경 후 주문 수량
-//        clientName = ui->clientLineEdit->text();
-//        productName = ui->productLineEdit->text();
-//        date = ui->dateEdit->date().toString("yyyy-MM-dd");
+        // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
+        emit sendClientId(clientId);
+        // 제품ID를 이용해서 제품 정보 관리 객체로부터 제품 가져오기
+        emit sendProductId(productId);
 
-//        // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
-//        emit sendClientId(clientId);
-//        // 제품ID를 이용해서 제품 정보 관리 객체로부터 제품 가져오기
-//        emit sendProductId(productId);
+        /* 입력 창에 입력된 정보에 따라 주문 정보를 변경 */
+        try {
+            if(searchedClientFlag == false)       // 고객 정보가 존재하지 않을 때
+                throw tr("Customer information does not exist.");
+            else if(searchedProductFlag == false) // 제품 정보가 존재하지 않을 때
+                throw tr("Product information does not exist.");
+            else if(newQuantity == 0)             // 올바른 수량을 입력하지 않았을 때
+                throw tr("Please enter a valid quantity.");
+            else if(searchedProduct->text(4).toInt() + oldQuantity \
+                    < newQuantity)                // 재고가 부족할 때
+                throw tr("There is a shortage of stock.\n") + tr("Maximum: ")
+                    + QString::number(searchedProduct->text(4).toInt() + oldQuantity);
 
-//        /* 입력 창에 입력된 정보에 따라 주문 정보를 변경 */
-//        try {
-//            if(searchedClientFlag == false)       // 고객 정보가 존재하지 않을 때
-//                throw tr("Customer information does not exist.");
-//            else if(searchedProductFlag == false) // 제품 정보가 존재하지 않을 때
-//                throw tr("Product information does not exist.");
-//            else if(newQuantity == 0)             // 올바른 수량을 입력하지 않았을 때
-//                throw tr("Please enter a valid quantity.");
-//            else if(searchedProduct->getStock() + oldQuantity \
-//                    < newQuantity)                // 재고가 부족할 때
-//                throw tr("There is a shortage of stock.\n") + tr("Maximum: ")
-//                    + QString::number(searchedProduct->getStock() + oldQuantity);
+            // 주문 금액 계산
+            total = QString::number(newQuantity * searchedProduct->text(3).toInt());
 
-//            // 주문 금액 계산
-//            total = QString::number(newQuantity * searchedProduct->getPrice());
+            // 주문 수량만큼 제품의 재고 차감
+            emit sendStock(productId, searchedProduct->text(4).toInt() + oldQuantity - newQuantity);
 
-//            // 주문 수량만큼 제품의 재고 차감
-//            searchedProduct->setStock(searchedProduct->getStock() + oldQuantity - newQuantity);
+            // 입력 창에 입력된 정보에 따라 주문 정보를 변경
+            QSqlQuery query(orderModel->database());
+            query.prepare("UPDATE Order_list SET date = ?, client = ?, product = ?, quantity = ? , total = ? WHERE id = ?");
+            query.bindValue(0, date);
+            query.bindValue(1, clientName);
+            query.bindValue(2, productName);
+            query.bindValue(3, newQuantity);
+            query.bindValue(4, total);
+            query.bindValue(5, id);
+            query.exec();
+            orderModel->select();
 
-//            // 입력 창에 입력된 정보에 따라 주문 정보를 변경
-//            o->setDate(date);
-//            o->setClientId(clientId);
-//            o->setClientName(clientName);
-//            o->setProductId(productId);
-//            o->setProductName(productName);
-//            o->setQuantity(newQuantity);
-//            o->setTotal(total);
-//            orderList[key] = o;
+            emit sendStatusMessage(tr("Modify completed (ID: %1, Client: %2, Product: %3)").arg(id).arg(clientName).arg(productName), 3000);
 
-//            searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
-//            searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
+            searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
+            searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
 
-//            // 주문 정보가 변경 됨에 따라
-//            // 고객, 제품 상세 정보 tree widget에 새로운 정보 표시를 위해서 다음의 함수 호출
-//            on_treeWidget_itemClicked(item, 0);
-//        }
-//        catch (QString msg) { // 비어있는 입력 창이 있을 때
-//            QMessageBox::warning(this, tr("Add error"),
-//                                     QString(msg), QMessageBox::Ok);
-//        }
+            // 주문 정보가 변경 됨에 따라
+            // 고객, 제품 상세 정보 tree widget에 새로운 정보 표시를 위해서 다음의 함수 호출
+            on_treeView_clicked(index);
 
-//        searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
-//        searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
-//    }
+            cleanInputLineEdit(); // 입력 창 클리어
+        }
+        catch (QString msg) { // 비어있는 입력 창이 있을 때
+            QMessageBox::warning(this, tr("Add error"),
+                                 QString(msg), QMessageBox::Ok);
+        }
+
+        searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
+        searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
+    }
 }
 
 /**
@@ -345,59 +372,15 @@ void OrderManagerForm::on_cleanPushButton_clicked()
 }
 
 /**
-* @brief tree widget에서 제품을 클릭(선택)했을 때 실행되는 슬롯
-* @brief 클릭된 제품의 정보를 입력 창에 표시, 고객, 제품 상세 정보 tree widget에 상세 정보 표시
-* @Param QTreeWidgetItem *item 클릭된 item
-* @Param int column 클릭된 item의 열
-*/
-void OrderManagerForm::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column)
-{
-    Q_UNUSED(column);
-
-    /* 클릭된 제품의 정보를 입력 창에 표시해줌 */
-    ui->idLineEdit->setText(item->text(0));
-    ui->dateEdit->setDate(QDate::fromString(item->text(1), "yyyy-MM-dd"));
-    ui->clientLineEdit->setText(item->text(2));
-    ui->productLineEdit->setText(item->text(3));
-    ui->quantitySpinBox->setValue(item->text(4).toInt());
-
-    searchedClientFlag = false;  // 고객 검색 결과 flag 초기화
-    searchedProductFlag = false; // 제품 검색 결과 flag 초기화
-
-    /* 고객, 제품 상세 정보 tree widget에 상세 정보 표시 */
-
-    // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
-    int clientId = ui->clientLineEdit->text().split(" ")[0].toInt();
-    emit sendClientId(clientId);
-    // 제품ID를 이용해서 제품 정보 관리 객체로부터 제품 가져오기
-    int productId = ui->productLineEdit->text().split(" ")[0].toInt();
-    emit sendProductId(productId);
-
-    ui->clientTreeWidget->clear();  // 고객 상세 정보 클리어
-    ui->productTreeWidget->clear(); // 제품 상세 정보 클리어
-
-    if(searchedClientFlag == true) { // 고객 정보가 존재할 때
-        // 고객 상세 정보 표시
-        ui->clientTreeWidget->addTopLevelItem(searchedClient);
-    }
-    if(searchedProductFlag == true) { // 제품 정보가 존재할 때
-        // 제품 상세 정보 표시
-        ui->productTreeWidget->addTopLevelItem(searchedProduct);
-    }
-
-    searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
-    searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
-}
-
-/**
-* @brief tree widget의 context 메뉴 출력
+* @brief tree view의 context 메뉴 출력
 * @param const QPoint &pos 우클릭한 위치
 */
 void OrderManagerForm::showContextMenu(const QPoint &pos)
 {
-    /* tree widget 위에서 우클릭한 위치에서 context menu 출력 */
-    QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
-    menu->exec(globalPos);
+    /* tree view 위에서 우클릭한 위치에서 context menu 출력 */
+    QPoint globalPos = ui->treeView->mapToGlobal(pos);
+    if(ui->treeView->indexAt(pos).isValid())
+        menu->exec(globalPos);
 }
 
 /**
@@ -405,33 +388,32 @@ void OrderManagerForm::showContextMenu(const QPoint &pos)
 */
 void OrderManagerForm::removeItem()
 {
-    /* tree widget에서 현재 선택된 item 가져오기 */
-    QTreeWidgetItem* item = ui->treeWidget->currentItem();
+    QModelIndex index = ui->treeView->currentIndex();
 
-    /* 고객 정보 삭제 */
-    if(item != nullptr) {
-
+    if(index.isValid()) {
         // 삭제된 재고를 다시 추가하기 위해서
         // 제품ID를 이용해서 제품 정보 관리 객체로부터 제품 가져오기
-        int productId = item->text(3).split(" ")[0].toInt();
+        int productId = orderModel->data(index.siblingAtColumn(3)).toString().split(" ")[0].toInt();
         emit sendProductId(productId);
         if(searchedProductFlag == true) { // 제품 정보가 존재할 때
             // OK를 누르면 삭제된 재고를 다시 추가
             if(QMessageBox::Yes == QMessageBox::information(this, tr("Order list remove"), \
                                                             tr("Do you want to re-add the deleted inventory?"), \
                                                             QMessageBox::Yes|QMessageBox::No))
-                ;//searchedProduct->setText(4, searchedProduct->text(4) + item->text(4).toInt());
+                emit sendStock(productId, searchedProduct->text(4).toInt() + orderModel->data(index.siblingAtColumn(4)).toInt());
+
         }
         searchedProductFlag = false; // 고객 검색 결과 flag를 다시 false로 변경
+        int id = orderModel->data(index.siblingAtColumn(0)).toInt();
+        QString client = orderModel->data(index.siblingAtColumn(2)).toString();
+        QString product = orderModel->data(index.siblingAtColumn(2)).toString();
+        orderModel->removeRow(index.row());
+        orderModel->select();
 
-        orderList.remove(item->text(0).toInt()); // 리스트에서 고객 정보 삭제
-        // tree widget에서 고객 정보 삭제
-        ui->treeWidget->takeTopLevelItem(ui->treeWidget->indexOfTopLevelItem(item));
-        delete item;
-
-        ui->treeWidget->update();       // tree widget update
         ui->clientTreeWidget->clear();  // 고객 상세 정보 클리어
         ui->productTreeWidget->clear(); // 제품 상세 정보 클리어
+
+        emit sendStatusMessage(tr("delete completed (ID: %1, Client: %2, Product: %3)").arg(id).arg(client).arg(product), 3000);
     }
 }
 
@@ -461,12 +443,18 @@ void OrderManagerForm::receiveProductInfo(QTreeWidgetItem* p)
 */
 int OrderManagerForm::makeId()
 {
-    if(orderList.size( ) == 0) {
-        return 1000001; // id는 1000001부터 시작
-    } else {
-        auto id = orderList.lastKey();
-        return ++id; // 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
+    QSqlQuery query("select count(*), max(id) from Order_list;",
+                    orderModel->database());
+    query.exec();
+    while (query.next()) {
+        if(query.value(0).toInt() == 0)
+            return 1000001; // id는 1000001부터 시작
+        else {
+            auto id = query.value(1).toInt();
+            return ++id; // 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
+        }
     }
+    return 1;
 }
 
 /**
@@ -479,4 +467,47 @@ void OrderManagerForm::cleanInputLineEdit()
     ui->clientLineEdit->clear();
     ui->productLineEdit->clear();
     ui->quantitySpinBox->clear();
+}
+
+void OrderManagerForm::on_treeView_clicked(const QModelIndex &index)
+{
+    QString id = orderModel->data(index.siblingAtColumn(0)).toString();
+    QString date = orderModel->data(index.siblingAtColumn(1)).toString();
+    QString client = orderModel->data(index.siblingAtColumn(2)).toString();
+    QString product = orderModel->data(index.siblingAtColumn(3)).toString();
+    int quantity = orderModel->data(index.siblingAtColumn(4)).toInt();
+
+    /* 클릭된 제품의 정보를 입력 창에 표시해줌 */
+    ui->idLineEdit->setText(id);
+    ui->dateEdit->setDate(QDate::fromString(date, "yyyy-MM-dd"));
+    ui->clientLineEdit->setText(client);
+    ui->productLineEdit->setText(product);
+    ui->quantitySpinBox->setValue(quantity);
+
+    searchedClientFlag = false;  // 고객 검색 결과 flag 초기화
+    searchedProductFlag = false; // 제품 검색 결과 flag 초기화
+
+    /* 고객, 제품 상세 정보 tree widget에 상세 정보 표시 */
+
+    // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
+    int clientId = client.split(" ")[0].toInt();
+    emit sendClientId(clientId);
+    // 제품ID를 이용해서 제품 정보 관리 객체로부터 제품 가져오기
+    int productId = product.split(" ")[0].toInt();
+    emit sendProductId(productId);
+
+    ui->clientTreeWidget->clear();  // 고객 상세 정보 클리어
+    ui->productTreeWidget->clear(); // 제품 상세 정보 클리어
+
+    if(searchedClientFlag == true) { // 고객 정보가 존재할 때
+        // 고객 상세 정보 표시
+        ui->clientTreeWidget->addTopLevelItem(searchedClient);
+    }
+    if(searchedProductFlag == true) { // 제품 정보가 존재할 때
+        // 제품 상세 정보 표시
+        ui->productTreeWidget->addTopLevelItem(searchedProduct);
+    }
+
+    searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
+    searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
 }

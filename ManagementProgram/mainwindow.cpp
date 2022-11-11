@@ -93,11 +93,14 @@ MainWindow::MainWindow(QWidget *parent)
     orderForm->loadData();
 
     connect(clientForm, SIGNAL(sendStatusMessage(QString,int)), \
-                this->statusBar(), SLOT(showMessage(const QString &,int)));
+            this->statusBar(), SLOT(showMessage(const QString &,int)));
     connect(productForm, SIGNAL(sendStatusMessage(QString,int)), \
-                this->statusBar(), SLOT(showMessage(const QString &,int)));
+            this->statusBar(), SLOT(showMessage(const QString &,int)));
     connect(orderForm, SIGNAL(sendStatusMessage(QString,int)), \
-                this->statusBar(), SLOT(showMessage(const QString &,int)));
+            this->statusBar(), SLOT(showMessage(const QString &,int)));
+
+    connect(orderForm, SIGNAL(sendStock(int,int)), \
+            productForm, SLOT(setStock(int,int)));
 }
 
 MainWindow::~MainWindow()
