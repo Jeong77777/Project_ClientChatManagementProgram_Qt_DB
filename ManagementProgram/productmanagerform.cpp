@@ -134,7 +134,7 @@ void ProductManagerForm::on_searchPushButton_clicked()
         str = ui->searchLineEdit->text();
         if(!str.length()) { // 검색 창이 비어 있을 때
             QMessageBox::warning(this, tr("Search error"),
-                                     tr("Please enter a search term."), QMessageBox::Ok);
+                                 tr("Please enter a search term."), QMessageBox::Ok);
             return;
         }
     }
@@ -298,18 +298,11 @@ void ProductManagerForm::receiveId(int id)
         int id = query.value(0).toInt();
         QString type = query.value(1).toString();
         QString name = query.value(2).toString();
-        QString price = query.value(3).toString();
-        QString stock = query.value(4).toString();
-
-        QTreeWidgetItem* item  = new QTreeWidgetItem;
-        item->setText(0, QString::number(id));
-        item->setText(1, type);
-        item->setText(2, name);
-        item->setText(3, price);
-        item->setText(4, stock);
+        int price = query.value(3).toInt();
+        int stock = query.value(4).toInt();
 
         //검색 결과를 주문 정보 관리 객체로 보냄
-        emit sendProductToManager(item);
+        emit sendProductToManager(id, type, name, price, stock);
     }
 }
 
@@ -329,15 +322,10 @@ void ProductManagerForm::receiveWord(QString word)
         int id = query.value(0).toInt();
         QString type = query.value(1).toString();
         QString name = query.value(2).toString();
-        QString price = query.value(3).toString();
-        QString stock = query.value(4).toString();
-        QTreeWidgetItem* item  = new QTreeWidgetItem;
-        item->setText(0, QString::number(id));
-        item->setText(1, type);
-        item->setText(2, name);
-        item->setText(3, price);
-        item->setText(4, stock);
-        emit sendProductToDialog(item);
+        int price = query.value(3).toInt();
+        int stock = query.value(4).toInt();
+
+        emit sendProductToDialog(id, type, name, price, stock);
     }
 }
 
@@ -390,13 +378,12 @@ void ProductManagerForm::on_treeView_clicked(const QModelIndex &index)
 
 void ProductManagerForm::setStock(int id, int stock)
 {
-    qDebug() << id<<stock<<"셋스톡";
     if(stock >= 0) {
-    QSqlQuery query(productModel->database());
-    query.prepare("UPDATE Product_list SET stock = ? WHERE id = ?");
-    query.bindValue(0, stock);
-    query.bindValue(1, id);
-    query.exec();
-    productModel->select();
+        QSqlQuery query(productModel->database());
+        query.prepare("UPDATE Product_list SET stock = ? WHERE id = ?");
+        query.bindValue(0, stock);
+        query.bindValue(1, id);
+        query.exec();
+        productModel->select();
     }
 }

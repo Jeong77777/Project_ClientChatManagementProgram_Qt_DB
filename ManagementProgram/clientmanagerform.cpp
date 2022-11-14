@@ -285,14 +285,8 @@ void ClientManagerForm::receiveId(int id)
         QString phone = query.value(2).toString();
         QString address = query.value(3).toString();
 
-        QTreeWidgetItem* item  = new QTreeWidgetItem;
-        item->setText(0, QString::number(id));
-        item->setText(1, name);
-        item->setText(2, phone);
-        item->setText(3, address);
-
         //검색 결과를 주문 정보 관리 객체로 보냄
-        emit sendClientToOrderManager(item);
+        emit sendClientToOrderManager(id, name, phone, address);
     }
 }
 
@@ -311,18 +305,12 @@ void ClientManagerForm::receiveWord(QString word)
                     clientModel->database());
     query.exec();
     while (query.next()) {
-        qDebug() << query.value(0).toInt();
         int id = query.value(0).toInt();
         QString name = query.value(1).toString();
         QString phone = query.value(2).toString();
         QString address = query.value(3).toString();
-        qDebug() << id << name;
-        QTreeWidgetItem* item  = new QTreeWidgetItem;
-        item->setText(0, QString::number(id));
-        item->setText(1, name);
-        item->setText(2, phone);
-        item->setText(3, address);
-        emit sendClientToDialog(item);
+
+        emit sendClientToDialog(id, name, phone, address);
     }
 }
 

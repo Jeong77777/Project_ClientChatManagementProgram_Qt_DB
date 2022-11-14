@@ -53,28 +53,28 @@ MainWindow::MainWindow(QWidget *parent)
     connect(clientDialog, SIGNAL(sendWord(QString)), \
             clientForm, SLOT(receiveWord(QString)));
     // 고객 관리 객체에서 검색 결과를 고객 검색 다이얼로그로 전달해줌
-    connect(clientForm, SIGNAL(sendClientToDialog(QTreeWidgetItem*)), \
-            clientDialog, SLOT(receiveClientInfo(QTreeWidgetItem*)));
+    connect(clientForm, SIGNAL(sendClientToDialog(int,QString,QString,QString)), \
+            clientDialog, SLOT(receiveClientInfo(int,QString,QString,QString)));
 
     // 제품 검색 다이얼로그에서 검색어를 제품 관리 객체로 전달해줌
     connect(productDialog, SIGNAL(sendWord(QString)), \
             productForm, SLOT(receiveWord(QString)));
     // 제품 관리 객체에서 검색 결과를 제품 검색 다이얼로그로 전달해줌
-    connect(productForm, SIGNAL(sendProductToDialog(QTreeWidgetItem*)), \
-            productDialog, SLOT(receiveProductInfo(QTreeWidgetItem*)));
+    connect(productForm, SIGNAL(sendProductToDialog(int,QString,QString,int,int)), \
+            productDialog, SLOT(receiveProductInfo(int,QString,QString,int,int)));
 
     // 주문 관리 객체에서 정보를 받아올 고객의 id를 고객 관리 객체로 전달해줌
     connect(orderForm, SIGNAL(sendClientId(int)), \
             clientForm, SLOT(receiveId(int)));
     // 고객 관리 객체에서 고객의 정보를 주문 관리 객체로 전달해줌
-    connect(clientForm, SIGNAL(sendClientToOrderManager(QTreeWidgetItem*)), \
-            orderForm, SLOT(receiveClientInfo(QTreeWidgetItem*)));
+    connect(clientForm, SIGNAL(sendClientToOrderManager(int,QString,QString,QString)), \
+            orderForm, SLOT(receiveClientInfo(int,QString,QString,QString)));
     // 주문 관리 객체에서 정보를 받아올 제품의 id를 제품 관리 객체로 전달해줌
     connect(orderForm, SIGNAL(sendProductId(int)), \
             productForm, SLOT(receiveId(int)));
     // 제품 관리 객체에서 제품의 정보를 주문 관리 객체로 전달해줌
-    connect(productForm, SIGNAL(sendProductToManager(QTreeWidgetItem*)), \
-            orderForm, SLOT(receiveProductInfo(QTreeWidgetItem*)));
+    connect(productForm, SIGNAL(sendProductToManager(int,QString,QString,int,int)), \
+            orderForm, SLOT(receiveProductInfo(int,QString,QString,int,int)));
 
     // 고객 관리 객체에서 고객의 정보를 채팅 서버 객체로 전달해줌
     connect(clientForm, SIGNAL(sendClientToChatServer(int,QString)), \

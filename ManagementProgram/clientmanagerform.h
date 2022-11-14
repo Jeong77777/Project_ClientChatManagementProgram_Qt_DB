@@ -4,7 +4,6 @@
 #include <QWidget>
 
 class QMenu;
-class QTreeWidgetItem;
 class QSqlTableModel;
 
 namespace Ui {
@@ -42,9 +41,9 @@ private slots:
 
 signals:
     // 고객 검색 Dialog로 검색된 고객 정보를 보내주는 시그널
-    void sendClientToDialog(QTreeWidgetItem*);
+    void sendClientToDialog(int, QString, QString, QString);
     // 주문 정보 관리 객체로 검색된 고객 정보를 보내주는 시그널
-    void sendClientToOrderManager(QTreeWidgetItem*);
+    void sendClientToOrderManager(int, QString, QString, QString);
     // 채팅 서버로 고객 정보를 보내주는 시그널
     void sendClientToChatServer(int, QString);
     void sendStatusMessage(QString, int);

@@ -6,8 +6,8 @@
 class QMenu;
 class ClientDialog;
 class ProductDialog;
-class QTreeWidgetItem;
 class QSqlTableModel;
+class QStandardItemModel;
 
 namespace Ui {
 class OrderManagerForm;
@@ -44,9 +44,9 @@ private slots:
     void showContextMenu(const QPoint &); // tree widget의 context 메뉴 출력
     void removeItem();                    // 주문 정보 삭제
     // 고객 정보 관리 객체로부터 고객 정보를 받기 위한 슬롯
-    void receiveClientInfo(QTreeWidgetItem*);
+    void receiveClientInfo(int, QString, QString, QString);
     // 제품 정보 관리 객체로부터 제품 정보를 받기 위한 슬롯
-    void receiveProductInfo(QTreeWidgetItem*);
+    void receiveProductInfo(int, QString, QString, int, int);
 
 signals:
     // 고객 정보 관리 객체로 가져올 고객 정보에 대한 ID를 보내는 시그널
@@ -67,8 +67,10 @@ private:
     QMenu* menu;                     // tree widget context 메뉴
     QSqlTableModel* orderModel;
 
-    QTreeWidgetItem *searchedClient;   // 고객 정보 관리 객체로부터 가져온 고객
-    QTreeWidgetItem *searchedProduct; // 제품 정보 관리 객체로부터 가져온 제품
+    //QTreeWidgetItem *searchedClient;   // 고객 정보 관리 객체로부터 가져온 고객
+    //QTreeWidgetItem *searchedProduct; // 제품 정보 관리 객체로부터 가져온 제품
+    QStandardItemModel *clientModel;
+    QStandardItemModel *productModel;
     bool searchedClientFlag;      // 고객 검색 결과 (결과가 있으면 true, 없으면 false)
     bool searchedProductFlag;     // 제품 검색 결과 (결과가 있으면 true, 없으면 false)
 };

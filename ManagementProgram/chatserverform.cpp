@@ -34,7 +34,7 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
     ui->splitter->setSizes(sizes);
 
     /* 고객 리스트 tree widget의 열 너비를 설정 */
-    ui->clientTreeWidget->QTreeView::setColumnWidth(0,80);
+    ui->clientTreeWidget->QTreeView::setColumnWidth(0,90);
     ui->clientTreeWidget->QTreeView::setColumnWidth(1,50);
     ui->clientTreeWidget->QTreeView::setColumnWidth(2,50);
 

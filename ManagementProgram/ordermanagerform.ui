@@ -294,6 +294,9 @@
       <layout class="QVBoxLayout" name="listVerticalLayout">
        <item>
         <widget class="QTreeView" name="treeView">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
          <property name="rootIsDecorated">
           <bool>false</bool>
          </property>
@@ -306,7 +309,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QTreeWidget" name="clientTreeWidget">
+           <widget class="QTreeView" name="clientTreeView">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -325,33 +328,16 @@
               <height>50</height>
              </size>
             </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
             <property name="rootIsDecorated">
              <bool>false</bool>
             </property>
-            <column>
-             <property name="text">
-              <string>ID</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Name</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Phone Number</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Address</string>
-             </property>
-            </column>
            </widget>
           </item>
           <item>
-           <widget class="QTreeWidget" name="productTreeWidget">
+           <widget class="QTreeView" name="productTreeView">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -370,34 +356,12 @@
               <height>50</height>
              </size>
             </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
             <property name="rootIsDecorated">
              <bool>false</bool>
             </property>
-            <column>
-             <property name="text">
-              <string notr="true">ID</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Type</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Name</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Unit Price</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Quntities in stock</string>
-             </property>
-            </column>
            </widget>
           </item>
          </layout>
