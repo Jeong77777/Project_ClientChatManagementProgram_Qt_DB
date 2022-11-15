@@ -46,11 +46,11 @@ void LogThread::saveData()
 
         QTextStream out(&file);
         foreach(auto item, itemList) {
-            out << item->text(0) << "|";
-            out << item->text(1) << "|";
-            out << item->text(2) << "|";
-            out << item->text(3) << "|";
-            out << item->text(4) << "|";
+            out << item->text(0) << " | ";
+            out << item->text(1) << " | ";
+            out << item->text(2) << " | ";
+            out << item->text(3) << " | ";
+            out << item->text(4) << " | ";
             out << item->text(5) << "\n";
         }
         file.close();

@@ -10,9 +10,7 @@
 LogThread::LogThread(int id, QString name, QObject *parent)
     : QThread{parent}
 {
-    filename = QString::number(id) + "_" + name + ".txt";
-    //QString format = "yyyyMMdd_hhmmss";
-    //filename = QString("log_%1.txt").arg(QDateTime::currentDateTime().toString(format));
+    filename = "log_" + QString::number(id) + "_" + name + ".txt";
 }
 
 /**

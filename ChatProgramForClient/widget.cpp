@@ -196,7 +196,7 @@ void Widget::receiveData( )
         ui->sentButton->setEnabled(true);
         ui->fileButton->setEnabled(true);
 
-        logThread->appendData(QString(data));
+        logThread->appendData(QString(data)+ " | " + QDateTime::currentDateTime().toString());
         break;
 
 
@@ -240,7 +240,8 @@ void Widget::sendData()
         ui->message->append("<font color=red>" + tr("Me") + "</font> : " + str);
         sendProtocol(Chat_Talk, bytearray.data());
 
-        logThread->appendData("<font color=red>" + tr("Me") + "</font> : " + str);
+        logThread->appendData("<font color=red>" + tr("Me") + "</font> : " + str \
+                              + " | " + QDateTime::currentDateTime().toString());
     }
 }
 
@@ -366,14 +367,17 @@ void Widget::goOnSend(qint64 numBytes)
 
 void Widget::loadData(int id, QString name)
 {
-    QFile file(QString::number(id)+"_"+name+".txt");
+    QFile file("log_" + QString::number(id)+"_"+name+".txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();
-        ui->message->append(line);
+        QList<QString> row = line.split(" | ");
+        if(row.size()) {
+            ui->message->append(row[0]);
+        }
     }
     file.close( );
     return;

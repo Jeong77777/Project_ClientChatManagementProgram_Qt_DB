@@ -101,6 +101,7 @@ ChatServerForm::~ChatServerForm()
 {
     delete ui;
 
+    logThread->saveData();
     logThread->terminate();
     chatServer->close( );
     fileServer->close( );

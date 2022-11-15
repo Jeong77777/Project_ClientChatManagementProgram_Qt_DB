@@ -1,6 +1,8 @@
 #include "chatwindowforadmin.h"
 #include "ui_chatwindowforadmin.h"
 
+#include <QDir>
+
 /**
 * @brief 생성자, 버튼,입력창 설정, 창 이름 설정
 */
@@ -13,6 +15,8 @@ ChatWindowForAdmin::ChatWindowForAdmin(QString id, QString name, QString state, 
     changeButtonAndEditState(state);
 
     setWindowTitle(clientId + " " + clientName + " | " + clientState);
+
+    loadChatLog();
 }
 
 /**
@@ -117,5 +121,46 @@ void ChatWindowForAdmin::changeButtonAndEditState(QString state)
         ui->inputLineEdit->setEnabled(true);
         ui->connectPushButton->setEnabled(true);
         ui->connectPushButton->setText(tr("Kick out"));
+    }
+}
+
+void ChatWindowForAdmin::loadChatLog()
+{
+    QString sPath = QDir::currentPath();
+    QString sExt = ".txt";
+    QString sWildcard = "*";
+    QStringList lFindList;
+    lFindList << "log_20" + sWildcard + sExt ;    // "log_20"으로 시작하는 txt 파일
+
+    QDir dir(sPath);
+    dir.setNameFilters(lFindList);
+    dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+
+    QFileInfoList lFileInfoList;
+    lFileInfoList = dir.entryInfoList();
+
+    for (int i = 0 ; i < lFileInfoList.count() ; i++) {
+        qDebug() <<lFileInfoList.at(i).absoluteFilePath();
+
+        QFile file(lFileInfoList.at(i).absoluteFilePath());
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            return;
+
+        QTextStream in(&file);
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            QList<QString> row = line.split(" | ");
+            if(row.size()) {
+                if(row[1].left(5) == clientId && row[3].contains("(8000)")) {
+                    QString data = "<font color=blue>" + clientName + "</font> : " + row[2];
+                    ui->messageTextEdit->append(data);
+                }
+                else if(row[1].left(5) == "10000" && row[4].left(5) == clientId) {
+                    QString data = "<font color=red>" + tr("Admin") + "</font> : " + row[2];
+                    ui->messageTextEdit->append(data);
+                }
+            }
+        }
+        file.close( );
     }
 }

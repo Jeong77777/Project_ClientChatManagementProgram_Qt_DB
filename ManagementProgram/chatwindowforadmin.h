@@ -30,6 +30,7 @@ signals:
 
 private:
     void changeButtonAndEditState(QString); // 고객의 상태에 따라 버튼과 입력 창을 변경
+    void loadChatLog();
 
     Ui::ChatWindowForAdmin *ui;
     QString clientId;
