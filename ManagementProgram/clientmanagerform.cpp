@@ -7,7 +7,6 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlTableModel>
-#include <QTreeWidgetItem>
 
 /**
 * @brief 생성자, split 사이즈 설정, 정규 표현식 설정, context 메뉴 설정
@@ -46,13 +45,15 @@ ClientManagerForm::ClientManagerForm(QWidget *parent) :
 }
 
 /**
-* @brief clientlist.txt 파일을 열어서 저장된 고객 리스트를 가져옴
+* @brief 고객 정보 데이터베이스 open
 */
 void ClientManagerForm::loadData()
 {
+    /* 고객 정보 데이터베이스 open */
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "clientConnection");
     db.setDatabaseName("clientlist.db");
     if (db.open( )) {
+        // 고객 정보 테이블 생성
         QSqlQuery query(db);
         query.exec( "CREATE TABLE IF NOT EXISTS Client_list ("
                     "id          INTEGER          PRIMARY KEY, "
@@ -62,6 +63,7 @@ void ClientManagerForm::loadData()
                     " )"
                     );
 
+        // model에 데이터 베이스를 가져옴
         clientModel = new QSqlTableModel(this, db);
         clientModel->setTable("Client_list");
         clientModel->select();
@@ -72,16 +74,16 @@ void ClientManagerForm::loadData()
         ui->treeView->setModel(clientModel);
     }
 
+    /* 채팅 서버로 고객 정보(id, 이름) 보냄 */
     for(int i = 0; i < clientModel->rowCount(); i++) {
         int id = clientModel->data(clientModel->index(i, 0)).toInt();
         QString name = clientModel->data(clientModel->index(i, 1)).toString();
-        // 채팅 서버로 고객 정보(id, 이름) 보냄
         emit sendClientToChatServer(id, name);
     }
 }
 
 /**
-* @brief 소멸자,
+* @brief 소멸자, 고객 정보 데이터베이스 저장하고 닫기
 */
 ClientManagerForm::~ClientManagerForm()
 {
@@ -100,7 +102,7 @@ ClientManagerForm::~ClientManagerForm()
 */
 void ClientManagerForm::on_showAllPushButton_clicked()
 {
-    clientModel->setFilter("");
+    clientModel->setFilter("");  // 필터 초기화
     clientModel->select();
     ui->searchLineEdit->clear(); // 검색 창 클리어
 }
@@ -135,8 +137,12 @@ void ClientManagerForm::on_searchPushButton_clicked()
         break;
     }
     clientModel->select();
-    emit sendStatusMessage(tr("%1 search results were found").arg(clientModel->rowCount()), 3000);
 
+    // status bar 메시지 출력
+    emit sendStatusMessage(tr("%1 search results were found")\
+                           .arg(clientModel->rowCount()), 3000);
+
+    /* 사용자 정보를 변경해도 검색 결과가 유지되도록 ID를 이용해서 필터 재설정 */
     QString filterStr = "id in (";
     for(int i = 0; i < clientModel->rowCount(); i++) {
         int id = clientModel->data(clientModel->index(i, 0)).toInt();
@@ -149,7 +155,6 @@ void ClientManagerForm::on_searchPushButton_clicked()
     qDebug() << filterStr;
     clientModel->setFilter(filterStr);
 }
-
 
 /**
 * @brief 고객 추가 버튼 슬롯, 입력 창에 입력된 정보에 따라 고객을 추가함
@@ -181,9 +186,11 @@ void ClientManagerForm::on_addPushButton_clicked()
         cleanInputLineEdit(); // 입력 창 클리어
 
         // 채팅 서버로 신규 고객 정보(id, 이름) 보냄
-        emit sendClientToChatServer(id, name); // 채팅 서버로
+        emit sendClientToChatServer(id, name);
 
-        emit sendStatusMessage(tr("Add completed (ID: %1, Name: %2)").arg(id).arg(name), 3000);
+        // status bar 메시지 출력
+        emit sendStatusMessage(tr("Add completed (ID: %1, Name: %2)")\
+                               .arg(id).arg(name), 3000);
     }
     else { // 비어있는 입력 창이 있을 때
         QMessageBox::warning(this, tr("Add error"),
@@ -197,9 +204,12 @@ void ClientManagerForm::on_addPushButton_clicked()
 */
 void ClientManagerForm::on_modifyPushButton_clicked()
 {
+    /* tree view에서 현재 선택된 고객의 index 가져오기 */
     QModelIndex index = ui->treeView->currentIndex();
 
+    /* 입력 창에 입력된 정보에 따라 고객 정보를 변경 */
     if(index.isValid()) {
+        // 입력 창에 입력된 정보 가져오기
         int id = clientModel->data(index.siblingAtColumn(0)).toInt();
         QString name, phone, address;
         name = ui->nameLineEdit->text();
@@ -209,7 +219,8 @@ void ClientManagerForm::on_modifyPushButton_clicked()
         // 입력 창에 입력된 정보에 따라 고객 정보를 변경
         if(name.length() && phone.length() && address.length()) {
             QSqlQuery query(clientModel->database());
-            query.prepare("UPDATE Client_list SET name = ?, phoneNumber = ?, address = ? WHERE id = ?");
+            query.prepare("UPDATE Client_list SET name = ?, "
+                          "phoneNumber = ?, address = ? WHERE id = ?");
             query.bindValue(0, name);
             query.bindValue(1, phone);
             query.bindValue(2, address);
@@ -222,6 +233,7 @@ void ClientManagerForm::on_modifyPushButton_clicked()
             //채팅 서버로 변경된 고객 정보(id, 이름) 보냄
             emit sendClientToChatServer(id, name);
 
+            // status bar 메시지 출력
             emit sendStatusMessage(tr("Modify completed (ID: %1, Name: %2)").arg(id).arg(name), 3000);
         }
         else { // 비어있는 입력 창이 있을 때
@@ -257,14 +269,22 @@ void ClientManagerForm::showContextMenu(const QPoint &pos)
 */
 void ClientManagerForm::removeItem()
 {
+    /* tree view에서 현재 선택된 고객의 index 가져오기 */
     QModelIndex index = ui->treeView->currentIndex();
 
+    /* 고객 정보 삭제 */
     if(index.isValid()) {
+        // 삭제된 고객 정보를 status bar에 출력해주기 위해서 id와 이름 가져오기
         int id = clientModel->data(index.siblingAtColumn(0)).toInt();
         QString name = clientModel->data(index.siblingAtColumn(1)).toString();
+
+        // 고객 정보 삭제
         clientModel->removeRow(index.row());
         clientModel->select();
-        emit sendStatusMessage(tr("delete completed (ID: %1, Name: %2)").arg(id).arg(name), 3000);
+
+        // status bar 메시지 출력
+        emit sendStatusMessage(tr("delete completed (ID: %1, Name: %2)")\
+                               .arg(id).arg(name), 3000);
     }
 }
 
@@ -274,6 +294,7 @@ void ClientManagerForm::removeItem()
 */
 void ClientManagerForm::receiveId(int id)
 {
+    /* 고객 ID를 이용하여 고객 검색 */
     QSqlQuery query(QString("select * "
                             "from Client_list "
                             "where id = '%1';").arg(id),
@@ -296,6 +317,7 @@ void ClientManagerForm::receiveId(int id)
 */
 void ClientManagerForm::receiveWord(QString word)
 {
+    /* 고객 ID 또는 이름을 이용하여 고객 검색 */
     QSqlQuery query(QString("select * "
                             "from Client_list "
                             "where id = '%1' "
@@ -310,6 +332,7 @@ void ClientManagerForm::receiveWord(QString word)
         QString phone = query.value(2).toString();
         QString address = query.value(3).toString();
 
+        //검색 결과를 고객 검색 Dialog로 보냄
         emit sendClientToDialog(id, name, phone, address);
     }
 }
@@ -320,15 +343,16 @@ void ClientManagerForm::receiveWord(QString word)
 */
 int ClientManagerForm::makeId()
 {
+    // id의 최댓값 가져오기
     QSqlQuery query("select count(*), max(id) from Client_list;",
                     clientModel->database());
     query.exec();
     while (query.next()) {
-        if(query.value(0).toInt() == 0)
-            return 10001;
-        else {
+        if(query.value(0).toInt() == 0) // 등록된 고객이 없을 경우
+            return 10001;               // id는 10001부터 시작
+        else {                          // 등록된 고객이 있을 경우
             auto id = query.value(1).toInt();
-            return ++id;
+            return ++id;                // 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
         }
     }
     return 1;
@@ -345,8 +369,13 @@ void ClientManagerForm::cleanInputLineEdit()
     ui->addressLineEdit->clear();
 }
 
+/**
+* @brief tree viewt에서 고객을 클릭(선택)했을 때 실행되는 슬롯, 클릭된 고객의 정보를 입력 창에 표시
+* @param const QModelIndex &index 선택된 고객의 index
+*/
 void ClientManagerForm::on_treeView_clicked(const QModelIndex &index)
 {
+    /* 클릭된 고객의 정보를 가져와서 입력 창에 표시해줌 */
     QString id = clientModel->data(index.siblingAtColumn(0)).toString();
     QString name = clientModel->data(index.siblingAtColumn(1)).toString();
     QString phoneNumber = clientModel->data(index.siblingAtColumn(2)).toString();
