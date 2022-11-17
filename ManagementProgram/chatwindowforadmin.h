@@ -12,7 +12,8 @@ class ChatWindowForAdmin : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChatWindowForAdmin(QString = "0", QString = "", QString = "", QWidget *parent = nullptr);
+    explicit ChatWindowForAdmin(QString = "0", QString = "", \
+                                QString = "", QWidget *parent = nullptr);
     ~ChatWindowForAdmin();
 
     void receiveMessage(QString);      // 고객으로부터 온 메시지를 표시
@@ -30,7 +31,7 @@ signals:
 
 private:
     void changeButtonAndEditState(QString); // 고객의 상태에 따라 버튼과 입력 창을 변경
-    void loadChatLog();
+    void loadChatLog();                     // 저장된 로그파일로부터 이전 채팅 내용을 불러옴
 
     Ui::ChatWindowForAdmin *ui;
     QString clientId;

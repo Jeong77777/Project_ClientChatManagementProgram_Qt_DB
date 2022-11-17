@@ -3,6 +3,7 @@
 #include "logthread.h"
 #include "chatwindowforadmin.h"
 
+#include <QList>
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QTcpServer>
@@ -435,8 +436,8 @@ void ChatServerForm::openChatWindow()
 
     if(false == clientIdWindowHash.contains(id)) { // 채팅창이 만들어져 있지 않으면 새로 만듦
         foreach(auto item, ui->clientTreeWidget->findItems(id, Qt::MatchFixedString, 1)) {
-                state = item->text(0);
-            }
+            state = item->text(0);
+        }
         ChatWindowForAdmin* w = new ChatWindowForAdmin(id, clientIdNameHash[id], state);
         clientIdWindowHash[id] = w;
         w->show();

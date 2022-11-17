@@ -63,7 +63,7 @@ void ClientManagerForm::loadData()
                     " )"
                     );
 
-        // model에 데이터 베이스를 가져옴
+        // model로 데이터 베이스를 가져옴
         clientModel = new QSqlTableModel(this, db);
         clientModel->setTable("Client_list");
         clientModel->select();
@@ -142,7 +142,7 @@ void ClientManagerForm::on_searchPushButton_clicked()
     emit sendStatusMessage(tr("%1 search results were found")\
                            .arg(clientModel->rowCount()), 3000);
 
-    /* 사용자 정보를 변경해도 검색 결과가 유지되도록 ID를 이용해서 필터 재설정 */
+    /* 사용자가 정보를 변경해도 검색 결과가 유지되도록 ID를 이용해서 필터 재설정 */
     QString filterStr = "id in (";
     for(int i = 0; i < clientModel->rowCount(); i++) {
         int id = clientModel->data(clientModel->index(i, 0)).toInt();
@@ -306,7 +306,7 @@ void ClientManagerForm::receiveId(int id)
         QString phone = query.value(2).toString();
         QString address = query.value(3).toString();
 
-        //검색 결과를 주문 정보 관리 객체로 보냄
+        // 검색 결과를 주문 정보 관리 객체로 보냄
         emit sendClientToOrderManager(id, name, phone, address);
     }
 }
@@ -332,7 +332,7 @@ void ClientManagerForm::receiveWord(QString word)
         QString phone = query.value(2).toString();
         QString address = query.value(3).toString();
 
-        //검색 결과를 고객 검색 Dialog로 보냄
+        // 검색 결과를 고객 검색 Dialog로 보냄
         emit sendClientToDialog(id, name, phone, address);
     }
 }
@@ -370,7 +370,7 @@ void ClientManagerForm::cleanInputLineEdit()
 }
 
 /**
-* @brief tree viewt에서 고객을 클릭(선택)했을 때 실행되는 슬롯, 클릭된 고객의 정보를 입력 창에 표시
+* @brief tree view에서 고객을 클릭(선택)했을 때 실행되는 슬롯, 클릭된 고객의 정보를 입력 창에 표시
 * @param const QModelIndex &index 선택된 고객의 index
 */
 void ClientManagerForm::on_treeView_clicked(const QModelIndex &index)

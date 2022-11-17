@@ -20,7 +20,7 @@ ClientDialog::ClientDialog(QWidget *parent) :
 
     ui->searchPushButton->setDefault(true);
 
-    /* client model */
+    /* 검색된 고객을 저장하는 model 초기화 */
     clientModel = new QStandardItemModel(0, 4);
     clientModel->setHeaderData(0, Qt::Horizontal, tr("ID"));
     clientModel->setHeaderData(1, Qt::Horizontal, tr("Name"));
@@ -39,9 +39,13 @@ ClientDialog::~ClientDialog()
 
 /**
 * @brief 고객 관리 객체로부터 검색 결과를 받는 슬롯
-* @param c 검색된 고객
+* @param int id 검색된 고객의 ID
+* @param QString name 이름
+* @param QString phone 전화번호
+* @param QString address 주소
 */
-void ClientDialog::receiveClientInfo(int id, QString name, QString phone, QString address)
+void ClientDialog::receiveClientInfo(int id, QString name, \
+                                     QString phone, QString address)
 {
     /* 검색 결과를 model에 추가 */
     QStringList strings;
@@ -56,8 +60,8 @@ void ClientDialog::receiveClientInfo(int id, QString name, QString phone, QStrin
 }
 
 /**
-* @brief 현재 선택된 고객 item을 반환
-* @return 현재 선택된 고객 item
+* @brief 현재 선택된 고객ID와 이름을 반환
+* @return 현재 선택된 고객ID(이름)
 */
 QString ClientDialog::getCurrentItem()
 {
@@ -79,7 +83,6 @@ void ClientDialog::clearDialog()
 {
     clientModel->removeRows(0, clientModel->rowCount());
     ui->lineEdit->clear();
-    ui->searchPushButton->setFocus();
 }
 
 /**
@@ -92,9 +95,12 @@ void ClientDialog::on_searchPushButton_clicked()
     emit sendWord(ui->lineEdit->text());
 }
 
+/**
+* @brief tree view에서 고객을 더블클릭 하였을 때의 슬롯
+*/
 void ClientDialog::on_treeView_doubleClicked(const QModelIndex &index)
 {
     Q_UNUSED(index)
+    // accept를 하면서 창을 닫는다
     accept();
 }
-

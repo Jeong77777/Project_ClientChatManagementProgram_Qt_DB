@@ -2,11 +2,9 @@
 #define CHATSERVERFORM_H
 
 #include <QWidget>
-#include <QList>
 #include <QHash>
 
 class QMenu;
-class QLabel;
 class QTcpServer;
 class QTcpSocket;
 class QFile;
