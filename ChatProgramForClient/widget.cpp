@@ -117,6 +117,7 @@ Widget::Widget(QWidget *parent)
         ui->connectButton->setText(tr("Log In"));
         ui->logOutButton->setDisabled(true);
 
+        // 채팅 로그 thread 종료
         if(logThread != nullptr) {
             logThread->saveData();
             logThread->terminate();
@@ -175,7 +176,9 @@ void Widget::receiveData( )
             ui->connectButton->setEnabled(true);
             ui->logOutButton->setEnabled(true);
 
+            // 이전 채팅 내용 불러오기
             loadData(ui->id->text().toInt(), ui->name->text());
+            // 채팅 로그 기록 thread 생성 및 시작
             logThread = new LogThread(ui->id->text().toInt(), ui->name->text());
             logThread->start();
         }
@@ -196,6 +199,7 @@ void Widget::receiveData( )
         ui->sentButton->setEnabled(true);
         ui->fileButton->setEnabled(true);
 
+        // 채팅 로그 기록 thread에 채팅 내용 추가
         logThread->appendData(QString(data)+ " | " + QDateTime::currentDateTime().toString());
         break;
 
@@ -240,6 +244,7 @@ void Widget::sendData()
         ui->message->append("<font color=red>" + tr("Me") + "</font> : " + str);
         sendProtocol(Chat_Talk, bytearray.data());
 
+        // 채팅 로그 기록 thread에 채팅 내용 추가
         logThread->appendData("<font color=red>" + tr("Me") + "</font> : " + str \
                               + " | " + QDateTime::currentDateTime().toString());
     }
@@ -254,6 +259,7 @@ void Widget::disconnect()
         QMessageBox::critical(this, tr("Chatting Client"), \
                               tr("Disconnect from Server"));
 
+    // 채팅 로그 thread 종료
     if(logThread != nullptr) {
         logThread->saveData();
         logThread->terminate();
@@ -290,7 +296,7 @@ void Widget::sendProtocol(Chat_Status type, char* data, int size)
 }
 
 /**
- * @brief // 관리자(서버)로 파일을 보내기 위한 슬롯
+ * @brief 관리자(서버)로 파일을 보내기 위한 슬롯
  */
 void Widget::sendFile()
 {
@@ -365,12 +371,19 @@ void Widget::goOnSend(qint64 numBytes)
     }
 }
 
+/**
+ * @brief 이전 채팅 내용 불러오기
+ * @param int id 고객ID
+ * @param QString name 이름
+ */
 void Widget::loadData(int id, QString name)
 {
+    // 로그 파일 검색 log_(ID)_(이름).txt
     QFile file("log_" + QString::number(id)+"_"+name+".txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
+    // 이전 채팅 내용 불러오기
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();

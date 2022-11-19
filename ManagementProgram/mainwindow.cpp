@@ -80,6 +80,20 @@ MainWindow::MainWindow(QWidget *parent)
     connect(clientForm, SIGNAL(sendClientToChatServer(int,QString)), \
             chatForm, SLOT(addClient(int,QString)));
 
+    // 고객 관리 객체에서 mainwindow의 status bar에 메시지를 표시해줌
+    connect(clientForm, SIGNAL(sendStatusMessage(QString,int)), \
+            this->statusBar(), SLOT(showMessage(const QString &,int)));
+    // 제품 관리 객체에서 mainwindow의 status bar에 메시지를 표시해줌
+    connect(productForm, SIGNAL(sendStatusMessage(QString,int)), \
+            this->statusBar(), SLOT(showMessage(const QString &,int)));
+    // 주문 관리 객체에서 mainwindow의 status bar에 메시지를 표시해줌
+    connect(orderForm, SIGNAL(sendStatusMessage(QString,int)), \
+            this->statusBar(), SLOT(showMessage(const QString &,int)));
+
+    // 주문 관리 객체에서 제품 관리 객체를 통해 재고수량을 변경함
+    connect(orderForm, SIGNAL(sendStock(int,int)), \
+            productForm, SLOT(setStock(int,int)));
+
     /* Mdi Area 설정 */
     QMdiSubWindow *cw = ui->mdiArea->addSubWindow(clientForm);
     ui->mdiArea->addSubWindow(productForm);
@@ -92,15 +106,8 @@ MainWindow::MainWindow(QWidget *parent)
     productForm->loadData();
     orderForm->loadData();
 
-    connect(clientForm, SIGNAL(sendStatusMessage(QString,int)), \
-            this->statusBar(), SLOT(showMessage(const QString &,int)));
-    connect(productForm, SIGNAL(sendStatusMessage(QString,int)), \
-            this->statusBar(), SLOT(showMessage(const QString &,int)));
-    connect(orderForm, SIGNAL(sendStatusMessage(QString,int)), \
-            this->statusBar(), SLOT(showMessage(const QString &,int)));
 
-    connect(orderForm, SIGNAL(sendStock(int,int)), \
-            productForm, SLOT(setStock(int,int)));
+
 }
 
 MainWindow::~MainWindow()

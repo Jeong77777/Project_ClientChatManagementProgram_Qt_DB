@@ -12,6 +12,9 @@ class ProductManagerForm;
 class OrderManagerForm;
 class ChatServerForm;
 
+/**
+ * @brief MainWindow 클래스
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -28,10 +31,10 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    ClientManagerForm *clientForm;
-    ProductManagerForm *productForm;
-    OrderManagerForm *orderForm;
-    ChatServerForm *chatForm;
+    ClientManagerForm *clientForm;      // 고객 정보 관리
+    ProductManagerForm *productForm;    // 제품 정보 관리
+    OrderManagerForm *orderForm;        // 주문 정보 관리
+    ChatServerForm *chatForm;           // 채팅 서버
 
 };
 #endif // MAINWINDOW_H

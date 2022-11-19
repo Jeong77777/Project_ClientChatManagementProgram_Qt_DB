@@ -27,7 +27,7 @@ void LogThread::run()
 
 /**
  * @brief 새로운 채팅 추가
- * @Param 로그 tree widget item
+ * @Param QTreeWidgetItem* item 로그 tree widget item
  */
 void LogThread::appendData(QTreeWidgetItem* item)
 {

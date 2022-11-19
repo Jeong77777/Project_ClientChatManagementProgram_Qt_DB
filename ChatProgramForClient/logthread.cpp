@@ -1,7 +1,6 @@
 #include "logthread.h"
 
 #include <QFile>
-//#include <QDateTime>
 #include <QTextStream>
 
 /**
@@ -26,7 +25,7 @@ void LogThread::run()
 
 /**
  * @brief 새로운 채팅 추가
- * @Param 로그 tree widget item
+ * @Param QString data 채팅 내용
  */
 void LogThread::appendData(QString data)
 {

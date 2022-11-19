@@ -34,9 +34,9 @@ private:
     void loadChatLog();                     // 저장된 로그파일로부터 이전 채팅 내용을 불러옴
 
     Ui::ChatWindowForAdmin *ui;
-    QString clientId;
-    QString clientName;
-    QString clientState;
+    QString clientId;       // 고객 ID
+    QString clientName;     // 고객 이름
+    QString clientState;    // 고객 상태
 };
 
 #endif // CHATWINDOWFORADMIN_H

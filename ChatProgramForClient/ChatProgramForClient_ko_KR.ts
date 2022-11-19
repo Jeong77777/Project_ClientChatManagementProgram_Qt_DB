@@ -40,10 +40,10 @@
     </message>
     <message>
         <location filename="widget.ui" line="155"/>
-        <location filename="widget.cpp" line="84"/>
-        <location filename="widget.cpp" line="112"/>
-        <location filename="widget.cpp" line="229"/>
-        <location filename="widget.cpp" line="239"/>
+        <location filename="widget.cpp" line="89"/>
+        <location filename="widget.cpp" line="117"/>
+        <location filename="widget.cpp" line="258"/>
+        <location filename="widget.cpp" line="274"/>
         <source>Log In</source>
         <translation>로그인</translation>
     </message>
@@ -63,57 +63,58 @@
         <translation>보내기</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="31"/>
+        <location filename="widget.cpp" line="34"/>
         <source>Chat Program for Client</source>
         <translation>고객용 채팅 프로그램</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="94"/>
-        <location filename="widget.cpp" line="102"/>
-        <location filename="widget.cpp" line="160"/>
-        <location filename="widget.cpp" line="189"/>
+        <location filename="widget.cpp" line="99"/>
+        <location filename="widget.cpp" line="107"/>
+        <location filename="widget.cpp" line="175"/>
+        <location filename="widget.cpp" line="214"/>
         <source>Chat in</source>
         <translation>채팅 참여</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="96"/>
-        <location filename="widget.cpp" line="100"/>
-        <location filename="widget.cpp" line="200"/>
+        <location filename="widget.cpp" line="101"/>
+        <location filename="widget.cpp" line="105"/>
+        <location filename="widget.cpp" line="225"/>
         <source>Chat Out</source>
         <translation>채팅 나가기</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="165"/>
-        <location filename="widget.cpp" line="183"/>
-        <location filename="widget.cpp" line="194"/>
-        <location filename="widget.cpp" line="230"/>
+        <location filename="widget.cpp" line="187"/>
+        <location filename="widget.cpp" line="208"/>
+        <location filename="widget.cpp" line="219"/>
+        <location filename="widget.cpp" line="259"/>
         <source>Chatting Client</source>
-        <translation></translation>
+        <translation>고객 채팅</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="166"/>
+        <location filename="widget.cpp" line="188"/>
         <source>Login failed.
 Customer information is invalid.</source>
         <translation>로그인 실패
 고객 정보가 유효하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="184"/>
+        <location filename="widget.cpp" line="209"/>
         <source>Kick out from Server</source>
         <translation>서버로 부터 강퇴되었습니다.</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="195"/>
+        <location filename="widget.cpp" line="220"/>
         <source>Invited from Server</source>
         <translation>서버로 부터 초대되었습니다.</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="219"/>
+        <location filename="widget.cpp" line="244"/>
+        <location filename="widget.cpp" line="248"/>
         <source>Me</source>
         <translation>나</translation>
     </message>
     <message>
-        <location filename="widget.cpp" line="231"/>
+        <location filename="widget.cpp" line="260"/>
         <source>Disconnect from Server</source>
         <translation>서버와의 연결이 끊겼습니다.</translation>
     </message>

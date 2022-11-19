@@ -50,7 +50,7 @@ private:
     Ui::Widget *ui;
 
     void closeEvent(QCloseEvent*) override;
-    void loadData(int, QString);
+    void loadData(int, QString);     // 이전 채팅 내용 불러오기
 
     QTcpSocket *clientSocket;		 // 채팅을 위한 소켓
     QTcpSocket *fileClient;          // 파일 전송을 위한 소켓
