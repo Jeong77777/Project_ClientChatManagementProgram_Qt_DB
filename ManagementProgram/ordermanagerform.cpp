@@ -300,7 +300,7 @@ void OrderManagerForm::on_addPushButton_clicked()
 
             cleanInputLineEdit(); // 입력 창 클리어
 
-            emit sendStatusMessage(tr("Modify completed (ID: %1, Client: %2, Product: %3)") \
+            emit sendStatusMessage(tr("Add completed (ID: %1, Client: %2, Product: %3)") \
                                    .arg(id).arg(clientName).arg(productName), 3000);
 
         } catch (QString msg) { // 비어있는 입력 창이 있을 때

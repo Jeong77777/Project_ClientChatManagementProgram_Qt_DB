@@ -585,6 +585,10 @@
     </message>
     <message>
         <location filename="ordermanagerform.cpp" line="303"/>
+        <source>Add completed (ID: %1, Client: %2, Product: %3)</source>
+        <translation>추가 완료 (ID: %1, 고객: %2, 제품: %3)</translation>
+    </message>
+    <message>
         <location filename="ordermanagerform.cpp" line="387"/>
         <source>Modify completed (ID: %1, Client: %2, Product: %3)</source>
         <translation>변경 완료 (ID: %1, 고객: %2, 제품: %3)</translation>
