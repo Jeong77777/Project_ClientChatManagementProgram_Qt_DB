@@ -7,7 +7,7 @@
  * @brief 생성자, 로그를 저장하는 파일 이름 설정
  */
 LogThread::LogThread(int id, QString name, QObject *parent)
-    : QThread{parent}
+    : QThread{parent}, filename("")
 {
     filename = "log_" + QString::number(id) + "_" + name + ".txt";
 }
