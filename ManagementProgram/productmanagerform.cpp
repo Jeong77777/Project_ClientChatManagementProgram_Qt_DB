@@ -13,7 +13,8 @@
 */
 ProductManagerForm::ProductManagerForm(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ProductManagerForm)
+    ui(new Ui::ProductManagerForm),
+    menu(nullptr), productModel(nullptr)
 {
     ui->setupUi(this);
 
