@@ -32,7 +32,7 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    const int PORT_NUMBER = 8000;
+    const int PORT_NUMBER;
 
     Widget(QWidget *parent = nullptr);
     ~Widget();

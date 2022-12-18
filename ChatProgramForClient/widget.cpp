@@ -26,8 +26,11 @@
  * @brief 생성자, 소켓 설정, 버튼 설정, 입력 창 설정
  */
 Widget::Widget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Widget), isSent(false)
+    : QWidget(parent), PORT_NUMBER(8000),
+      ui(new Ui::Widget),
+      clientSocket(nullptr), fileClient(nullptr), progressDialog(nullptr),
+      file(nullptr), loadSize(0), byteToWrite(0), totalSize(0), outBlock(),
+      isSent(false), logThread(nullptr)
 {
     ui->setupUi(this);
 
