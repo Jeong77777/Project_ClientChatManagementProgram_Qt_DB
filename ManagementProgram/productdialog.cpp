@@ -8,7 +8,7 @@
 */
 ProductDialog::ProductDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ProductDialog)
+    ui(new Ui::ProductDialog), productModel(nullptr)
 {
     ui->setupUi(this);
 
