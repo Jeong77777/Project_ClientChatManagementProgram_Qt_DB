@@ -12,8 +12,8 @@
 
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    : QMainWindow(parent), ui(new Ui::MainWindow),
+      clientForm(nullptr), productForm(nullptr), orderForm(nullptr), chatForm(nullptr)
 {
     ui->setupUi(this);
 
