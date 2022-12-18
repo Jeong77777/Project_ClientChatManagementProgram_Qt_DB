@@ -18,14 +18,12 @@ OrderManagerForm::OrderManagerForm(QWidget *parent, \
                                    ClientDialog *clientDialog, \
                                    ProductDialog *productDialog) :
     QWidget(parent), clientDialog(clientDialog), productDialog(productDialog),
-    ui(new Ui::OrderManagerForm)
+    ui(new Ui::OrderManagerForm), menu(nullptr), orderModel(nullptr),
+    clientModel(nullptr), productModel(nullptr),
+    searchedClientFlag(false), searchedProductFlag(false)
 {
     ui->setupUi(this);
     ui->searchDateEdit->setDate(QDate::currentDate());
-
-    /* 검색 결과를 저장하는 flag 초기화 */
-    searchedClientFlag = false;
-    searchedProductFlag = false;
 
     /* 입력 창 초기화 */
     cleanInputLineEdit();
