@@ -8,7 +8,7 @@
 */
 ClientDialog::ClientDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ClientDialog)
+    ui(new Ui::ClientDialog), clientModel(nullptr)
 {
     ui->setupUi(this);
 
