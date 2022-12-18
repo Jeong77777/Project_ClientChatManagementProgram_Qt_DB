@@ -13,7 +13,8 @@
 */
 ClientManagerForm::ClientManagerForm(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ClientManagerForm)
+    ui(new Ui::ClientManagerForm),
+    menu(nullptr), clientModel(nullptr)
 {
     ui->setupUi(this);
 
