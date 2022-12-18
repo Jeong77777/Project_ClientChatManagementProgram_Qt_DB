@@ -64,8 +64,8 @@ private slots:
     void on_clientTreeWidget_customContextMenuRequested(const QPoint &pos);
 
 private:
-    const int BLOCK_SIZE = 1024;  // 블록 사이즈
-    const int PORT_NUMBER = 8000; // 채팅을 위한 port number
+    const int BLOCK_SIZE;  // 블록 사이즈
+    const int PORT_NUMBER; // 채팅을 위한 port number
 
     // 고객에게 로그인 결과를 전송
     void sendLoginResult(QTcpSocket*, const char*);

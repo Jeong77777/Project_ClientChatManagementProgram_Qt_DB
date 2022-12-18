@@ -24,8 +24,11 @@
 * @brief log thread 생성
 */
 ChatServerForm::ChatServerForm(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ChatServerForm), totalSize(0), byteReceived(0)
+    QWidget(parent), BLOCK_SIZE(1024), PORT_NUMBER(8000),
+    ui(new Ui::ChatServerForm),
+    chatServer(nullptr), fileServer(nullptr),
+    menu(nullptr), file(nullptr), progressDialog(nullptr),
+    totalSize(0), byteReceived(0), inBlock(0), logThread(nullptr)
 {
     ui->setupUi(this);
 
