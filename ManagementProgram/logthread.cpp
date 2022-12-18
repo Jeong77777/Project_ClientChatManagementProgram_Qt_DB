@@ -8,7 +8,7 @@
  * @brief 생성자, 로그를 저장하는 파일 이름 설정
  */
 LogThread::LogThread(QObject *parent)
-    : QThread{parent}
+    : QThread{parent}, filename("")
 {
     QString format = "yyyyMMdd_hhmmss";
     filename = QString("log_%1.txt").arg(QDateTime::currentDateTime().toString(format));
