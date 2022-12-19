@@ -15,8 +15,8 @@ ProductDialog::ProductDialog(QWidget *parent) :
     setWindowTitle(tr("Product Info"));
     setWindowModality(Qt::ApplicationModal);
 
-    connect(ui->lineEdit, SIGNAL(returnPressed()),
-            this, SLOT(on_searchPushButton_clicked()));
+    assert(connect(ui->lineEdit, SIGNAL(returnPressed()),
+            this, SLOT(on_searchPushButton_clicked())));
 
     ui->searchPushButton->setDefault(true);
 
