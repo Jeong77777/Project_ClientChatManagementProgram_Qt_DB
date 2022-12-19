@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QProgressDialog>
+#include <cassert>
 
 
 /**
@@ -44,7 +45,7 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
 
     /* 채팅 서버 생성 */
     chatServer = new QTcpServer(this); // tcpserver를 만들어줌
-    connect(chatServer, SIGNAL(newConnection()), SLOT(clientConnect()));
+    assert(connect(chatServer, SIGNAL(newConnection()), SLOT(clientConnect())));
     if (!chatServer->listen(QHostAddress::Any, PORT_NUMBER)) {
         QMessageBox::critical(this, tr("Chatting Server"), \
                               tr("Unable to start the server: %1.") \
@@ -55,7 +56,7 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
 
     /* 파일 서버 생성 */
     fileServer = new QTcpServer(this);
-    connect(fileServer, SIGNAL(newConnection()), SLOT(acceptConnection()));
+    assert(connect(fileServer, SIGNAL(newConnection()), SLOT(acceptConnection())));
     if (!fileServer->listen(QHostAddress::Any, PORT_NUMBER+1)) {
         QMessageBox::critical(this, tr("Chatting Server"), \
                               tr("Unable to start the server: %1.") \
@@ -69,14 +70,14 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
     /* 고객 리스트 tree widget의 context 메뉴 설정 */
     QAction* openAction = new QAction(tr("Open chat window"));
     openAction->setObjectName("Open");
-    connect(openAction, SIGNAL(triggered()), SLOT(openChatWindow()));
+    assert(connect(openAction, SIGNAL(triggered()), SLOT(openChatWindow())));
 
     QAction* inviteAction = new QAction(tr("Invite"));
     inviteAction->setObjectName("Invite");
-    connect(inviteAction, SIGNAL(triggered()), SLOT(inviteClient()));
+    assert(connect(inviteAction, SIGNAL(triggered()), SLOT(inviteClient())));
 
     QAction* kickOutAction = new QAction(tr("Kick out"));
-    connect(kickOutAction, SIGNAL(triggered()), SLOT(kickOut()));
+    assert(connect(kickOutAction, SIGNAL(triggered()), SLOT(kickOut())));
 
     menu = new QMenu;
     menu->addAction(openAction);
@@ -93,7 +94,7 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
     logThread = new LogThread(this);
     logThread->start();
     // save 버튼을 누르면 logThread에서 로그가 저장되도록 connect
-    connect(ui->savePushButton, SIGNAL(clicked()), logThread, SLOT(saveData()));
+    assert(connect(ui->savePushButton, SIGNAL(clicked()), logThread, SLOT(saveData())));
 
     qDebug() << tr("The server is running on port %1.").arg(chatServer->serverPort( ));
 }
@@ -148,7 +149,7 @@ void ChatServerForm::acceptConnection()
 
     QTcpSocket* receivedSocket = fileServer->nextPendingConnection();
     // 파일을 수신하면 읽어들일 수 있도록 connect
-    connect(receivedSocket, SIGNAL(readyRead()), this, SLOT(readClient()));
+    assert(connect(receivedSocket, SIGNAL(readyRead()), this, SLOT(readClient())));
 }
 
 /**
@@ -241,9 +242,9 @@ void ChatServerForm::clientConnect( )
 {
     QTcpSocket *clientConnection = chatServer->nextPendingConnection();
     // 메시지가 오면 읽어들일 수 있도록 connect
-    connect(clientConnection, SIGNAL(readyRead()), SLOT(receiveData()));
+    assert(connect(clientConnection, SIGNAL(readyRead()), SLOT(receiveData())));
     // 연결이 끊어지면 고객의 상태를 offline으로 변경하도록 connect
-    connect(clientConnection, SIGNAL(disconnected()), SLOT(removeClient()));
+    assert(connect(clientConnection, SIGNAL(disconnected()), SLOT(removeClient())));
     qDebug("new connection is established...");
 }
 
@@ -302,9 +303,9 @@ void ChatServerForm::receiveData( )
                     else { // 채팅창이 만들어져 있지 않으면 새로 만들고 설정
                         ChatWindowForAdmin* w = new ChatWindowForAdmin(id, name, tr("Online"));
                         clientIdWindowHash[id] = w;
-                        connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString)));
-                        connect(w, SIGNAL(inviteClient(QString)), this, SLOT(inviteClientInChatWindow(QString)));
-                        connect(w, SIGNAL(kickOutClient(QString)), this, SLOT(kickOutInChatWindow(QString)));
+                        assert(connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString))));
+                        assert(connect(w, SIGNAL(inviteClient(QString)), this, SLOT(inviteClientInChatWindow(QString))));
+                        assert(connect(w, SIGNAL(kickOutClient(QString)), this, SLOT(kickOutInChatWindow(QString))));
                     }
                     return;
                 }
@@ -444,9 +445,9 @@ void ChatServerForm::openChatWindow()
         ChatWindowForAdmin* w = new ChatWindowForAdmin(id, clientIdNameHash[id], state);
         clientIdWindowHash[id] = w;
         w->show();
-        connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString)));
-        connect(w, SIGNAL(inviteClient(QString)), this, SLOT(inviteClientInChatWindow(QString)));
-        connect(w, SIGNAL(kickOutClient(QString)), this, SLOT(kickOutInChatWindow(QString)));
+        assert(connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString))));
+        assert(connect(w, SIGNAL(inviteClient(QString)), this, SLOT(inviteClientInChatWindow(QString))));
+        assert(connect(w, SIGNAL(kickOutClient(QString)), this, SLOT(kickOutInChatWindow(QString))));
     }
     else {                                         // 채팅창이 이미 만들어져 있으면 열기만 함
         clientIdWindowHash[id]->showNormal();
