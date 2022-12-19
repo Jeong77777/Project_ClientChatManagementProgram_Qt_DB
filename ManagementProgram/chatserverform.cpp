@@ -28,8 +28,7 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
     ui(new Ui::ChatServerForm),
     chatServer(nullptr), fileServer(nullptr),
     menu(nullptr), file(nullptr), progressDialog(nullptr),
-    totalSize(0), byteReceived(0), inBlock(0), logThread(nullptr),
-    openAction(nullptr), inviteAction(nullptr), kickOutAction(nullptr)
+    totalSize(0), byteReceived(0), inBlock(0), logThread(nullptr)
 {
     ui->setupUi(this);
 
@@ -68,15 +67,15 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
     qDebug("Start listening ...");
 
     /* 고객 리스트 tree widget의 context 메뉴 설정 */
-    openAction = new QAction(tr("Open chat window"));
+    QAction* openAction = new QAction(tr("Open chat window"));
     openAction->setObjectName("Open");
     connect(openAction, SIGNAL(triggered()), SLOT(openChatWindow()));
 
-    inviteAction = new QAction(tr("Invite"));
+    QAction* inviteAction = new QAction(tr("Invite"));
     inviteAction->setObjectName("Invite");
     connect(inviteAction, SIGNAL(triggered()), SLOT(inviteClient()));
 
-    kickOutAction = new QAction(tr("Kick out"));
+    QAction* kickOutAction = new QAction(tr("Kick out"));
     connect(kickOutAction, SIGNAL(triggered()), SLOT(kickOut()));
 
     menu = new QMenu;
@@ -104,35 +103,12 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
 */
 ChatServerForm::~ChatServerForm()
 {
+    delete ui;
+
     logThread->saveData();
     logThread->terminate();
     chatServer->close( );
-    fileServer->close( );    
-
-    delete chatServer;
-    delete fileServer;
-    delete openAction;
-    delete inviteAction;
-    delete kickOutAction;
-    delete menu;
-    delete progressDialog;
-    delete logThread;
-
-    for(int i = 0; i < ui->clientTreeWidget->topLevelItemCount(); i++) {
-        auto item = ui->clientTreeWidget->itemAt(i, 0);
-        ui->clientTreeWidget->takeTopLevelItem(ui->clientTreeWidget->indexOfTopLevelItem(item));
-        delete item;
-    }
-    for(int i = 0; i < ui->messageTreeWidget->topLevelItemCount(); i++) {
-        auto item = ui->messageTreeWidget->itemAt(i, 0);
-        ui->messageTreeWidget->takeTopLevelItem(ui->messageTreeWidget->indexOfTopLevelItem(item));
-        delete item;
-    }
-
-    foreach(auto i, clientIdWindowHash.values())
-        delete i;
-
-    delete ui;
+    fileServer->close( );
 }
 
 /**
