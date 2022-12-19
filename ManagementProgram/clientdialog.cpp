@@ -34,12 +34,6 @@ ClientDialog::ClientDialog(QWidget *parent) :
 */
 ClientDialog::~ClientDialog()
 {
-    for(int i = 0; i < clientModel->rowCount(); i++) {
-        QList<QStandardItem *> itmes = clientModel->takeRow(i);
-        foreach(auto item, itmes)
-            delete item;
-    }
-
     delete ui;
 }
 
@@ -87,11 +81,7 @@ QString ClientDialog::getCurrentItem()
 */
 void ClientDialog::clearDialog()
 {
-    for(int i = 0; i < clientModel->rowCount(); i++) {
-        QList<QStandardItem *> itmes = clientModel->takeRow(i);
-        foreach(auto item, itmes)
-            delete item;
-    }
+    clientModel->removeRows(0, clientModel->rowCount());
     ui->lineEdit->clear();
 }
 
@@ -100,11 +90,8 @@ void ClientDialog::clearDialog()
 */
 void ClientDialog::on_searchPushButton_clicked()
 {
-    for(int i = 0; i < clientModel->rowCount(); i++) {
-        QList<QStandardItem *> itmes = clientModel->takeRow(i);
-        foreach(auto item, itmes)
-            delete item;
-    }
+    /* 검색을 위해 고객 관리 객체로 검색어를 전달하는 시그널 emit */
+    clientModel->removeRows(0, clientModel->rowCount());
     emit sendWord(ui->lineEdit->text());
 }
 
