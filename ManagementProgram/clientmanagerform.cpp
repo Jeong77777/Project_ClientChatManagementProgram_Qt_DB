@@ -33,16 +33,16 @@ ClientManagerForm::ClientManagerForm(QWidget *parent) :
     /* tree widget의 context 메뉴 설정 */
     // tree widget에서 고객을 삭제하는 action
     QAction* removeAction = new QAction(tr("Remove"));
-    connect(removeAction, SIGNAL(triggered()), SLOT(removeItem()));
+    assert(connect(removeAction, SIGNAL(triggered()), SLOT(removeItem())));
     menu = new QMenu; // context 메뉴
     menu->addAction(removeAction);
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)),\
-            this, SLOT(showContextMenu(QPoint)));
+    assert(connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)),\
+            this, SLOT(showContextMenu(QPoint))));
 
     /* 검색 창에서 enter 키를 누르면 검색 버튼이 클릭되도록 connect */
-    connect(ui->searchLineEdit, SIGNAL(returnPressed()),
-            this, SLOT(on_searchPushButton_clicked()));
+    assert(connect(ui->searchLineEdit, SIGNAL(returnPressed()),
+            this, SLOT(on_searchPushButton_clicked())));
 }
 
 /**
