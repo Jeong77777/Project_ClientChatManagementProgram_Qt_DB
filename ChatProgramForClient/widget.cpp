@@ -16,6 +16,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QProgressDialog>
+#include <cassert>
 
 #include "logthread.h"
 
@@ -52,12 +53,12 @@ Widget::Widget(QWidget *parent)
 
 
     /* 메시지 입력 창에서 enter 키를 누르면 메시지가 보내지고 입력 창이 clear 되도록 connect */
-    connect(ui->inputLine, SIGNAL(returnPressed()), SLOT(sendData()));
-    connect(ui->inputLine, SIGNAL(returnPressed()), ui->inputLine, SLOT(clear()));
+    assert(connect(ui->inputLine, SIGNAL(returnPressed()), SLOT(sendData())));
+    assert(connect(ui->inputLine, SIGNAL(returnPressed()), ui->inputLine, SLOT(clear())));
 
     /* send 버튼을 누르면 메시지가 보내지고 입력 창이 clear 되도록 connect */
-    connect(ui->sentButton, SIGNAL(clicked()), SLOT(sendData()));
-    connect(ui->sentButton, SIGNAL(clicked()), ui->inputLine, SLOT(clear()));
+    assert(connect(ui->sentButton, SIGNAL(clicked()), SLOT(sendData())));
+    assert(connect(ui->sentButton, SIGNAL(clicked()), ui->inputLine, SLOT(clear())));
 
     /* 프로그램 실행 시 초기에 메시지 입력 창과 send 버튼은 disabled로 설정 */
     ui->inputLine->setDisabled(true);
@@ -66,20 +67,20 @@ Widget::Widget(QWidget *parent)
     ui->logOutButton->setDisabled(true);
 
     /* 파일 전송 버튼을 누르면 파일 전송이 시작 되도록 설정 */
-    connect(ui->fileButton, SIGNAL(clicked()), SLOT(sendFile()));
+    assert(connect(ui->fileButton, SIGNAL(clicked()), SLOT(sendFile())));
     ui->fileButton->setDisabled(true);
 
     /* 채팅을 위한 소켓 생성 */
     clientSocket = new QTcpSocket(this);
-    connect(clientSocket, &QAbstractSocket::errorOccurred, this,
-            [=]{ qDebug() << clientSocket->errorString(); });
-    connect(clientSocket, SIGNAL(readyRead()), SLOT(receiveData()));
-    connect(clientSocket, SIGNAL(disconnected()), SLOT(disconnect()));
+    assert(connect(clientSocket, &QAbstractSocket::errorOccurred, this,
+            [=]{ qDebug() << clientSocket->errorString(); }));
+    assert(connect(clientSocket, SIGNAL(readyRead()), SLOT(receiveData())));
+    assert(connect(clientSocket, SIGNAL(disconnected()), SLOT(disconnect())));
 
     /* 파일 전송을 위한 소켓 생성 */
     fileClient = new QTcpSocket(this);
     // 파일 전송시 여러 번 나눠서 전송
-    connect(fileClient, SIGNAL(bytesWritten(qint64)), SLOT(goOnSend(qint64)));
+    assert(connect(fileClient, SIGNAL(bytesWritten(qint64)), SLOT(goOnSend(qint64))));
 
     /* 파일 전송 진행 상태를 나타내는 progress dialog 초기화 */
     progressDialog = new QProgressDialog(0);
@@ -87,7 +88,7 @@ Widget::Widget(QWidget *parent)
     progressDialog->reset();
 
     /* connect button 설정 */
-    connect(ui->connectButton, &QPushButton::clicked, this,
+    assert(connect(ui->connectButton, &QPushButton::clicked, this,
             [=]{
         if(ui->connectButton->text() == tr("Log In")) {
             ui->connectButton->setDisabled(true);
@@ -112,10 +113,10 @@ Widget::Widget(QWidget *parent)
             ui->sentButton->setDisabled(true);
             ui->fileButton->setDisabled(true);
         }
-    } );
+    } ));
 
     /* 로그아웃 기능 */
-    connect(ui->logOutButton, &QPushButton::clicked, this,
+    assert(connect(ui->logOutButton, &QPushButton::clicked, this,
             [=]{
         ui->connectButton->setText(tr("Log In"));
         ui->logOutButton->setDisabled(true);
@@ -132,7 +133,7 @@ Widget::Widget(QWidget *parent)
         ui->message->clear();
         ui->id->setReadOnly(false);
         ui->name->setReadOnly(false);
-    } );
+    } ));
 
     logThread = nullptr;
 }
