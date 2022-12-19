@@ -7,6 +7,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlTableModel>
+#include <cassert>
 
 /**
 * @brief 생성자, split 사이즈 설정, 정규 표현식 설정, context 메뉴 설정

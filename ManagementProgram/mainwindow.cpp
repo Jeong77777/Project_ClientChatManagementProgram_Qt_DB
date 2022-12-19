@@ -9,6 +9,7 @@
 
 #include <QMdiSubWindow>
 #include <QSqlDatabase>
+#include <cassert>
 
 
 MainWindow::MainWindow(QWidget *parent)

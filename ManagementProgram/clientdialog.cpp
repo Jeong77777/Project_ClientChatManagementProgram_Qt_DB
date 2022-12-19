@@ -2,6 +2,7 @@
 #include "ui_clientdialog.h"
 
 #include <QStandardItemModel>
+#include <cassert>
 
 /**
 * @brief 생성자, dialog 초기화
