@@ -309,7 +309,8 @@ void ClientManagerForm::receiveId(int id)
         QString address = query.value(3).toString();
 
         // 검색 결과를 주문 정보 관리 객체로 보냄
-        emit sendClientToOrderManager(id, name, phone, address);
+        emit sendClientToOrderManager(id, name.toStdString(), \
+                                      phone.toStdString(), address.toStdString());
     }
 }
 

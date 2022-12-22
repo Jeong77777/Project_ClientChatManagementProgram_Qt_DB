@@ -2,6 +2,7 @@
 #define ORDERMANAGERFORM_H
 
 #include <QWidget>
+#include <string>
 
 class QMenu;
 class ClientDialog;
@@ -44,7 +45,7 @@ private slots:
     void showContextMenu(const QPoint &); // tree view의 context 메뉴 출력
     void removeItem();                    // 주문 정보 삭제
     // 고객 정보 관리 객체로부터 고객 정보를 받기 위한 슬롯
-    void receiveClientInfo(int, QString, QString, QString);
+    void receiveClientInfo(int, std::string, std::string, std::string);
     // 제품 정보 관리 객체로부터 제품 정보를 받기 위한 슬롯
     void receiveProductInfo(int, QString, QString, int, int);
 

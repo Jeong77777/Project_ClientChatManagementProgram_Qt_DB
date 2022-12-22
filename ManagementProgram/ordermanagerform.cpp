@@ -476,19 +476,22 @@ void OrderManagerForm::removeItem()
 /**
 * @brief 고객 정보 관리 객체로부터 고객 정보를 받기 위한 슬롯
 * @param int id 고객 ID
-* @param QString name 이름
-* @param QString phone 전화번호
-* @param QString address 주소
+* @param std::string name 이름
+* @param std::string phone 전화번호
+* @param std::string address 주소
 */
-void OrderManagerForm::receiveClientInfo(int id, QString name, \
-                                         QString phone, QString address)
+void OrderManagerForm::receiveClientInfo(int id, std::string name, \
+                                         std::string phone, std::string address)
 {
     // 고객 상세 정보 model 초기화
     clientModel->removeRows(0, clientModel->rowCount());
 
     /* 고객 상세 정보 model에 고객 정보 추가 */
     QStringList strings;
-    strings << QString::number(id) << name << phone << address;
+    strings << QString::number(id) \
+            << QString::fromStdString(name) \
+            << QString::fromStdString(phone) \
+            << QString::fromStdString(address);
 
     QList<QStandardItem *> items;
     for (int i = 0; i < 4; ++i) {
