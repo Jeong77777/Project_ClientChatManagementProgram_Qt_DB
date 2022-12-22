@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QHash>
+#include <string>
 
 class QMenu;
 class QTcpServer;
@@ -40,7 +41,7 @@ public:
 
 private slots:
     // 고객 정보 관리 객체로부터 받은 고객 정보를 리스트에 추가(변경)하는 슬롯
-    void addClient(int, QString);
+    void addClient(int, std::string);
 
     /* 파일 서버 */
     void acceptConnection(); // 새로운 연결을 위한 슬롯

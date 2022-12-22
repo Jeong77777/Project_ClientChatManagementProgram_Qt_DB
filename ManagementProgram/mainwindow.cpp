@@ -10,6 +10,7 @@
 #include <QMdiSubWindow>
 #include <QSqlDatabase>
 #include <cassert>
+#include <string>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -78,8 +79,8 @@ MainWindow::MainWindow(QWidget *parent)
             orderForm, SLOT(receiveProductInfo(int,QString,QString,int,int))));
 
     // 고객 관리 객체에서 고객의 정보를 채팅 서버 객체로 전달해줌
-    assert(connect(clientForm, SIGNAL(sendClientToChatServer(int,QString)), \
-            chatForm, SLOT(addClient(int,QString))));
+    assert(connect(clientForm, SIGNAL(sendClientToChatServer(int,std::string)), \
+            chatForm, SLOT(addClient(int,std::string))));
 
     // 고객 관리 객체에서 mainwindow의 status bar에 메시지를 표시해줌
     assert(connect(clientForm, SIGNAL(sendStatusMessage(QString,int)), \

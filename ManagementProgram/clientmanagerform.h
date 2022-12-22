@@ -2,6 +2,7 @@
 #define CLIENTMANAGERFORM_H
 
 #include <QWidget>
+#include <string>
 
 class QMenu;
 class QSqlTableModel;
@@ -45,7 +46,7 @@ signals:
     // 주문 정보 관리 객체로 검색된 고객 정보를 보내주는 시그널
     void sendClientToOrderManager(int, QString, QString, QString);
     // 채팅 서버로 고객 정보를 보내주는 시그널
-    void sendClientToChatServer(int, QString);
+    void sendClientToChatServer(int, std::string);
     // status bar에 표시될 메시지를 보내주는 시그널
     void sendStatusMessage(QString, int);
 

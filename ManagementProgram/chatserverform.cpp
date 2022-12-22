@@ -115,18 +115,18 @@ ChatServerForm::~ChatServerForm()
 /**
 * @brief 고객 정보 관리 객체로부터 받은 고객 정보를 리스트에 추가(변경)하는 슬롯
 * @Param int indId 고객 ID
-* @Param QString name 고객 이름
+* @Param std::string name 고객 이름
 */
-void ChatServerForm::addClient(int intId, QString name)
+void ChatServerForm::addClient(int intId, std::string name)
 {
     QString id = QString::number(intId); // int->QString 변환
 
     /* 리스트에 이미 등록된 고객이면 정보를 변경 */
     foreach(auto c, ui->clientTreeWidget->findItems(id, Qt::MatchFixedString, 1)) {
-        c->setText(2, name);
-        clientIdNameHash[id] = name;
+        c->setText(2, QString::fromStdString(name));
+        clientIdNameHash[id] = QString::fromStdString(name);
         if(clientIdWindowHash.contains(id))
-            clientIdWindowHash[id]->updateInfo(name, "");
+            clientIdWindowHash[id]->updateInfo(QString::fromStdString(name), "");
         return;
     }
 
@@ -135,9 +135,9 @@ void ChatServerForm::addClient(int intId, QString name)
     item->setText(0, tr("Offline"));
     item->setIcon(0, QIcon(":/images/Red-Circle.png"));
     item->setText(1, id);
-    item->setText(2, name);
+    item->setText(2, QString::fromStdString(name));
     ui->clientTreeWidget->addTopLevelItem(item);
-    clientIdNameHash[id] = name;
+    clientIdNameHash[id] = QString::fromStdString(name);
 }
 
 /**

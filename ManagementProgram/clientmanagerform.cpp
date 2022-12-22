@@ -80,7 +80,7 @@ void ClientManagerForm::loadData()
     for(int i = 0; i < clientModel->rowCount(); i++) {
         int id = clientModel->data(clientModel->index(i, 0)).toInt();
         QString name = clientModel->data(clientModel->index(i, 1)).toString();
-        emit sendClientToChatServer(id, name);
+        emit sendClientToChatServer(id, name.toStdString());
     }
 }
 
@@ -188,7 +188,7 @@ void ClientManagerForm::on_addPushButton_clicked()
         cleanInputLineEdit(); // 입력 창 클리어
 
         // 채팅 서버로 신규 고객 정보(id, 이름) 보냄
-        emit sendClientToChatServer(id, name);
+        emit sendClientToChatServer(id, name.toStdString());
 
         // status bar 메시지 출력
         emit sendStatusMessage(tr("Add completed (ID: %1, Name: %2)")\
@@ -233,7 +233,7 @@ void ClientManagerForm::on_modifyPushButton_clicked()
             cleanInputLineEdit(); // 입력 창 클리어
 
             //채팅 서버로 변경된 고객 정보(id, 이름) 보냄
-            emit sendClientToChatServer(id, name);
+            emit sendClientToChatServer(id, name.toStdString());
 
             // status bar 메시지 출력
             emit sendStatusMessage(tr("Modify completed (ID: %1, Name: %2)").arg(id).arg(name), 3000);
