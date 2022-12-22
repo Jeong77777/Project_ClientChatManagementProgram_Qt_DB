@@ -42,7 +42,7 @@ private slots:
 
 signals:
     // 고객 검색 Dialog로 검색된 고객 정보를 보내주는 시그널
-    void sendClientToDialog(int, QString, QString, QString);
+    void sendClientToDialog(int, std::string, std::string, std::string);
     // 주문 정보 관리 객체로 검색된 고객 정보를 보내주는 시그널
     void sendClientToOrderManager(int, QString, QString, QString);
     // 채팅 서버로 고객 정보를 보내주는 시그널

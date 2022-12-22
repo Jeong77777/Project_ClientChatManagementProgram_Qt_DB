@@ -335,7 +335,8 @@ void ClientManagerForm::receiveWord(QString word)
         QString address = query.value(3).toString();
 
         // 검색 결과를 고객 검색 Dialog로 보냄
-        emit sendClientToDialog(id, name, phone, address);
+        emit sendClientToDialog(id, name.toStdString(), \
+                                phone.toStdString(), address.toStdString());
     }
 }
 

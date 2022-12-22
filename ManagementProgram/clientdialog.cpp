@@ -41,16 +41,19 @@ ClientDialog::~ClientDialog()
 /**
 * @brief 고객 관리 객체로부터 검색 결과를 받는 슬롯
 * @param int id 검색된 고객의 ID
-* @param QString name 이름
-* @param QString phone 전화번호
-* @param QString address 주소
+* @param std::string name 이름
+* @param std::string phone 전화번호
+* @param std::string address 주소
 */
-void ClientDialog::receiveClientInfo(int id, QString name, \
-                                     QString phone, QString address)
+void ClientDialog::receiveClientInfo(int id, std::string name, \
+                                     std::string phone, std::string address)
 {
     /* 검색 결과를 model에 추가 */
     QStringList strings;
-    strings << QString::number(id) << name << phone << address;
+    strings << QString::number(id) \
+            << QString::fromStdString(name) \
+            << QString::fromStdString(phone) \
+            << QString::fromStdString(address);
 
     QList<QStandardItem *> items;
     for (int i = 0; i < 4; ++i) {
