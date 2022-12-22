@@ -42,17 +42,18 @@ ProductDialog::~ProductDialog()
 /**
 * @brief 제품 관리 객체로부터 검색 결과를 받는 슬롯
 * @param int id 검색된 제품의 ID
-* @param QString type 제품종류
-* @param QString name 이름
+* @param std::string type 제품종류
+* @param std::string name 이름
 * @param int price 가격
 * @param int stock 재고수량
 */
-void ProductDialog::receiveProductInfo(int id, QString type, \
-                                       QString name, int price, int stock)
+void ProductDialog::receiveProductInfo(int id, std::string type, \
+                                       std::string name, int price, int stock)
 {
     /* 검색 결과를 model에 추가 */
     QStringList strings;
-    strings << QString::number(id) << type << name \
+    strings << QString::number(id) << QString::fromStdString(type) \
+            << QString::fromStdString(name) \
             << QString::number(price) << QString::number(stock);
 
     QList<QStandardItem *> items;

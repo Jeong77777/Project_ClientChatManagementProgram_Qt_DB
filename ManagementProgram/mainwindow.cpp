@@ -62,8 +62,8 @@ MainWindow::MainWindow(QWidget *parent)
     assert(connect(productDialog, SIGNAL(sendWord(QString)), \
             productForm, SLOT(receiveWord(QString))));
     // 제품 관리 객체에서 검색 결과를 제품 검색 다이얼로그로 전달해줌
-    assert(connect(productForm, SIGNAL(sendProductToDialog(int,QString,QString,int,int)), \
-            productDialog, SLOT(receiveProductInfo(int,QString,QString,int,int))));
+    assert(connect(productForm, SIGNAL(sendProductToDialog(int,std::string,std::string,int,int)), \
+            productDialog, SLOT(receiveProductInfo(int,std::string,std::string,int,int))));
 
     // 주문 관리 객체에서 정보를 받아올 고객의 id를 고객 관리 객체로 전달해줌
     assert(connect(orderForm, SIGNAL(sendClientId(int)), \

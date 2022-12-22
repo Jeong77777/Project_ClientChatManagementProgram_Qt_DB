@@ -2,6 +2,7 @@
 #define PRODUCTMANAGERFORM_H
 
 #include <QWidget>
+#include <string>
 
 class QMenu;
 class QSqlTableModel;
@@ -45,7 +46,7 @@ private slots:
 
 signals:
     // 제품 검색 Dialog로 검색된 제품 정보를 보내주는 시그널
-    void sendProductToDialog(int,QString,QString,int,int);
+    void sendProductToDialog(int,std::string,std::string,int,int);
     // 주문 정보 관리 객체로 검색된 제품 정보를 보내주는 시그널
     void sendProductToManager(int, std::string, std::string, int, int);
     // status bar에 표시될 메시지를 보내주는 시그널

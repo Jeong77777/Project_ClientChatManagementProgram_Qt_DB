@@ -350,7 +350,7 @@ void ProductManagerForm::receiveWord(QString word)
         int stock = query.value(4).toInt();
 
         // 검색 결과를 제품 검색 Dialog로 보냄
-        emit sendProductToDialog(id, type, name, price, stock);
+        emit sendProductToDialog(id, type.toStdString(), name.toStdString(), price, stock);
     }
 }
 
