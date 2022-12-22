@@ -57,7 +57,7 @@ private slots:
     void inviteClientInChatWindow(std::string);
     void kickOut();        // 고객을 채팅방에서 강퇴하는 슬롯
     // 관리자의 채팅창에서 고객을 채팅방으로부터 강퇴하는 슬롯
-    void kickOutInChatWindow(QString);
+    void kickOutInChatWindow(std::string);
     // 관리자가 고객에게 채팅을 전송하기 위한 슬롯
     void sendData(QString, QString);
 

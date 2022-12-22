@@ -305,7 +305,7 @@ void ChatServerForm::receiveData( )
                         clientIdWindowHash[id] = w;
                         assert(connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString))));
                         assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
-                        assert(connect(w, SIGNAL(kickOutClient(QString)), this, SLOT(kickOutInChatWindow(QString))));
+                        assert(connect(w, SIGNAL(kickOutClient(std::string)), this, SLOT(kickOutInChatWindow(std::string))));
                     }
                     return;
                 }
@@ -447,7 +447,7 @@ void ChatServerForm::openChatWindow()
         w->show();
         assert(connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString))));
         assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
-        assert(connect(w, SIGNAL(kickOutClient(QString)), this, SLOT(kickOutInChatWindow(QString))));
+        assert(connect(w, SIGNAL(kickOutClient(std::string)), this, SLOT(kickOutInChatWindow(std::string))));
     }
     else {                                         // 채팅창이 이미 만들어져 있으면 열기만 함
         clientIdWindowHash[id]->showNormal();
@@ -534,9 +534,9 @@ void ChatServerForm::kickOut()
 
 /**
 * @brief 관리자의 채팅창에서 고객을 채팅방으로부터 강퇴하는 슬롯
-* @Param QString id 강퇴할 고객의 id
+* @Param std::string id 강퇴할 고객의 id
 */
-void ChatServerForm::kickOutInChatWindow(QString id)
+void ChatServerForm::kickOutInChatWindow(std::string id)
 {
     /* 고객을 채팅방에서 강퇴 */
     QByteArray sendArray;
@@ -545,17 +545,17 @@ void ChatServerForm::kickOutInChatWindow(QString id)
     out.writeRawData("", 1020);
 
     // ID와 해쉬로 부터 소켓을 가져옴
-    QTcpSocket* sock = clientIdSocketHash[id];
+    QTcpSocket* sock = clientIdSocketHash[QString::fromStdString(id)];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 online으로 변경
     foreach(auto item, ui->clientTreeWidget-> \
-            findItems(id, Qt::MatchFixedString, 1)) {
+            findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
         item->setText(0, tr("Online"));
         item->setIcon(0, QIcon(":/images/Blue-Circle.png"));
     }
-    if(clientIdWindowHash.contains(id))
-        clientIdWindowHash[id]->updateInfo("", tr("Online"));
+    if(clientIdWindowHash.contains(QString::fromStdString(id)))
+        clientIdWindowHash[QString::fromStdString(id)]->updateInfo("", tr("Online"));
 }
 
 /**

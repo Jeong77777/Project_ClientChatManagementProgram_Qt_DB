@@ -103,7 +103,7 @@ void ChatWindowForAdmin::on_connectPushButton_clicked()
     if(ui->connectPushButton->text() == tr("Invite")) // 초대
         emit inviteClient(clientId.toStdString());
     else                                              // 강퇴
-        emit kickOutClient(clientId);
+        emit kickOutClient(clientId.toStdString());
 }
 
 /**
