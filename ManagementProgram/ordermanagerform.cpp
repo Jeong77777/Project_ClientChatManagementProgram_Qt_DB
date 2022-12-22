@@ -221,7 +221,8 @@ void OrderManagerForm::on_inputClientPushButton_clicked()
 
     if (clientDialog->exec() == QDialog::Accepted) { // OK 버튼을 누르면
         // 다이얼로그에서 선택한 고객을 가져온다.
-        ui->clientLineEdit->setText(clientDialog->getCurrentItem());
+        ui->clientLineEdit->setText(\
+                    QString::fromStdString(clientDialog->getCurrentItem()));
     }
     clientDialog->clearDialog(); // 다이얼로그 초기화
 }

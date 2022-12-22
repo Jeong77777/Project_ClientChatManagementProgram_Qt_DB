@@ -64,14 +64,14 @@ void ClientDialog::receiveClientInfo(int id, QString name, \
 * @brief 현재 선택된 고객ID와 이름을 반환
 * @return 현재 선택된 고객ID(이름)
 */
-QString ClientDialog::getCurrentItem()
+std::string ClientDialog::getCurrentItem()
 {
     QModelIndex index = ui->treeView->currentIndex();
 
     if(index.isValid()) {
         int id = clientModel->data(index.siblingAtColumn(0)).toInt();
         QString name = clientModel->data(index.siblingAtColumn(1)).toString();
-        return QString::number(id)+" ("+name+")";
+        return std::to_string(id)+" ("+name.toStdString()+")";
     }
     else
         return "";
