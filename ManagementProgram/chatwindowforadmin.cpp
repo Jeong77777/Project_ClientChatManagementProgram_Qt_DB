@@ -10,7 +10,7 @@ ChatWindowForAdmin::ChatWindowForAdmin(std::string id, std::string name, \
                                        std::string state, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChatWindowForAdmin), \
-    clientId(QString::fromStdString(id)), clientName(QString::fromStdString(name)), clientState(QString::fromStdString(state))
+    clientId(id), clientName(name), clientState(state)
 {
     ui->setupUi(this);
 
@@ -18,7 +18,8 @@ ChatWindowForAdmin::ChatWindowForAdmin(std::string id, std::string name, \
     changeButtonAndEditState(state);
 
     // 창 이름 설정
-    setWindowTitle(clientId + " " + clientName + " | " + clientState);
+    setWindowTitle(QString::fromStdString\
+                   (clientId + " " + clientName + " | " + clientState));
 
     // 이전 채팅 내용 불러오기
     loadChatLog();
@@ -38,8 +39,8 @@ ChatWindowForAdmin::~ChatWindowForAdmin()
 */
 void ChatWindowForAdmin::receiveMessage(std::string strData)
 {
-    ui->messageTextEdit->append("<font color=blue>" + \
-                                clientName + "</font> : " + QString::fromStdString(strData));
+    ui->messageTextEdit->append(QString::fromStdString\
+                                ("<font color=blue>" + clientName + "</font> : " + strData));
 }
 
 /**
@@ -51,15 +52,16 @@ void ChatWindowForAdmin::updateInfo(std::string name, std::string state)
 {
     // 입력 값이 있을 때만 변경
     if(name.length())
-        clientName = QString::fromStdString(name);
+        clientName = name;
     if(state.length())
-        clientState = QString::fromStdString(state);
+        clientState = state;
 
     // 고객의 상태 변경에 따라서 버튼과 입력 창의 상태도 변경
     changeButtonAndEditState(state);
 
     // 창 이름 변경
-    setWindowTitle(clientId + " " + clientName + " | " + clientState);
+    setWindowTitle(QString::fromStdString\
+                   (clientId + " " + clientName + " | " + clientState));
 }
 
 /**
@@ -73,7 +75,7 @@ void ChatWindowForAdmin::on_inputLineEdit_returnPressed()
         ui->messageTextEdit->append("<font color=red>" + \
                                     tr("Admin") + "</font> : " + str);
         // 고객에게 메시지를 보내도록 하는 시그널 emit
-        emit sendMessage(clientId.toStdString(), ui->inputLineEdit->text().toStdString());
+        emit sendMessage(clientId, ui->inputLineEdit->text().toStdString());
         ui->inputLineEdit->clear();
     }
 }
@@ -89,7 +91,7 @@ void ChatWindowForAdmin::on_sendPushButton_clicked()
         ui->messageTextEdit->append("<font color=red>" + \
                                     tr("Admin") + "</font> : " + str);
         // 고객에게 메시지를 보내도록 하는 시그널 emit
-        emit sendMessage(clientId.toStdString(), ui->inputLineEdit->text().toStdString());
+        emit sendMessage(clientId, ui->inputLineEdit->text().toStdString());
         ui->inputLineEdit->clear();
     }
 }
@@ -101,9 +103,9 @@ void ChatWindowForAdmin::on_connectPushButton_clicked()
 {
     /* 고객을 초대/강퇴 하도록 하는 시그널 emit */
     if(ui->connectPushButton->text() == tr("Invite")) // 초대
-        emit inviteClient(clientId.toStdString());
+        emit inviteClient(clientId);
     else                                              // 강퇴
-        emit kickOutClient(clientId.toStdString());
+        emit kickOutClient(clientId);
 }
 
 /**
@@ -165,13 +167,15 @@ void ChatWindowForAdmin::loadChatLog()
             QList<QString> row = line.split(" | ");
             if(row.size()) {
                 // 고객이 전송한 채팅
-                if(row[1].left(5) == clientId && row[3].contains("(8000)")) {
+                if(row[1].left(5) == QString::fromStdString(clientId)
+                        && row[3].contains("(8000)")) {
                     QString data = "<font color=blue>" \
-                            + clientName + "</font> : " + row[2];
+                            + QString::fromStdString(clientName) + "</font> : " + row[2];
                     ui->messageTextEdit->append(data);
                 }
                 // 관리자가 전송한 채팅
-                else if(row[1].left(5) == "10000" && row[4].left(5) == clientId) {
+                else if(row[1].left(5) == "10000" \
+                        && row[4].left(5) == QString::fromStdString(clientId)) {
                     QString data = "<font color=red>" \
                             + tr("Admin") + "</font> : " + row[2];
                     ui->messageTextEdit->append(data);
