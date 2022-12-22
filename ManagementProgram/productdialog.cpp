@@ -68,14 +68,14 @@ void ProductDialog::receiveProductInfo(int id, QString type, \
 * @brief 현재 선택된 제품ID와 이름을 반환
 * @return 현재 선택된 제품ID(이름)
 */
-QString ProductDialog::getCurrentItem()
+std::string ProductDialog::getCurrentItem()
 {
     QModelIndex index = ui->treeView->currentIndex();
 
     if(index.isValid()) {
         int id = productModel->data(index.siblingAtColumn(0)).toInt();
         QString name = productModel->data(index.siblingAtColumn(2)).toString();
-        return QString::number(id)+" ("+name+")";
+        return std::to_string(id)+" ("+name.toStdString()+")";
     }
     else
         return "";

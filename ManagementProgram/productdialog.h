@@ -2,6 +2,7 @@
 #define PRODUCTDIALOG_H
 
 #include <QDialog>
+#include <string>
 
 class QStandardItemModel;
 
@@ -20,7 +21,7 @@ public:
     explicit ProductDialog(QWidget *parent = nullptr);
     ~ProductDialog();
 
-    QString getCurrentItem();           // 현재 선택된 제품ID와 이름을 반환
+    std::string getCurrentItem();           // 현재 선택된 제품ID와 이름을 반환
     void clearDialog();                 // 검색 결과, 입력 창 초기화
 
 private slots:

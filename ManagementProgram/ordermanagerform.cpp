@@ -237,7 +237,8 @@ void OrderManagerForm::on_inputProductPushButton_clicked()
 
     if (productDialog->exec() == QDialog::Accepted) { // OK 버튼을 누르면
         // 다이얼로그에서 선택한 제품을 가져온다.
-        ui->productLineEdit->setText(productDialog->getCurrentItem());
+        ui->productLineEdit->setText(\
+                    QString::fromStdString(productDialog->getCurrentItem()));
     }
     productDialog->clearDialog(); // 다이얼로그 초기화
 }
