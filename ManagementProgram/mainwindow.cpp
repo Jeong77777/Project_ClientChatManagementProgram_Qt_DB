@@ -75,8 +75,8 @@ MainWindow::MainWindow(QWidget *parent)
     assert(connect(orderForm, SIGNAL(sendProductId(int)), \
             productForm, SLOT(receiveId(int))));
     // 제품 관리 객체에서 제품의 정보를 주문 관리 객체로 전달해줌
-    assert(connect(productForm, SIGNAL(sendProductToManager(int,QString,QString,int,int)), \
-            orderForm, SLOT(receiveProductInfo(int,QString,QString,int,int))));
+    assert(connect(productForm, SIGNAL(sendProductToManager(int,std::string,std::string,int,int)), \
+            orderForm, SLOT(receiveProductInfo(int,std::string,std::string,int,int))));
 
     // 고객 관리 객체에서 고객의 정보를 채팅 서버 객체로 전달해줌
     assert(connect(clientForm, SIGNAL(sendClientToChatServer(int,std::string)), \

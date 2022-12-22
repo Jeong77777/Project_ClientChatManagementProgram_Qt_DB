@@ -325,7 +325,7 @@ void ProductManagerForm::receiveId(int id)
         int stock = query.value(4).toInt();
 
         // 검색 결과를 주문 정보 관리 객체로 보냄
-        emit sendProductToManager(id, type, name, price, stock);
+        emit sendProductToManager(id, type.toStdString(), name.toStdString(), price, stock);
     }
 }
 

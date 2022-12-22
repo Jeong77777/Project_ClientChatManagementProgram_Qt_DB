@@ -506,20 +506,22 @@ void OrderManagerForm::receiveClientInfo(int id, std::string name, \
 /**
 * @brief 제품 정보 관리 객체로부터 제품 정보를 받기 위한 슬롯
 * @param int id
-* @param QString type
-* @param QString name
+* @param std::string type
+* @param std::string name
 * @param int price
 * @param int stock
 */
-void OrderManagerForm::receiveProductInfo(int id, QString type, \
-                                          QString name, int price, int stock)
+void OrderManagerForm::receiveProductInfo(int id, std::string type, \
+                                          std::string name, int price, int stock)
 {
     // 제품 상세 정보 model 초기화
     productModel->removeRows(0, productModel->rowCount());
 
     /* 제품 상세 정보 model에 제품 정보 추가 */
     QStringList strings;
-    strings << QString::number(id) << type << name << QString::number(price) << QString::number(stock);
+    strings << QString::number(id) << QString::fromStdString(type) \
+            << QString::fromStdString(name) << QString::number(price) \
+            << QString::number(stock);
 
     QList<QStandardItem *> items;
     for (int i = 0; i < 5; ++i) {

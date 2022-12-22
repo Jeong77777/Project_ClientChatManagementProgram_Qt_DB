@@ -47,7 +47,7 @@ private slots:
     // 고객 정보 관리 객체로부터 고객 정보를 받기 위한 슬롯
     void receiveClientInfo(int, std::string, std::string, std::string);
     // 제품 정보 관리 객체로부터 제품 정보를 받기 위한 슬롯
-    void receiveProductInfo(int, QString, QString, int, int);
+    void receiveProductInfo(int, std::string, std::string, int, int);
 
 signals:
     // 고객 정보 관리 객체로 가져올 고객 정보에 대한 ID를 보내는 시그널
