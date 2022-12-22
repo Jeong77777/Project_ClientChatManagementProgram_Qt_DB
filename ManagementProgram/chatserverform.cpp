@@ -304,7 +304,7 @@ void ChatServerForm::receiveData( )
                         ChatWindowForAdmin* w = new ChatWindowForAdmin(id, name, tr("Online"));
                         clientIdWindowHash[id] = w;
                         assert(connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString))));
-                        assert(connect(w, SIGNAL(inviteClient(QString)), this, SLOT(inviteClientInChatWindow(QString))));
+                        assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
                         assert(connect(w, SIGNAL(kickOutClient(QString)), this, SLOT(kickOutInChatWindow(QString))));
                     }
                     return;
@@ -446,7 +446,7 @@ void ChatServerForm::openChatWindow()
         clientIdWindowHash[id] = w;
         w->show();
         assert(connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString))));
-        assert(connect(w, SIGNAL(inviteClient(QString)), this, SLOT(inviteClientInChatWindow(QString))));
+        assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
         assert(connect(w, SIGNAL(kickOutClient(QString)), this, SLOT(kickOutInChatWindow(QString))));
     }
     else {                                         // 채팅창이 이미 만들어져 있으면 열기만 함
@@ -483,9 +483,9 @@ void ChatServerForm::inviteClient()
 
 /**
 * @brief 관리자의 채팅창에서 고객을 채팅방에 초대하는 슬롯
-* @Param QString id 초대할 고객의 id
+* @Param std::string id 초대할 고객의 id
 */
-void ChatServerForm::inviteClientInChatWindow(QString id)
+void ChatServerForm::inviteClientInChatWindow(std::string id)
 {
     QByteArray sendArray;
     QDataStream out(&sendArray, QIODevice::WriteOnly);
@@ -493,17 +493,17 @@ void ChatServerForm::inviteClientInChatWindow(QString id)
     out.writeRawData("", 1020);
 
     // ID와 해쉬로 부터 소켓을 가져옴
-    QTcpSocket* sock = clientIdSocketHash[id];
+    QTcpSocket* sock = clientIdSocketHash[QString::fromStdString(id)];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 chat in으로 변경
     foreach(auto item, ui->clientTreeWidget-> \
-            findItems(id, Qt::MatchFixedString, 1)) {
+            findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
         item->setText(0, tr("Chat in"));
         item->setIcon(0, QIcon(":/images/Green-Circle.png"));
     }
-    if(clientIdWindowHash.contains(id))
-        clientIdWindowHash[id]->updateInfo("", tr("Chat in"));
+    if(clientIdWindowHash.contains(QString::fromStdString(id)))
+        clientIdWindowHash[QString::fromStdString(id)]->updateInfo("", tr("Chat in"));
 }
 
 /**

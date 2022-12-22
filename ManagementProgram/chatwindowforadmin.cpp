@@ -101,7 +101,7 @@ void ChatWindowForAdmin::on_connectPushButton_clicked()
 {
     /* 고객을 초대/강퇴 하도록 하는 시그널 emit */
     if(ui->connectPushButton->text() == tr("Invite")) // 초대
-        emit inviteClient(clientId);
+        emit inviteClient(clientId.toStdString());
     else                                              // 강퇴
         emit kickOutClient(clientId);
 }

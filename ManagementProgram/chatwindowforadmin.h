@@ -2,6 +2,7 @@
 #define CHATWINDOWFORADMIN_H
 
 #include <QWidget>
+#include <string>
 
 namespace Ui {
 class ChatWindowForAdmin;
@@ -26,7 +27,7 @@ private slots:
 
 signals:
     void sendMessage(QString, QString); // 고객에게 메시지를 보내도록 하는 시그널
-    void inviteClient(QString);         // 고객을 초대하도록 하는 시그널
+    void inviteClient(std::string);         // 고객을 초대하도록 하는 시그널
     void kickOutClient(QString);        // 고객을 강퇴하도록 하는 시그널
 
 private:
