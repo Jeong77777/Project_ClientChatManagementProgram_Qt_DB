@@ -315,9 +315,9 @@ void ClientManagerForm::receiveId(int id)
 
 /**
 * @brief 고객 검색 Dialog에서 고객을 검색 하기 위한 슬롯
-* @Param QString word 검색어(id 또는 이름)
+* @Param std::string word 검색어(id 또는 이름)
 */
-void ClientManagerForm::receiveWord(QString word)
+void ClientManagerForm::receiveWord(std::string word)
 {
     /* 고객 ID 또는 이름을 이용하여 고객 검색 */
     QSqlQuery query(QString("select * "
@@ -325,7 +325,7 @@ void ClientManagerForm::receiveWord(QString word)
                             "where id = '%1' "
                             "or name LIKE '%%1%' "
                             "or phoneNumber LIKE '%%1%' "
-                            "or address LIKE '%%1%';").arg(word),
+                            "or address LIKE '%%1%';").arg(QString::fromStdString(word)),
                     clientModel->database());
     query.exec();
     while (query.next()) {

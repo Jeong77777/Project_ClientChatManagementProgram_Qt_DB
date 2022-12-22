@@ -52,8 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* 객체 간 signal과 slot을 connect */
     // 고객 검색 다이얼로그에서 검색어를 고객 관리 객체로 전달해줌
-    assert(connect(clientDialog, SIGNAL(sendWord(QString)), \
-            clientForm, SLOT(receiveWord(QString))));
+    assert(connect(clientDialog, SIGNAL(sendWord(std::string)), \
+            clientForm, SLOT(receiveWord(std::string))));
     // 고객 관리 객체에서 검색 결과를 고객 검색 다이얼로그로 전달해줌
     assert(connect(clientForm, SIGNAL(sendClientToDialog(int,std::string,std::string,std::string)), \
             clientDialog, SLOT(receiveClientInfo(int,std::string,std::string,std::string))));

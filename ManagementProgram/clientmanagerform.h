@@ -38,7 +38,7 @@ private slots:
     // 주문 정보 관리 객체에서 고객ID를 가지고 고객을 검색 하기 위한 슬롯
     void receiveId(int);
     // 고객 검색 Dialog에서 고객을 검색 하기 위한 슬롯
-    void receiveWord(QString);
+    void receiveWord(std::string);
 
 signals:
     // 고객 검색 Dialog로 검색된 고객 정보를 보내주는 시그널

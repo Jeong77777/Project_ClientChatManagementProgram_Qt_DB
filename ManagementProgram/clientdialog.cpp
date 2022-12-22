@@ -96,7 +96,7 @@ void ClientDialog::on_searchPushButton_clicked()
 {
     /* 검색을 위해 고객 관리 객체로 검색어를 전달하는 시그널 emit */
     clientModel->removeRows(0, clientModel->rowCount());
-    emit sendWord(ui->lineEdit->text());
+    emit sendWord(ui->lineEdit->text().toStdString());
 }
 
 /**
