@@ -31,7 +31,7 @@ signals:
     void kickOutClient(std::string);        // 고객을 강퇴하도록 하는 시그널
 
 private:
-    void changeButtonAndEditState(QString); // 고객의 상태에 따라 버튼과 입력 창을 변경
+    void changeButtonAndEditState(std::string); // 고객의 상태에 따라 버튼과 입력 창을 변경
     void loadChatLog();                     // 저장된 로그파일로부터 이전 채팅 내용을 불러옴
 
     Ui::ChatWindowForAdmin *ui;

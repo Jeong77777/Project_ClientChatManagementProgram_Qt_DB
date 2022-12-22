@@ -15,7 +15,7 @@ ChatWindowForAdmin::ChatWindowForAdmin(std::string id, std::string name, \
     ui->setupUi(this);
 
     // 버튼 초기화, 입력창 초기화
-    changeButtonAndEditState(QString::fromStdString(state));
+    changeButtonAndEditState(state);
 
     // 창 이름 설정
     setWindowTitle(clientId + " " + clientName + " | " + clientState);
@@ -56,7 +56,7 @@ void ChatWindowForAdmin::updateInfo(std::string name, std::string state)
         clientState = QString::fromStdString(state);
 
     // 고객의 상태 변경에 따라서 버튼과 입력 창의 상태도 변경
-    changeButtonAndEditState(QString::fromStdString(state));
+    changeButtonAndEditState(state);
 
     // 창 이름 변경
     setWindowTitle(clientId + " " + clientName + " | " + clientState);
@@ -108,17 +108,17 @@ void ChatWindowForAdmin::on_connectPushButton_clicked()
 
 /**
 * @brief 고객의 상태에 따라 버튼과 입력 창을 변경
-* @Param QString state 고객의 상태
+* @Param std::string state 고객의 상태
 */
-void ChatWindowForAdmin::changeButtonAndEditState(QString state)
+void ChatWindowForAdmin::changeButtonAndEditState(std::string state)
 {
-    if(state == tr("Offline")) {
+    if(state == tr("Offline").toStdString()) {
         ui->sendPushButton->setDisabled(true);
         ui->inputLineEdit->setDisabled(true);
         ui->connectPushButton->setDisabled(true);
         ui->connectPushButton->setText(tr("Invite"));
     }
-    else if(state == tr("Online")) {
+    else if(state == tr("Online").toStdString()) {
         ui->sendPushButton->setDisabled(true);
         ui->inputLineEdit->setDisabled(true);
         ui->connectPushButton->setEnabled(true);
