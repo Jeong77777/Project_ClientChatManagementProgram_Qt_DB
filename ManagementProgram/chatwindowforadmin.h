@@ -13,11 +13,11 @@ class ChatWindowForAdmin : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChatWindowForAdmin(QString = "0", QString = "", \
-                                QString = "", QWidget *parent = nullptr);
+    explicit ChatWindowForAdmin(std::string = "0", std::string = "", \
+                                std::string = "", QWidget *parent = nullptr);
     ~ChatWindowForAdmin();
 
-    void receiveMessage(QString);      // 고객으로부터 온 메시지를 표시
+    void receiveMessage(std::string);      // 고객으로부터 온 메시지를 표시
     void updateInfo(QString, QString); // 고객의 상태 업데이트
 
 private slots:

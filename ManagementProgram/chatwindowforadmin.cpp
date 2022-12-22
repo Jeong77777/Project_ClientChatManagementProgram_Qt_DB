@@ -6,16 +6,16 @@
 /**
 * @brief 생성자, 버튼,입력창 설정, 창 이름 설정, 이전 채팅 내용 불러오기
 */
-ChatWindowForAdmin::ChatWindowForAdmin(QString id, QString name, \
-                                       QString state, QWidget *parent) :
+ChatWindowForAdmin::ChatWindowForAdmin(std::string id, std::string name, \
+                                       std::string state, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ChatWindowForAdmin), \
-    clientId(id), clientName(name), clientState(state)
+    clientId(QString::fromStdString(id)), clientName(QString::fromStdString(name)), clientState(QString::fromStdString(state))
 {
     ui->setupUi(this);
 
     // 버튼 초기화, 입력창 초기화
-    changeButtonAndEditState(state);
+    changeButtonAndEditState(QString::fromStdString(state));
 
     // 창 이름 설정
     setWindowTitle(clientId + " " + clientName + " | " + clientState);
@@ -34,12 +34,12 @@ ChatWindowForAdmin::~ChatWindowForAdmin()
 
 /**
 * @brief 고객으로부터 온 메시지를 표시
-* @Param QString strData 고객으로부터 받은 메시지
+* @Param std::string strData 고객으로부터 받은 메시지
 */
-void ChatWindowForAdmin::receiveMessage(QString strData)
+void ChatWindowForAdmin::receiveMessage(std::string strData)
 {
     ui->messageTextEdit->append("<font color=blue>" + \
-                                clientName + "</font> : " + strData);
+                                clientName + "</font> : " + QString::fromStdString(strData));
 }
 
 /**

@@ -301,7 +301,7 @@ void ChatServerForm::receiveData( )
                         // 채팅창이 이미 만들어져 있으면 고객 상태 변경
                         clientIdWindowHash[item->text(1)]->updateInfo("", tr("Online"));
                     else { // 채팅창이 만들어져 있지 않으면 새로 만들고 설정
-                        ChatWindowForAdmin* w = new ChatWindowForAdmin(id, name, tr("Online"));
+                        ChatWindowForAdmin* w = new ChatWindowForAdmin(id.toStdString(), name.toStdString(), tr("Online").toStdString());
                         clientIdWindowHash[id] = w;
                         assert(connect(w, SIGNAL(sendMessage(std::string,std::string)), this, SLOT(sendData(std::string,std::string))));
                         assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
@@ -338,7 +338,7 @@ void ChatServerForm::receiveData( )
 
     case Chat_Talk: { // 채팅 주고 받기
         if(clientIdWindowHash.contains(portClientIdHash[port]))
-            clientIdWindowHash[portClientIdHash[port]]->receiveMessage(strData);
+            clientIdWindowHash[portClientIdHash[port]]->receiveMessage(strData.toStdString());
 
         /* 로그 tree widget에 채팅 로그 기록 */
         QTreeWidgetItem* item = new QTreeWidgetItem(ui->messageTreeWidget);
@@ -442,7 +442,7 @@ void ChatServerForm::openChatWindow()
         foreach(auto item, ui->clientTreeWidget->findItems(id, Qt::MatchFixedString, 1)) {
             state = item->text(0);
         }
-        ChatWindowForAdmin* w = new ChatWindowForAdmin(id, clientIdNameHash[id], state);
+        ChatWindowForAdmin* w = new ChatWindowForAdmin(id.toStdString(), clientIdNameHash[id].toStdString(), state.toStdString());
         clientIdWindowHash[id] = w;
         w->show();
         assert(connect(w, SIGNAL(sendMessage(std::string,std::string)), this, SLOT(sendData(std::string,std::string))));
