@@ -44,19 +44,19 @@ void ChatWindowForAdmin::receiveMessage(std::string strData)
 
 /**
 * @brief 고객의 상태 업데이트
-* @Param QString name 변경할 이름
-* @Param QString state 변경할 상태
+* @Param std::string name 변경할 이름
+* @Param std::string state 변경할 상태
 */
-void ChatWindowForAdmin::updateInfo(QString name, QString state)
+void ChatWindowForAdmin::updateInfo(std::string name, std::string state)
 {
     // 입력 값이 있을 때만 변경
     if(name.length())
-        clientName = name;
+        clientName = QString::fromStdString(name);
     if(state.length())
-        clientState = state;
+        clientState = QString::fromStdString(state);
 
     // 고객의 상태 변경에 따라서 버튼과 입력 창의 상태도 변경
-    changeButtonAndEditState(state);
+    changeButtonAndEditState(QString::fromStdString(state));
 
     // 창 이름 변경
     setWindowTitle(clientId + " " + clientName + " | " + clientState);

@@ -126,7 +126,7 @@ void ChatServerForm::addClient(int intId, std::string name)
         c->setText(2, QString::fromStdString(name));
         clientIdNameHash[id] = QString::fromStdString(name);
         if(clientIdWindowHash.contains(id))
-            clientIdWindowHash[id]->updateInfo(QString::fromStdString(name), "");
+            clientIdWindowHash[id]->updateInfo(name, "");
         return;
     }
 
@@ -299,7 +299,7 @@ void ChatServerForm::receiveData( )
                     // 관리자의 채팅창에서 고객의 상태를 online 변경
                     if(clientIdWindowHash.contains(item->text(1)))
                         // 채팅창이 이미 만들어져 있으면 고객 상태 변경
-                        clientIdWindowHash[item->text(1)]->updateInfo("", tr("Online"));
+                        clientIdWindowHash[item->text(1)]->updateInfo("", tr("Online").toStdString());
                     else { // 채팅창이 만들어져 있지 않으면 새로 만들고 설정
                         ChatWindowForAdmin* w = new ChatWindowForAdmin(id.toStdString(), name.toStdString(), tr("Online").toStdString());
                         clientIdWindowHash[id] = w;
@@ -328,7 +328,7 @@ void ChatServerForm::receiveData( )
                 item->setIcon(0, QIcon(":/images/Green-Circle.png"));
 
                 if(clientIdWindowHash.contains(item->text(1)))
-                    clientIdWindowHash[item->text(1)]->updateInfo("", tr("Chat in"));
+                    clientIdWindowHash[item->text(1)]->updateInfo("", tr("Chat in").toStdString());
             }
             if(clientIdSocketHash.contains(strData))
                 clientIdSocketHash[strData] = clientConnection;
@@ -376,7 +376,7 @@ void ChatServerForm::receiveData( )
                 item->setIcon(0, QIcon(":/images/Blue-Circle.png"));
 
                 if(clientIdWindowHash.contains(item->text(1)))
-                    clientIdWindowHash[item->text(1)]->updateInfo("", tr("Online"));
+                    clientIdWindowHash[item->text(1)]->updateInfo("", tr("Online").toStdString());
             }
         }
         break;
@@ -391,7 +391,7 @@ void ChatServerForm::receiveData( )
                 item->setIcon(0, QIcon(":/images/Red-Circle.png"));
 
                 if(clientIdWindowHash.contains(item->text(1)))
-                    clientIdWindowHash[item->text(1)]->updateInfo("", tr("Offline"));
+                    clientIdWindowHash[item->text(1)]->updateInfo("", tr("Offline").toStdString());
             }
             clientIdSocketHash.remove(portClientIdHash[port]);
             portClientIdHash.remove(port);
@@ -420,7 +420,7 @@ void ChatServerForm::removeClient()
             item->setText(0, tr("Offline"));
             item->setIcon(0, QIcon(":/images/Red-Circle.png"));
             if(clientIdWindowHash.contains(id))
-                clientIdWindowHash[id]->updateInfo("", tr("Offline"));
+                clientIdWindowHash[id]->updateInfo("", tr("Offline").toStdString());
         }
 
         /* 소켓 삭제 */
@@ -478,7 +478,7 @@ void ChatServerForm::inviteClient()
     ui->clientTreeWidget->currentItem()->setText(0, tr("Chat in"));
     ui->clientTreeWidget->currentItem()->setIcon(0, QIcon(":/images/Green-Circle.png"));
     if(clientIdWindowHash.contains(id))
-        clientIdWindowHash[id]->updateInfo("", tr("Chat in"));
+        clientIdWindowHash[id]->updateInfo("", tr("Chat in").toStdString());
 }
 
 /**
@@ -503,7 +503,7 @@ void ChatServerForm::inviteClientInChatWindow(std::string id)
         item->setIcon(0, QIcon(":/images/Green-Circle.png"));
     }
     if(clientIdWindowHash.contains(QString::fromStdString(id)))
-        clientIdWindowHash[QString::fromStdString(id)]->updateInfo("", tr("Chat in"));
+        clientIdWindowHash[QString::fromStdString(id)]->updateInfo("", tr("Chat in").toStdString());
 }
 
 /**
@@ -529,7 +529,7 @@ void ChatServerForm::kickOut()
     ui->clientTreeWidget->currentItem()->setText(0, tr("Online"));
     ui->clientTreeWidget->currentItem()->setIcon(0, QIcon(":/images/Blue-Circle.png"));
     if(clientIdWindowHash.contains(id))
-        clientIdWindowHash[id]->updateInfo("", tr("Online"));
+        clientIdWindowHash[id]->updateInfo("", tr("Online").toStdString());
 }
 
 /**
@@ -555,7 +555,7 @@ void ChatServerForm::kickOutInChatWindow(std::string id)
         item->setIcon(0, QIcon(":/images/Blue-Circle.png"));
     }
     if(clientIdWindowHash.contains(QString::fromStdString(id)))
-        clientIdWindowHash[QString::fromStdString(id)]->updateInfo("", tr("Online"));
+        clientIdWindowHash[QString::fromStdString(id)]->updateInfo("", tr("Online").toStdString());
 }
 
 /**

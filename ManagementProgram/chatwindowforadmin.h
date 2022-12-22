@@ -17,8 +17,8 @@ public:
                                 std::string = "", QWidget *parent = nullptr);
     ~ChatWindowForAdmin();
 
-    void receiveMessage(std::string);      // 고객으로부터 온 메시지를 표시
-    void updateInfo(QString, QString); // 고객의 상태 업데이트
+    void receiveMessage(std::string);           // 고객으로부터 온 메시지를 표시
+    void updateInfo(std::string, std::string);  // 고객의 상태 업데이트
 
 private slots:
     void on_inputLineEdit_returnPressed(); // 입력 창에서 엔터키를 눌렀을 때의 슬롯
