@@ -331,15 +331,15 @@ void ProductManagerForm::receiveId(int id)
 
 /**
 * @brief 제품 검색 Dialog에서 제품을 검색 하기 위한 슬롯
-* @Param QString word 검색어(id 또는 이름)
+* @Param std::string word 검색어(id 또는 이름)
 */
-void ProductManagerForm::receiveWord(QString word)
+void ProductManagerForm::receiveWord(std::string word)
 {
     /* 제품 ID 또는 이름을 이용하여 고객 검색 */
     QSqlQuery query(QString("select * "
                             "from Product_list "
                             "where id = '%1' "
-                            "or name LIKE '%%1%';").arg(word),
+                            "or name LIKE '%%1%';").arg(QString::fromStdString(word)),
                     productModel->database());
     query.exec();
     while (query.next()) {

@@ -99,7 +99,7 @@ void ProductDialog::on_searchPushButton_clicked()
 {
     /* 검색을 위해 제품 관리 객체로 검색어를 전달하는 시그널 emit */
     productModel->removeRows(0, productModel->rowCount());
-    emit sendWord(ui->lineEdit->text());
+    emit sendWord(ui->lineEdit->text().toStdString());
 }
 
 /**

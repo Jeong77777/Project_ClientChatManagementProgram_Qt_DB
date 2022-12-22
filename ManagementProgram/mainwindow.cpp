@@ -59,8 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
             clientDialog, SLOT(receiveClientInfo(int,std::string,std::string,std::string))));
 
     // 제품 검색 다이얼로그에서 검색어를 제품 관리 객체로 전달해줌
-    assert(connect(productDialog, SIGNAL(sendWord(QString)), \
-            productForm, SLOT(receiveWord(QString))));
+    assert(connect(productDialog, SIGNAL(sendWord(std::string)), \
+            productForm, SLOT(receiveWord(std::string))));
     // 제품 관리 객체에서 검색 결과를 제품 검색 다이얼로그로 전달해줌
     assert(connect(productForm, SIGNAL(sendProductToDialog(int,std::string,std::string,int,int)), \
             productDialog, SLOT(receiveProductInfo(int,std::string,std::string,int,int))));

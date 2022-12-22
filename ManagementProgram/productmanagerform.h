@@ -40,7 +40,7 @@ private slots:
     // 주문 정보 관리 객체에서 제품ID를 가지고 제품을 검색 하기 위한 슬롯
     void receiveId(int);
     // 제품 검색 Dialog에서 제품을 검색 하기 위한 슬롯
-    void receiveWord(QString);
+    void receiveWord(std::string);
     // 주문 정보 관리 객체를 통해서 재고량을 변경하기 위한 슬롯
     void setStock(int, int);
 
