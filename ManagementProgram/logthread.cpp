@@ -10,8 +10,9 @@
 LogThread::LogThread(QObject *parent)
     : QThread{parent}, filename("")
 {
-    QString format = "yyyyMMdd_hhmmss";
-    filename = QString("log_%1.txt").arg(QDateTime::currentDateTime().toString(format));
+    std::string format = "yyyyMMdd_hhmmss";
+    filename = std::string("log_.txt")\
+            .insert(4, QDateTime::currentDateTime().toString().toStdString());
 }
 
 /**
@@ -40,7 +41,7 @@ void LogThread::appendData(QTreeWidgetItem* item)
 void LogThread::saveData()
 {
     if(itemList.count() > 0) {
-        QFile file(filename);
+        QFile file(QString::fromStdString(filename));
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
             return;
 
