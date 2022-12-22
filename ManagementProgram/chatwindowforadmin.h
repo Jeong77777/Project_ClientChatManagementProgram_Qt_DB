@@ -26,7 +26,7 @@ private slots:
     void on_connectPushButton_clicked();   // 고객 초대/강퇴 버튼을 눌렀을 때의 슬롯
 
 signals:
-    void sendMessage(QString, QString); // 고객에게 메시지를 보내도록 하는 시그널
+    void sendMessage(std::string, std::string); // 고객에게 메시지를 보내도록 하는 시그널
     void inviteClient(std::string);         // 고객을 초대하도록 하는 시그널
     void kickOutClient(std::string);        // 고객을 강퇴하도록 하는 시그널
 

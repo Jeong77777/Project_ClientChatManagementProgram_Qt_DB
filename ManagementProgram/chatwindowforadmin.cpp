@@ -73,7 +73,7 @@ void ChatWindowForAdmin::on_inputLineEdit_returnPressed()
         ui->messageTextEdit->append("<font color=red>" + \
                                     tr("Admin") + "</font> : " + str);
         // 고객에게 메시지를 보내도록 하는 시그널 emit
-        emit sendMessage(clientId, ui->inputLineEdit->text());
+        emit sendMessage(clientId.toStdString(), ui->inputLineEdit->text().toStdString());
         ui->inputLineEdit->clear();
     }
 }
@@ -89,7 +89,7 @@ void ChatWindowForAdmin::on_sendPushButton_clicked()
         ui->messageTextEdit->append("<font color=red>" + \
                                     tr("Admin") + "</font> : " + str);
         // 고객에게 메시지를 보내도록 하는 시그널 emit
-        emit sendMessage(clientId, ui->inputLineEdit->text());
+        emit sendMessage(clientId.toStdString(), ui->inputLineEdit->text().toStdString());
         ui->inputLineEdit->clear();
     }
 }

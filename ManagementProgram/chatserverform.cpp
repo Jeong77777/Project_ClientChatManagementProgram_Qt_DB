@@ -303,7 +303,7 @@ void ChatServerForm::receiveData( )
                     else { // 채팅창이 만들어져 있지 않으면 새로 만들고 설정
                         ChatWindowForAdmin* w = new ChatWindowForAdmin(id, name, tr("Online"));
                         clientIdWindowHash[id] = w;
-                        assert(connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString))));
+                        assert(connect(w, SIGNAL(sendMessage(std::string,std::string)), this, SLOT(sendData(std::string,std::string))));
                         assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
                         assert(connect(w, SIGNAL(kickOutClient(std::string)), this, SLOT(kickOutInChatWindow(std::string))));
                     }
@@ -445,7 +445,7 @@ void ChatServerForm::openChatWindow()
         ChatWindowForAdmin* w = new ChatWindowForAdmin(id, clientIdNameHash[id], state);
         clientIdWindowHash[id] = w;
         w->show();
-        assert(connect(w, SIGNAL(sendMessage(QString,QString)), this, SLOT(sendData(QString,QString))));
+        assert(connect(w, SIGNAL(sendMessage(std::string,std::string)), this, SLOT(sendData(std::string,std::string))));
         assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
         assert(connect(w, SIGNAL(kickOutClient(std::string)), this, SLOT(kickOutInChatWindow(std::string))));
     }
@@ -560,23 +560,23 @@ void ChatServerForm::kickOutInChatWindow(std::string id)
 
 /**
 * @brief 관리자가 고객에게 채팅을 전송하기 위한 슬롯
-* @Param QString 메시지를 받을 고객의 id
-* @Param QString str 전달할 메시지
+* @Param std::string 메시지를 받을 고객의 id
+* @Param std::string str 전달할 메시지
 */
-void ChatServerForm::sendData(QString id, QString str)
+void ChatServerForm::sendData(std::string id, std::string str)
 {
 
-    if(false == clientIdSocketHash.contains(id))
+    if(false == clientIdSocketHash.contains(QString::fromStdString(id)))
         return;
 
     /* 메시지 전송 */
-    QTcpSocket* sock = clientIdSocketHash[id];
+    QTcpSocket* sock = clientIdSocketHash[QString::fromStdString(id)];
     QString data;
     QByteArray sendArray;
     sendArray.clear();
     QDataStream out(&sendArray, QIODevice::WriteOnly);
     out << Chat_Talk;
-    data = "<font color=blue>" + tr("Admin") + "</font> : " + str;
+    data = "<font color=blue>" + tr("Admin") + "</font> : " + QString::fromStdString(str);
     out.writeRawData(data.toStdString().data(), 1020);
     sock->write(sendArray);
 
@@ -588,15 +588,15 @@ void ChatServerForm::sendData(QString id, QString str)
     // Sender ID(name) = 10000(Admin)
     item->setText(1, QString("10000")+"("+tr("Admin")+")");
     // message
-    item->setText(2, str);
+    item->setText(2, QString::fromStdString(str));
     // Receiver IP(Port)
     item->setText(3, sock->peerAddress().toString()+ \
                   "("+QString::number(sock->peerPort())+")");
     // Receiver ID(name)
-    item->setText(4, id+"("+clientIdNameHash[id]+")");
+    item->setText(4, QString::fromStdString(id)+"("+clientIdNameHash[QString::fromStdString(id)]+")");
     // Time
     item->setText(5, QDateTime::currentDateTime().toString());
-    item->setToolTip(2, str);
+    item->setToolTip(2, QString::fromStdString(str));
     ui->messageTreeWidget->addTopLevelItem(item);
 
     for(int i = 0; i < ui->messageTreeWidget->columnCount(); i++)

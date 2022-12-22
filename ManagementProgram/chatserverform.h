@@ -59,7 +59,7 @@ private slots:
     // 관리자의 채팅창에서 고객을 채팅방으로부터 강퇴하는 슬롯
     void kickOutInChatWindow(std::string);
     // 관리자가 고객에게 채팅을 전송하기 위한 슬롯
-    void sendData(QString, QString);
+    void sendData(std::string, std::string);
 
     // 고객 리스트 tree widget의 context menu 슬롯
     void on_clientTreeWidget_customContextMenuRequested(const QPoint &pos);
