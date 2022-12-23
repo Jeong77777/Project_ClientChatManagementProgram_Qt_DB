@@ -70,10 +70,10 @@ void ChatWindowForAdmin::updateInfo(std::string name, std::string state)
 void ChatWindowForAdmin::on_inputLineEdit_returnPressed()
 {
     /* 입력 창에 입력된 메시지가 채팅 서버를 통해서 전송되도록 한다. */
-    QString str = ui->inputLineEdit->text(); // 입력된 메시지
+    std::string str = ui->inputLineEdit->text().toStdString(); // 입력된 메시지
     if(str.length()) {
         ui->messageTextEdit->append("<font color=red>" + \
-                                    tr("Admin") + "</font> : " + str);
+                                    tr("Admin") + "</font> : " + QString::fromStdString(str));
         // 고객에게 메시지를 보내도록 하는 시그널 emit
         emit sendMessage(clientId, ui->inputLineEdit->text().toStdString());
         ui->inputLineEdit->clear();
@@ -86,10 +86,10 @@ void ChatWindowForAdmin::on_inputLineEdit_returnPressed()
 void ChatWindowForAdmin::on_sendPushButton_clicked()
 {
     /* 입력 창에 입력된 메시지가 채팅 서버를 통해서 전송되도록 한다. */
-    QString str = ui->inputLineEdit->text(); // 입력된 메시지
+    std::string str = ui->inputLineEdit->text().toStdString(); // 입력된 메시지
     if(str.length()) {
         ui->messageTextEdit->append("<font color=red>" + \
-                                    tr("Admin") + "</font> : " + str);
+                                    tr("Admin") + "</font> : " + QString::fromStdString(str));
         // 고객에게 메시지를 보내도록 하는 시그널 emit
         emit sendMessage(clientId, ui->inputLineEdit->text().toStdString());
         ui->inputLineEdit->clear();
@@ -140,13 +140,13 @@ void ChatWindowForAdmin::changeButtonAndEditState(std::string state)
 void ChatWindowForAdmin::loadChatLog()
 {
     // 로그 파일 검색
-    QString sPath = QDir::currentPath();
-    QString sExt = ".txt";
-    QString sWildcard = "*";
+    std::string sPath = QDir::currentPath().toStdString();
+    std::string sExt = ".txt";
+    std::string sWildcard = "*";
     QStringList lFindList;
-    lFindList << "log_20" + sWildcard + sExt ;  // "log_20"으로 시작하는 txt 파일
+    lFindList << QString::fromStdString("log_20" + sWildcard + sExt);  // "log_20"으로 시작하는 txt 파일
 
-    QDir dir(sPath);
+    QDir dir(QString::fromStdString(sPath));
     dir.setNameFilters(lFindList);
     dir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
 
