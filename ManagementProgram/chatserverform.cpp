@@ -291,7 +291,7 @@ void ChatServerForm::receiveData( )
 
                     // clientIdSocketHash에 <id, socket> 추가
                     clientIdSocketHash[id] = clientConnection;
-                    portClientIdHash[port] = id;
+                    portClientIdHash[port] = id.toStdString();
 
                     // 로그인을 허가한다는 메시지 전송
                     sendLoginResult(clientConnection, "permit");
@@ -337,16 +337,16 @@ void ChatServerForm::receiveData( )
 
 
     case Chat_Talk: { // 채팅 주고 받기
-        if(clientIdWindowHash.contains(portClientIdHash[port]))
-            clientIdWindowHash[portClientIdHash[port]]->receiveMessage(strData.toStdString());
+        if(clientIdWindowHash.contains(QString::fromStdString(portClientIdHash[port])))
+            clientIdWindowHash[QString::fromStdString(portClientIdHash[port])]->receiveMessage(strData.toStdString());
 
         /* 로그 tree widget에 채팅 로그 기록 */
         QTreeWidgetItem* item = new QTreeWidgetItem(ui->messageTreeWidget);
         // Sender IP(Port)
         item->setText(0, ip+"("+QString::number(port)+")");
         // Sende ID(Name)
-        item->setText(1, portClientIdHash[port]+ \
-                      "("+clientIdNameHash[portClientIdHash[port]]+")");
+        item->setText(1, QString::fromStdString(portClientIdHash[port])+ \
+                      "("+clientIdNameHash[QString::fromStdString(portClientIdHash[port])]+")");
         // message
         item->setText(2, QString(data));
         // Receiver IP(Port)
@@ -393,8 +393,8 @@ void ChatServerForm::receiveData( )
                 if(clientIdWindowHash.contains(item->text(1)))
                     clientIdWindowHash[item->text(1)]->updateInfo("", tr("Offline").toStdString());
             }
-            clientIdSocketHash.remove(portClientIdHash[port]);
-            portClientIdHash.remove(port);
+            clientIdSocketHash.remove(QString::fromStdString(portClientIdHash[port]));
+            portClientIdHash.erase(port);
             clientConnection->disconnectFromHost();
         }
         break;
@@ -414,7 +414,7 @@ void ChatServerForm::removeClient()
     if(clientConnection != nullptr) {
 
         // 고객 리스트와 관리자 채팅창에서 고객의 상태를 offline으로 변경
-        QString id = portClientIdHash[clientConnection->peerPort()];
+        QString id = QString::fromStdString(portClientIdHash[clientConnection->peerPort()]);
         foreach(auto item, ui->clientTreeWidget->findItems(id, Qt::MatchFixedString, 1)) {
             qDebug() << item->text(2);
             item->setText(0, tr("Offline"));

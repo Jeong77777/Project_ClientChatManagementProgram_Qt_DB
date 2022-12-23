@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QHash>
 #include <string>
+#include <unordered_map>
 
 class QMenu;
 class QTcpServer;
@@ -75,8 +76,8 @@ private:
     QTcpServer *chatServer; // 채팅을 위한 서버
     QTcpServer *fileServer; // 파일 수신을 위한 서버
 
-    // <port, id>를 저장하는 hash
-    QHash<quint16, QString> portClientIdHash;
+    // <port, id>를 저장하는 unordered_map
+    std::unordered_map<unsigned short, std::string> portClientIdHash;
     // <id, socket>을 저장하는 hash
     QHash<QString, QTcpSocket*> clientIdSocketHash;
     // <id, name>을 저장하는 hash
