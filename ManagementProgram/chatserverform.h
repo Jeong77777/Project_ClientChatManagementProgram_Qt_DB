@@ -2,7 +2,6 @@
 #define CHATSERVERFORM_H
 
 #include <QWidget>
-#include <QHash>
 #include <string>
 #include <unordered_map>
 
