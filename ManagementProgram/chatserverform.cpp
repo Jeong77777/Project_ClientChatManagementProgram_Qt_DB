@@ -290,7 +290,7 @@ void ChatServerForm::receiveData( )
                     item->setIcon(0, QIcon(":/images/Blue-Circle.png"));
 
                     // clientIdSocketHash에 <id, socket> 추가
-                    clientIdSocketHash[id] = clientConnection;
+                    clientIdSocketHash[id.toStdString()] = clientConnection;
                     portClientIdHash[port] = id.toStdString();
 
                     // 로그인을 허가한다는 메시지 전송
@@ -330,8 +330,7 @@ void ChatServerForm::receiveData( )
                 if(clientIdWindowHash.contains(item->text(1)))
                     clientIdWindowHash[item->text(1)]->updateInfo("", tr("Chat in").toStdString());
             }
-            if(clientIdSocketHash.contains(strData))
-                clientIdSocketHash[strData] = clientConnection;
+            clientIdSocketHash[strData.toStdString()] = clientConnection;
         }
         break;
 
@@ -393,7 +392,7 @@ void ChatServerForm::receiveData( )
                 if(clientIdWindowHash.contains(item->text(1)))
                     clientIdWindowHash[item->text(1)]->updateInfo("", tr("Offline").toStdString());
             }
-            clientIdSocketHash.remove(QString::fromStdString(portClientIdHash[port]));
+            clientIdSocketHash.erase(portClientIdHash[port]);
             portClientIdHash.erase(port);
             clientConnection->disconnectFromHost();
         }
@@ -424,7 +423,7 @@ void ChatServerForm::removeClient()
         }
 
         /* 소켓 삭제 */
-        clientIdSocketHash.remove(id);
+        clientIdSocketHash.erase(id.toStdString());
         clientConnection->deleteLater();
     }
 }
@@ -471,7 +470,7 @@ void ChatServerForm::inviteClient()
 
     // 현재 선택된 item에 표시된 ID와 해쉬로 부터 소켓을 가져옴
     QString id = ui->clientTreeWidget->currentItem()->text(1);
-    QTcpSocket* sock = clientIdSocketHash[id];
+    QTcpSocket* sock = clientIdSocketHash[id.toStdString()];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 chat in으로 변경
@@ -493,7 +492,7 @@ void ChatServerForm::inviteClientInChatWindow(std::string id)
     out.writeRawData("", 1020);
 
     // ID와 해쉬로 부터 소켓을 가져옴
-    QTcpSocket* sock = clientIdSocketHash[QString::fromStdString(id)];
+    QTcpSocket* sock = clientIdSocketHash[id];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 chat in으로 변경
@@ -522,7 +521,7 @@ void ChatServerForm::kickOut()
 
     // 현재 선택된 item에 표시된 ID와 해쉬로 부터 소켓을 가져옴
     QString id = ui->clientTreeWidget->currentItem()->text(1);
-    QTcpSocket* sock = clientIdSocketHash[id];
+    QTcpSocket* sock = clientIdSocketHash[id.toStdString()];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 online으로 변경
@@ -545,7 +544,7 @@ void ChatServerForm::kickOutInChatWindow(std::string id)
     out.writeRawData("", 1020);
 
     // ID와 해쉬로 부터 소켓을 가져옴
-    QTcpSocket* sock = clientIdSocketHash[QString::fromStdString(id)];
+    QTcpSocket* sock = clientIdSocketHash[id];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 online으로 변경
@@ -566,11 +565,11 @@ void ChatServerForm::kickOutInChatWindow(std::string id)
 void ChatServerForm::sendData(std::string id, std::string str)
 {
 
-    if(false == clientIdSocketHash.contains(QString::fromStdString(id)))
+    if(clientIdSocketHash.find(id) == clientIdSocketHash.end())
         return;
 
     /* 메시지 전송 */
-    QTcpSocket* sock = clientIdSocketHash[QString::fromStdString(id)];
+    QTcpSocket* sock = clientIdSocketHash[id];
     QString data;
     QByteArray sendArray;
     sendArray.clear();
