@@ -88,8 +88,8 @@ private:
 
     QFile* file;                     // 수신 받는 파일
     QProgressDialog* progressDialog; // 파일 수신 진행 상태
-    qint64 totalSize;                // 총 데이터의 크기(파일 + 파일 정보)
-    qint64 byteReceived;             // 수신한 누적 데이터의 크기
+    long long totalSize;                // 총 데이터의 크기(파일 + 파일 정보)
+    long long byteReceived;             // 수신한 누적 데이터의 크기
     QByteArray inBlock;              // 파일 수신을 위한 블록
 
     LogThread* logThread; // 채팅 로그를 저장하기 위한 thread
