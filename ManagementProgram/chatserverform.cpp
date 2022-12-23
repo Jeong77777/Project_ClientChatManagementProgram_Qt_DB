@@ -124,7 +124,7 @@ void ChatServerForm::addClient(int intId, std::string name)
     /* 리스트에 이미 등록된 고객이면 정보를 변경 */
     foreach(auto c, ui->clientTreeWidget->findItems(id, Qt::MatchFixedString, 1)) {
         c->setText(2, QString::fromStdString(name));
-        clientIdNameHash[id] = QString::fromStdString(name);
+        clientIdNameHash[id.toStdString()] = name;
         if(clientIdWindowHash.contains(id))
             clientIdWindowHash[id]->updateInfo(name, "");
         return;
@@ -137,7 +137,7 @@ void ChatServerForm::addClient(int intId, std::string name)
     item->setText(1, id);
     item->setText(2, QString::fromStdString(name));
     ui->clientTreeWidget->addTopLevelItem(item);
-    clientIdNameHash[id] = QString::fromStdString(name);
+    clientIdNameHash[id.toStdString()] = name;
 }
 
 /**
@@ -180,7 +180,7 @@ void ChatServerForm::readClient()
         // Sender IP(Port)
         item->setText(0, ip+"("+QString::number(port)+")");
         // Sende ID(Name)
-        item->setText(1, id+"("+clientIdNameHash[id]+")");
+        item->setText(1, id+"("+ QString::fromStdString(clientIdNameHash[id.toStdString()]) +")");
         // filename
         item->setText(2, filename);
         // Receiver IP(Port)
@@ -345,7 +345,7 @@ void ChatServerForm::receiveData( )
         item->setText(0, ip+"("+QString::number(port)+")");
         // Sende ID(Name)
         item->setText(1, QString::fromStdString(portClientIdHash[port])+ \
-                      "("+clientIdNameHash[QString::fromStdString(portClientIdHash[port])]+")");
+                      "("+ QString::fromStdString(clientIdNameHash[portClientIdHash[port]])+")");
         // message
         item->setText(2, QString(data));
         // Receiver IP(Port)
@@ -441,7 +441,7 @@ void ChatServerForm::openChatWindow()
         foreach(auto item, ui->clientTreeWidget->findItems(id, Qt::MatchFixedString, 1)) {
             state = item->text(0);
         }
-        ChatWindowForAdmin* w = new ChatWindowForAdmin(id.toStdString(), clientIdNameHash[id].toStdString(), state.toStdString());
+        ChatWindowForAdmin* w = new ChatWindowForAdmin(id.toStdString(), clientIdNameHash[id.toStdString()], state.toStdString());
         clientIdWindowHash[id] = w;
         w->show();
         assert(connect(w, SIGNAL(sendMessage(std::string,std::string)), this, SLOT(sendData(std::string,std::string))));
@@ -592,7 +592,7 @@ void ChatServerForm::sendData(std::string id, std::string str)
     item->setText(3, sock->peerAddress().toString()+ \
                   "("+QString::number(sock->peerPort())+")");
     // Receiver ID(name)
-    item->setText(4, QString::fromStdString(id)+"("+clientIdNameHash[QString::fromStdString(id)]+")");
+    item->setText(4, QString::fromStdString(id)+"("+ QString::fromStdString(clientIdNameHash[id])+")");
     // Time
     item->setText(5, QDateTime::currentDateTime().toString());
     item->setToolTip(2, QString::fromStdString(str));

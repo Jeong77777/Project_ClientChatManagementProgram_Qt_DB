@@ -80,8 +80,8 @@ private:
     std::unordered_map<unsigned short, std::string> portClientIdHash;
     // <id, socket>을 저장하는 unordered_map
     std::unordered_map<std::string, QTcpSocket*> clientIdSocketHash;
-    // <id, name>을 저장하는 hash
-    QHash<QString, QString> clientIdNameHash;
+    // <id, name>을 저장하는 unordered_map
+    std::unordered_map<std::string, std::string> clientIdNameHash;
     // <id, chat window>을 저장하는 hash
     QHash<QString, ChatWindowForAdmin*> clientIdWindowHash;
 
