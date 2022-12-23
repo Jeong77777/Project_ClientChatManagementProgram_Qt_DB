@@ -82,8 +82,8 @@ private:
     std::unordered_map<std::string, QTcpSocket*> clientIdSocketHash;
     // <id, name>을 저장하는 unordered_map
     std::unordered_map<std::string, std::string> clientIdNameHash;
-    // <id, chat window>을 저장하는 hash
-    QHash<QString, ChatWindowForAdmin*> clientIdWindowHash;
+    // <id, chat window>을 저장하는 unordered_map
+    std::unordered_map<std::string, ChatWindowForAdmin*> clientIdWindowHash;
 
     QMenu* menu; // 고객 리스트 tree widget context 메뉴
 
