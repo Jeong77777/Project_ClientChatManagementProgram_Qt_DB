@@ -46,7 +46,7 @@ void LogThread::saveData()
             return;
 
         QTextStream out(&file);
-        foreach(auto item, itemList) {
+        for(const auto& item : itemList) {
             out << item->text(0) << " | ";
             out << item->text(1) << " | ";
             out << item->text(2) << " | ";

@@ -154,10 +154,10 @@ void ChatWindowForAdmin::loadChatLog()
     lFileInfoList = dir.entryInfoList();
 
     // 검색된 로그 파일들로부터 이전 채팅 내용 불러오기
-    for (int i = 0 ; i < lFileInfoList.count() ; i++) {
-        qDebug() <<lFileInfoList.at(i).absoluteFilePath();
+    for (const auto &i : lFileInfoList) {
+        qDebug() << i.absoluteFilePath();
 
-        QFile file(lFileInfoList.at(i).absoluteFilePath());
+        QFile file(i.absoluteFilePath());
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             return;
 

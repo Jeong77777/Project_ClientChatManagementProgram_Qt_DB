@@ -122,7 +122,7 @@ void ChatServerForm::addClient(int intId, std::string name)
     std::string id = std::to_string(intId); // int->std::string 변환
 
     /* 리스트에 이미 등록된 고객이면 정보를 변경 */
-    foreach(auto c, ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
+    for(const auto& c : ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
         c->setText(2, QString::fromStdString(name));
         clientIdNameHash[id] = name;
         if(clientIdWindowHash.find(id) != clientIdWindowHash.end())
@@ -281,7 +281,7 @@ void ChatServerForm::receiveData( )
         std::string id = strData.substr(0, delimPos);
         std::string name = strData.substr(delimPos + delim.size());
         /* 고객 리스트에서 ID와 이름을 확인 */
-        foreach(auto item, ui->clientTreeWidget-> \
+        for(const auto& item : ui->clientTreeWidget-> \
                 findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
 
             // 고객 리스트에 ID와 이름이 있으면 로그인 허가
@@ -322,7 +322,7 @@ void ChatServerForm::receiveData( )
 
 
     case Chat_In: // 고객이 채팅에 참여
-        foreach(auto item, ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
+        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
 
             /* 고객 리스트와 관리자 채팅창에서 고객의 상태를 chat in으로 변경 */
             if(item->text(0) != tr("Chat in")) {
@@ -369,7 +369,7 @@ void ChatServerForm::receiveData( )
 
 
     case Chat_Out: // 고객이 채팅에서 나감
-        foreach(auto item, ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
+        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
 
             /* 고객 리스트와 관리자 채팅창에서 고객의 상태를 online으로 변경 */
             if(item->text(0) != tr("Online")) {
@@ -384,7 +384,7 @@ void ChatServerForm::receiveData( )
 
 
     case Chat_LogOut: // 고객이 log out
-        foreach(auto item, ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
+        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
 
             /* 고객 리스트와 관리자 채팅창에서 고객의 상태를 offline으로 변경 */
             if(item->text(0) != tr("Offline")) {
@@ -416,7 +416,7 @@ void ChatServerForm::removeClient()
 
         // 고객 리스트와 관리자 채팅창에서 고객의 상태를 offline으로 변경
         std::string id = portClientIdHash[clientConnection->peerPort()];
-        foreach(auto item, ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
+        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
             qDebug() << item->text(2);
             item->setText(0, tr("Offline"));
             item->setIcon(0, QIcon(":/images/Red-Circle.png"));
@@ -440,7 +440,7 @@ void ChatServerForm::openChatWindow()
 
 
     if(clientIdWindowHash.find(id) == clientIdWindowHash.end()) { // 채팅창이 만들어져 있지 않으면 새로 만듦
-        foreach(auto item, ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
+        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
             state = item->text(0).toStdString();
         }
         ChatWindowForAdmin* w = new ChatWindowForAdmin(id, clientIdNameHash[id], state);
@@ -498,7 +498,7 @@ void ChatServerForm::inviteClientInChatWindow(std::string id)
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 chat in으로 변경
-    foreach(auto item, ui->clientTreeWidget-> \
+    for(const auto& item : ui->clientTreeWidget-> \
             findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
         item->setText(0, tr("Chat in"));
         item->setIcon(0, QIcon(":/images/Green-Circle.png"));
@@ -550,7 +550,7 @@ void ChatServerForm::kickOutInChatWindow(std::string id)
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 online으로 변경
-    foreach(auto item, ui->clientTreeWidget-> \
+    for(const auto& item : ui->clientTreeWidget-> \
             findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
         item->setText(0, tr("Online"));
         item->setIcon(0, QIcon(":/images/Blue-Circle.png"));
@@ -616,7 +616,7 @@ void ChatServerForm::on_clientTreeWidget_customContextMenuRequested(const QPoint
         return;
 
     /* 고객 리스트 tree widget 위에서 우클릭한 위치에서 context menu 출력 */
-    foreach(QAction *action, menu->actions()) {
+    for(auto const& action : menu->actions()) {
         if(action->objectName() == "Open")        // 관리자 채팅창 열기(항상 활성화)
             action->setEnabled(true);
         else if(action->objectName() == "Invite") // 초대(고객이 online 일때만 활성화)
