@@ -2,8 +2,8 @@
 #define LOGTHREAD_H
 
 #include <QThread>
-#include <QList>
 #include <string>
+#include <vector>
 
 class QTreeWidgetItem;
 
@@ -19,7 +19,7 @@ public:
 private:
     void run(); // 1분마다 채팅 로그를 저장
 
-    QList<QTreeWidgetItem*> itemList; // 채팅 로그 tree widget
+    std::vector<QTreeWidgetItem*> itemList; // 채팅 로그 tree widget
     std::string filename;                 // 로그를 저장하는 파일의 이름
 
 public slots:

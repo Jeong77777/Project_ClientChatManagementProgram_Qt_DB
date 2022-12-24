@@ -32,7 +32,7 @@ void LogThread::run()
  */
 void LogThread::appendData(QTreeWidgetItem* item)
 {
-    itemList.append(item);
+    itemList.push_back(item);
 }
 
 /**
@@ -40,7 +40,7 @@ void LogThread::appendData(QTreeWidgetItem* item)
  */
 void LogThread::saveData()
 {
-    if(itemList.count() > 0) {
+    if(itemList.size() > 0) {
         QFile file(QString::fromStdString(filename));
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
             return;
