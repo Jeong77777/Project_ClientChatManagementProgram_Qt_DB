@@ -80,8 +80,7 @@ std::string ProductDialog::getCurrentItem()
         std::string name = productModel->data(index.siblingAtColumn(2)).toString().toStdString();
         return std::to_string(id)+" ("+name+")";
     }
-    else
-        return "";
+    return "";
 }
 
 /**

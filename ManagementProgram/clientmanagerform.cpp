@@ -351,12 +351,12 @@ int ClientManagerForm::makeId()
                     clientModel->database());
     query.exec();
     while (query.next()) {
-        if(query.value(0).toInt() == 0) // 등록된 고객이 없을 경우
-            return 10001;               // id는 10001부터 시작
-        else {                          // 등록된 고객이 있을 경우
-            auto id = query.value(1).toInt();
-            return ++id;                // 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
-        }
+        // 등록된 고객이 없을 경우, id는 10001부터 시작
+        if(query.value(0).toInt() == 0)
+            return 10001;
+        // 등록된 고객이 있을 경우, 기존의 제일 큰 id보다 1만큼 큰 숫자를 반환
+        auto id = query.value(1).toInt();
+        return ++id;
     }
     return 1;
 }

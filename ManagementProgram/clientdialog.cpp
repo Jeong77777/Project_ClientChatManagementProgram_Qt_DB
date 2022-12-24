@@ -77,8 +77,8 @@ std::string ClientDialog::getCurrentItem()
         std::string name = clientModel->data(index.siblingAtColumn(1)).toString().toStdString();
         return std::to_string(id)+" ("+name+")";
     }
-    else
-        return "";
+
+    return "";
 }
 
 /**
