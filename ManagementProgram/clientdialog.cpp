@@ -56,14 +56,12 @@ void ClientDialog::receiveClientInfo(int id, std::string name, \
     strings.push_back(phone);
     strings.push_back(address);
 
-    std::vector<QStandardItem *> items;
+    QList<QStandardItem *> items;
     for (const auto &i : strings) {
-        items.push_back(new QStandardItem(QString::fromStdString(i)));
+        items.append(new QStandardItem(QString::fromStdString(i)));
     }
 
-    for (auto i : items) {
-        clientModel->appendRow(i);
-    }
+    clientModel->appendRow(items);
 }
 
 /**
