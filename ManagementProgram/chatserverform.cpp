@@ -276,9 +276,10 @@ void ChatServerForm::receiveData( )
 
     switch(type) {
     case Chat_Login: { // 로그인
-        QList<QString> row = QString::fromStdString(strData).split(", "); // row[0] = id, row[1] = name
-        std::string id = row[0].toStdString();
-        std::string name = row[1].toStdString();
+        std::string delim = ", ";
+        int delimPos = strData.find(delim);
+        std::string id = strData.substr(0, delimPos);
+        std::string name = strData.substr(delimPos + delim.size());
         /* 고객 리스트에서 ID와 이름을 확인 */
         foreach(auto item, ui->clientTreeWidget-> \
                 findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
