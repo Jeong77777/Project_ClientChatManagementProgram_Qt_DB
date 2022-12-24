@@ -3,6 +3,7 @@
 
 #include <QStandardItemModel>
 #include <cassert>
+#include <vector>
 
 /**
 * @brief 생성자, dialog 초기화
@@ -49,18 +50,20 @@ void ClientDialog::receiveClientInfo(int id, std::string name, \
                                      std::string phone, std::string address)
 {
     /* 검색 결과를 model에 추가 */
-    QStringList strings;
-    strings << QString::number(id) \
-            << QString::fromStdString(name) \
-            << QString::fromStdString(phone) \
-            << QString::fromStdString(address);
+    std::vector<std::string> strings;
+    strings.push_back(std::to_string(id));
+    strings.push_back(name);
+    strings.push_back(phone);
+    strings.push_back(address);
 
-    QList<QStandardItem *> items;
-    for (int i = 0; i < 4; ++i) {
-        items.append(new QStandardItem(strings.at(i)));
+    std::vector<QStandardItem *> items;
+    for (const auto &i : strings) {
+        items.push_back(new QStandardItem(QString::fromStdString(i)));
     }
 
-    clientModel->appendRow(items);
+    for (auto i : items) {
+        clientModel->appendRow(i);
+    }
 }
 
 /**
@@ -73,8 +76,8 @@ std::string ClientDialog::getCurrentItem()
 
     if(index.isValid()) {
         int id = clientModel->data(index.siblingAtColumn(0)).toInt();
-        QString name = clientModel->data(index.siblingAtColumn(1)).toString();
-        return std::to_string(id)+" ("+name.toStdString()+")";
+        std::string name = clientModel->data(index.siblingAtColumn(1)).toString().toStdString();
+        return std::to_string(id)+" ("+name+")";
     }
     else
         return "";
