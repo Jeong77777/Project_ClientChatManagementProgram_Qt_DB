@@ -3,6 +3,7 @@
 
 #include <QStandardItemModel>
 #include <cassert>
+#include <vector>
 
 /**
 * @brief 생성자, dialog 초기화
@@ -51,18 +52,19 @@ void ProductDialog::receiveProductInfo(int id, std::string type, \
                                        std::string name, int price, int stock)
 {
     /* 검색 결과를 model에 추가 */
-    QStringList strings;
-    strings << QString::number(id) << QString::fromStdString(type) \
-            << QString::fromStdString(name) \
-            << QString::number(price) << QString::number(stock);
+    std::vector<std::string> strings;
+    strings.push_back(std::to_string(id));
+    strings.push_back(type);
+    strings.push_back(name);
+    strings.push_back(std::to_string(price));
+    strings.push_back(std::to_string(stock));
 
     QList<QStandardItem *> items;
-    for (int i = 0; i < 5; ++i) {
-        items.append(new QStandardItem(strings.at(i)));
+    for (const auto &i : strings) {
+        items.append(new QStandardItem(QString::fromStdString(i)));
     }
 
     productModel->appendRow(items);
-
 }
 
 /**
@@ -75,8 +77,8 @@ std::string ProductDialog::getCurrentItem()
 
     if(index.isValid()) {
         int id = productModel->data(index.siblingAtColumn(0)).toInt();
-        QString name = productModel->data(index.siblingAtColumn(2)).toString();
-        return std::to_string(id)+" ("+name.toStdString()+")";
+        std::string name = productModel->data(index.siblingAtColumn(2)).toString().toStdString();
+        return std::to_string(id)+" ("+name+")";
     }
     else
         return "";
