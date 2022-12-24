@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QDataStream>
 #include <QAbstractSocket>
+#include <string>
 
 class QTcpSocket;
 class QFile;
@@ -50,15 +51,15 @@ private:
     Ui::Widget *ui;
 
     void closeEvent(QCloseEvent*) override;
-    void loadData(int, QString);     // 이전 채팅 내용 불러오기
+    void loadData(int, std::string);     // 이전 채팅 내용 불러오기
 
     QTcpSocket *clientSocket;		 // 채팅을 위한 소켓
     QTcpSocket *fileClient;          // 파일 전송을 위한 소켓
     QProgressDialog* progressDialog; // 파일 전송 진행 상태
     QFile* file;                     // 관리자(서버)로 보내는 파일
-    qint64 loadSize;                 // 데이터 전송 단위 크기
-    qint64 byteToWrite;              // 전송할 남은 데이터의 크기
-    qint64 totalSize;                // 총 데이터의 크기(파일 + 파일 정보)
+    long long loadSize;                 // 데이터 전송 단위 크기
+    long long byteToWrite;              // 전송할 남은 데이터의 크기
+    long long totalSize;                // 총 데이터의 크기(파일 + 파일 정보)
     QByteArray outBlock;             // 파일 전송을 위한 블록
     bool isSent;                     // 파일 서버와의 연결 flag
 

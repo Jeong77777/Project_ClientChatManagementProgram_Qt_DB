@@ -181,9 +181,9 @@ void Widget::receiveData( )
             ui->logOutButton->setEnabled(true);
 
             // 이전 채팅 내용 불러오기
-            loadData(ui->id->text().toInt(), ui->name->text());
+            loadData(ui->id->text().toInt(), ui->name->text().toStdString());
             // 채팅 로그 기록 thread 생성 및 시작
-            logThread = new LogThread(ui->id->text().toInt(), ui->name->text());
+            logThread = new LogThread(ui->id->text().toInt(), ui->name->text().toStdString());
             logThread->start();
         }
         else {
@@ -204,7 +204,7 @@ void Widget::receiveData( )
         ui->fileButton->setEnabled(true);
 
         // 채팅 로그 기록 thread에 채팅 내용 추가
-        logThread->appendData(QString(data)+ " | " + QDateTime::currentDateTime().toString());
+        logThread->appendData(std::string(data) + " | " + QDateTime::currentDateTime().toString().toStdString());
         break;
 
 
@@ -240,17 +240,17 @@ void Widget::receiveData( )
  */
 void Widget::sendData()
 {
-    QString str = ui->inputLine->text();
+    std::string str = ui->inputLine->text().toStdString();
     if(str.length()) {
         QByteArray bytearray;
-        bytearray = str.toUtf8( );
+        bytearray = QString::fromStdString(str).toUtf8( );
         // 화면에 표시 : 앞에 'me(나)'라고 추가
-        ui->message->append("<font color=red>" + tr("Me") + "</font> : " + str);
+        ui->message->append("<font color=red>" + tr("Me") + "</font> : " + QString::fromStdString(str));
         sendProtocol(Chat_Talk, bytearray.data());
 
         // 채팅 로그 기록 thread에 채팅 내용 추가
-        logThread->appendData("<font color=red>" + tr("Me") + "</font> : " + str \
-                              + " | " + QDateTime::currentDateTime().toString());
+        logThread->appendData("<font color=red>" + tr("Me").toStdString() + "</font> : " + str \
+                              + " | " + QDateTime::currentDateTime().toString().toStdString());
     }
 }
 
@@ -378,12 +378,12 @@ void Widget::goOnSend(qint64 numBytes)
 /**
  * @brief 이전 채팅 내용 불러오기
  * @param int id 고객ID
- * @param QString name 이름
+ * @param std::string name 이름
  */
-void Widget::loadData(int id, QString name)
+void Widget::loadData(int id, std::string name)
 {
     // 로그 파일 검색 log_(ID)_(이름).txt
-    QFile file("log_" + QString::number(id)+"_"+name+".txt");
+    QFile file("log_" + QString::number(id)+"_"+QString::fromStdString(name)+".txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
