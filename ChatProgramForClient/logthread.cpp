@@ -43,7 +43,7 @@ void LogThread::saveData()
             return;
 
         QTextStream out(&file);
-        foreach(auto data, chatList) {
+        for(const auto& data : chatList) {
             out << QString::fromStdString(data) << "\n";
         }
         file.close();
