@@ -11,6 +11,7 @@
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <cassert>
+#include <vector>
 
 /**
 * @brief 생성자, split 사이즈 설정, 입력 칸 초기화, context 메뉴 설정, 검색 관련 초기 설정
@@ -161,10 +162,10 @@ void OrderManagerForm::on_searchPushButton_clicked()
     int i = ui->searchComboBox->currentIndex();
 
     /* 검색 수행 */
-    QString str; // 검색어
+    std::string str; // 검색어
 
     if(i != 1) { // ID, Client, Product
-        str = ui->searchLineEdit->text();
+        str = ui->searchLineEdit->text().toStdString();
         if(!str.length()) { // 검색 창이 비어 있을 때
             QMessageBox::warning(this, tr("Search error"), \
                                  tr("Please enter a search term."), \
@@ -173,17 +174,17 @@ void OrderManagerForm::on_searchPushButton_clicked()
         }
     }
     else         // Date
-        str = ui->searchDateEdit->date().toString("yyyy-MM-dd");
+        str = ui->searchDateEdit->date().toString("yyyy-MM-dd").toStdString();
 
     // 0. ID  1. Date  2. Client  3. Product
     switch (i) {
-    case 0: orderModel->setFilter(QString("id = '%1'").arg(str));
+    case 0: orderModel->setFilter(QString("id = '%1'").arg(QString::fromStdString(str)));
         break;
-    case 1: orderModel->setFilter(QString("date = '%1'").arg(str));
+    case 1: orderModel->setFilter(QString("date = '%1'").arg(QString::fromStdString(str)));
         break;
-    case 2: orderModel->setFilter(QString("client LIKE '%%1%'").arg(str));
+    case 2: orderModel->setFilter(QString("client LIKE '%%1%'").arg(QString::fromStdString(str)));
         break;
-    case 3: orderModel->setFilter(QString("product LIKE '%%1%'").arg(str));
+    case 3: orderModel->setFilter(QString("product LIKE '%%1%'").arg(QString::fromStdString(str)));
         break;
     default:
         break;
@@ -195,17 +196,17 @@ void OrderManagerForm::on_searchPushButton_clicked()
                            .arg(orderModel->rowCount()), 3000);
 
     /* 사용자가 정보를 변경해도 검색 결과가 유지되도록 ID를 이용해서 필터 재설정 */
-    QString filterStr = "id in (";
+    std::string filterStr = "id in (";
     for(int i = 0; i < orderModel->rowCount(); i++) {
         int id = orderModel->data(orderModel->index(i, 0)).toInt();
         if(i != orderModel->rowCount()-1)
-            filterStr += QString("%1, ").arg(id);
+            filterStr += (std::to_string(id) + ", ");
         else
-            filterStr += QString("%1").arg(id);
+            filterStr += std::to_string(id);
     }
     filterStr += ");";
-    qDebug() << filterStr;
-    orderModel->setFilter(filterStr);
+    qDebug() << QString::fromStdString(filterStr);
+    orderModel->setFilter(QString::fromStdString(filterStr));
 
     clientModel->removeRows(0, clientModel->rowCount());
     productModel->removeRows(0, productModel->rowCount());
@@ -249,15 +250,15 @@ void OrderManagerForm::on_inputProductPushButton_clicked()
 void OrderManagerForm::on_addPushButton_clicked()
 {
     /* 입력 창에 입력된 정보 가져오기 */
-    QString date, clientName, productName, total;
+    std::string date, clientName, productName, total;
     int id = makeId(); // 자동으로 ID 생성
     int clientId, productId, quantity;
     clientId = ui->clientLineEdit->text().split(" ")[0].toInt();
     productId = ui->productLineEdit->text().split(" ")[0].toInt();
     quantity = ui->quantitySpinBox->text().toInt();
-    clientName = ui->clientLineEdit->text();
-    productName = ui->productLineEdit->text();
-    date = ui->dateEdit->date().toString("yyyy-MM-dd");
+    clientName = ui->clientLineEdit->text().toStdString();
+    productName = ui->productLineEdit->text().toStdString();
+    date = ui->dateEdit->date().toString("yyyy-MM-dd").toStdString();
 
     // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
     emit sendClientId(clientId);
@@ -278,7 +279,7 @@ void OrderManagerForm::on_addPushButton_clicked()
                 throw tr("There is a shortage of stock.");
 
             // 주문 금액 계산
-            total = QString::number(quantity \
+            total = std::to_string(quantity \
                                     * productModel->data(productModel->index(0,3)).toInt());
 
             QSqlQuery query(orderModel->database());
@@ -287,11 +288,11 @@ void OrderManagerForm::on_addPushButton_clicked()
                            "VALUES "
                            "(:ID, :DATE, :CLIENT, :PRODUCT, :QUANTITY, :TOTAL)" );
             query.bindValue(":ID",        id);
-            query.bindValue(":DATE",      date);
-            query.bindValue(":CLIENT",    clientName);
-            query.bindValue(":PRODUCT",   productName);
+            query.bindValue(":DATE",      QString::fromStdString(date));
+            query.bindValue(":CLIENT",    QString::fromStdString(clientName));
+            query.bindValue(":PRODUCT",   QString::fromStdString(productName));
             query.bindValue(":QUANTITY",  quantity);
-            query.bindValue(":TOTAL",     total);
+            query.bindValue(":TOTAL",     QString::fromStdString(total));
             query.exec();
             orderModel->select();
 
@@ -302,7 +303,8 @@ void OrderManagerForm::on_addPushButton_clicked()
             cleanInputLineEdit(); // 입력 창 클리어
 
             emit sendStatusMessage(tr("Add completed (ID: %1, Client: %2, Product: %3)") \
-                                   .arg(id).arg(clientName).arg(productName), 3000);
+                                   .arg(id).arg(QString::fromStdString(clientName))\
+                                   .arg(QString::fromStdString(productName)), 3000);
 
         } catch (QString msg) { // 비어있는 입력 창이 있을 때
             QMessageBox::warning(this, tr("Add error"),
@@ -330,7 +332,7 @@ void OrderManagerForm::on_modifyPushButton_clicked()
     if(index.isValid()) {
         // 입력 창에 입력된 정보 가져오기
         int id = orderModel->data(index.siblingAtColumn(0)).toInt();
-        QString date, clientName, productName, total;
+        std::string date, clientName, productName, total;
         int clientId, productId, oldQuantity, newQuantity;
         clientId = ui->clientLineEdit->text().split(" ")[0].toInt();
         productId = ui->productLineEdit->text().split(" ")[0].toInt();
@@ -338,9 +340,9 @@ void OrderManagerForm::on_modifyPushButton_clicked()
         oldQuantity = orderModel->data(index.siblingAtColumn(4)).toInt();
         // 변경 후 주문 수량
         newQuantity = ui->quantitySpinBox->text().toInt();
-        clientName = ui->clientLineEdit->text();
-        productName = ui->productLineEdit->text();
-        date = ui->dateEdit->date().toString("yyyy-MM-dd");
+        clientName = ui->clientLineEdit->text().toStdString();
+        productName = ui->productLineEdit->text().toStdString();
+        date = ui->dateEdit->date().toString("yyyy-MM-dd").toStdString();
 
         // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
         emit sendClientId(clientId);
@@ -362,7 +364,7 @@ void OrderManagerForm::on_modifyPushButton_clicked()
                                       + oldQuantity);
 
             // 총 주문 금액 계산
-            total = QString::number(newQuantity \
+            total = std::to_string(newQuantity \
                                     * productModel->data(productModel->index(0,3)).toInt());
 
             // 주문 수량만큼 제품의 재고 차감
@@ -375,18 +377,19 @@ void OrderManagerForm::on_modifyPushButton_clicked()
             query.prepare("UPDATE Order_list "
                           "SET date = ?, client = ?, product = ?, "
                           "quantity = ?, total = ? WHERE id = ?");
-            query.bindValue(0, date);
-            query.bindValue(1, clientName);
-            query.bindValue(2, productName);
+            query.bindValue(0, QString::fromStdString(date));
+            query.bindValue(1, QString::fromStdString(clientName));
+            query.bindValue(2, QString::fromStdString(productName));
             query.bindValue(3, newQuantity);
-            query.bindValue(4, total);
+            query.bindValue(4, QString::fromStdString(total));
             query.bindValue(5, id);
             query.exec();
             orderModel->select();
 
             // status bar 메시지 출력
             emit sendStatusMessage(tr("Modify completed (ID: %1, Client: %2, Product: %3)") \
-                                   .arg(id).arg(clientName).arg(productName), 3000);
+                                   .arg(id).arg(QString::fromStdString(clientName))\
+                                   .arg(QString::fromStdString(productName)), 3000);
 
             searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
             searchedProductFlag = false; // 제품 검색 결과 flag를 다시 false로 변경
@@ -459,8 +462,8 @@ void OrderManagerForm::removeItem()
         // 주문 정보 삭제
         int id = orderModel->data(index.siblingAtColumn(0)).toInt();
         // 삭제된 주문 정보를 status bar에 출력해주기 위해서 고객명과 제품명 가져오기
-        QString client = orderModel->data(index.siblingAtColumn(2)).toString();
-        QString product = orderModel->data(index.siblingAtColumn(3)).toString();
+        std::string client = orderModel->data(index.siblingAtColumn(2)).toString().toStdString();
+        std::string product = orderModel->data(index.siblingAtColumn(3)).toString().toStdString();
         orderModel->removeRow(index.row());
         orderModel->select();
 
@@ -470,7 +473,8 @@ void OrderManagerForm::removeItem()
 
         // status bar 메시지 출력
         emit sendStatusMessage(tr("delete completed (ID: %1, Client: %2, Product: %3)") \
-                               .arg(id).arg(client).arg(product), 3000);
+                               .arg(id).arg(QString::fromStdString(client))\
+                               .arg(QString::fromStdString(product)), 3000);
     }
 }
 
@@ -488,20 +492,20 @@ void OrderManagerForm::receiveClientInfo(int id, std::string name, \
     clientModel->removeRows(0, clientModel->rowCount());
 
     /* 고객 상세 정보 model에 고객 정보 추가 */
-    QStringList strings;
-    strings << QString::number(id) \
-            << QString::fromStdString(name) \
-            << QString::fromStdString(phone) \
-            << QString::fromStdString(address);
+    std::vector<std::string> strings;
+    strings.push_back(std::to_string(id));
+    strings.push_back(name);
+    strings.push_back(phone);
+    strings.push_back(address);
 
     QList<QStandardItem *> items;
-    for (int i = 0; i < 4; ++i) {
-        items.append(new QStandardItem(strings.at(i)));
+    for (const auto &i : strings) {
+        items.append(new QStandardItem(QString::fromStdString(i)));
     }
 
     clientModel->appendRow(items);
 
-    searchedClientFlag = true; // 고객 검색 결과를 true로 변경
+    searchedClientFlag = true; // 제품 검색 결과를 true로 변경
 }
 
 /**
@@ -519,14 +523,16 @@ void OrderManagerForm::receiveProductInfo(int id, std::string type, \
     productModel->removeRows(0, productModel->rowCount());
 
     /* 제품 상세 정보 model에 제품 정보 추가 */
-    QStringList strings;
-    strings << QString::number(id) << QString::fromStdString(type) \
-            << QString::fromStdString(name) << QString::number(price) \
-            << QString::number(stock);
+    std::vector<std::string> strings;
+    strings.push_back(std::to_string(id));
+    strings.push_back(type);
+    strings.push_back(name);
+    strings.push_back(std::to_string(price));
+    strings.push_back(std::to_string(stock));
 
     QList<QStandardItem *> items;
-    for (int i = 0; i < 5; ++i) {
-        items.append(new QStandardItem(strings.at(i)));
+    for (const auto &i : strings) {
+        items.append(new QStandardItem(QString::fromStdString(i)));
     }
 
     productModel->appendRow(items);
@@ -574,16 +580,16 @@ void OrderManagerForm::cleanInputLineEdit()
 void OrderManagerForm::on_treeView_clicked(const QModelIndex &index)
 {
     /* 클릭된 주문의 정보를 가져와서 입력 창에 표시해줌 */
-    QString id = orderModel->data(index.siblingAtColumn(0)).toString();
-    QString date = orderModel->data(index.siblingAtColumn(1)).toString();
-    QString client = orderModel->data(index.siblingAtColumn(2)).toString();
-    QString product = orderModel->data(index.siblingAtColumn(3)).toString();
+    std::string id = orderModel->data(index.siblingAtColumn(0)).toString().toStdString();
+    std::string date = orderModel->data(index.siblingAtColumn(1)).toString().toStdString();
+    std::string client = orderModel->data(index.siblingAtColumn(2)).toString().toStdString();
+    std::string product = orderModel->data(index.siblingAtColumn(3)).toString().toStdString();
     int quantity = orderModel->data(index.siblingAtColumn(4)).toInt();
 
-    ui->idLineEdit->setText(id);
-    ui->dateEdit->setDate(QDate::fromString(date, "yyyy-MM-dd"));
-    ui->clientLineEdit->setText(client);
-    ui->productLineEdit->setText(product);
+    ui->idLineEdit->setText(QString::fromStdString(id));
+    ui->dateEdit->setDate(QDate::fromString(QString::fromStdString(date), "yyyy-MM-dd"));
+    ui->clientLineEdit->setText(QString::fromStdString(client));
+    ui->productLineEdit->setText(QString::fromStdString(product));
     ui->quantitySpinBox->setValue(quantity);
 
     /* 고객, 제품 상세 정보 tree view에 상세 정보 표시 */
@@ -592,10 +598,10 @@ void OrderManagerForm::on_treeView_clicked(const QModelIndex &index)
     searchedProductFlag = false; // 제품 검색 결과 flag 초기화
 
     // 고객ID를 이용해서 고객 정보 관리 객체로부터 고객 가져오기
-    int clientId = client.split(" ")[0].toInt();
+    int clientId = std::stoi(client.substr(0, client.find(" ")));
     emit sendClientId(clientId);
     // 제품ID를 이용해서 제품 정보 관리 객체로부터 제품 가져오기
-    int productId = product.split(" ")[0].toInt();
+    int productId = std::stoi(product.substr(0, product.find(" ")));
     emit sendProductId(productId);
 
     searchedClientFlag = false;  // 고객 검색 결과 flag를 다시 false로 변경
