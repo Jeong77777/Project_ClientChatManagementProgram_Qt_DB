@@ -132,11 +132,11 @@ void ProductManagerForm::on_searchPushButton_clicked()
     int i = ui->searchComboBox->currentIndex();
 
     /* 검색 수행 */
-    QString str; // 검색어
+    std::string str; // 검색어
     if(i == 1) // Type
-        str = ui->searchTypeComboBox->currentText();
+        str = ui->searchTypeComboBox->currentText().toStdString();
     else {     // ID, Name
-        str = ui->searchLineEdit->text();
+        str = ui->searchLineEdit->text().toStdString();
         if(!str.length()) { // 검색 창이 비어 있을 때
             QMessageBox::warning(this, tr("Search error"),
                                  tr("Please enter a search term."), QMessageBox::Ok);
@@ -146,11 +146,11 @@ void ProductManagerForm::on_searchPushButton_clicked()
 
     // 0. ID  1. Type  2. Name
     switch (i) {
-    case 0: productModel->setFilter(QString("id = '%1'").arg(str));
+    case 0: productModel->setFilter(QString("id = '%1'").arg(QString::fromStdString(str)));
         break;
-    case 1: productModel->setFilter(QString("type = '%1'").arg(str));
+    case 1: productModel->setFilter(QString("type = '%1'").arg(QString::fromStdString(str)));
         break;
-    case 2: productModel->setFilter(QString("name LIKE '%%1%'").arg(str));
+    case 2: productModel->setFilter(QString("name LIKE '%%1%'").arg(QString::fromStdString(str)));
         break;
     default:
         break;
@@ -161,17 +161,17 @@ void ProductManagerForm::on_searchPushButton_clicked()
     emit sendStatusMessage(tr("%1 search results were found").arg(productModel->rowCount()), 3000);
 
     /* 사용자가 정보를 변경해도 검색 결과가 유지되도록 ID를 이용해서 필터 재설정 */
-    QString filterStr = "id in (";
+    std::string filterStr = "id in (";
     for(int i = 0; i < productModel->rowCount(); i++) {
         int id = productModel->data(productModel->index(i, 0)).toInt();
         if(i != productModel->rowCount()-1)
-            filterStr += QString("%1, ").arg(id);
+            filterStr += (std::to_string(id) + ", ");
         else
-            filterStr += QString("%1").arg(id);
+            filterStr += std::to_string(id);
     }
     filterStr += ");";
-    qDebug() << filterStr;
-    productModel->setFilter(filterStr);
+    qDebug() << QString::fromStdString(filterStr);
+    productModel->setFilter(QString::fromStdString(filterStr));
 }
 
 /**
@@ -180,12 +180,12 @@ void ProductManagerForm::on_searchPushButton_clicked()
 void ProductManagerForm::on_addPushButton_clicked()
 {
     /* 입력 창에 입력된 정보 가져오기 */
-    QString type, name, price, stock;
+    std::string type, name, price, stock;
     int id = makeId(); // 자동으로 ID 생성
-    type = ui->typeComboBox->currentText();
-    name = ui->nameLineEdit->text();
-    price = ui->priceLineEdit->text();
-    stock = ui->stockLineEdit->text();
+    type = ui->typeComboBox->currentText().toStdString();
+    name = ui->nameLineEdit->text().toStdString();
+    price = ui->priceLineEdit->text().toStdString();
+    stock = ui->stockLineEdit->text().toStdString();
 
     /* 입력된 정보를 DB에 추가 */
     QSqlDatabase db = QSqlDatabase::database("productConnection");
@@ -196,10 +196,10 @@ void ProductManagerForm::on_addPushButton_clicked()
                        "VALUES "
                        "(:ID, :TYPE, :NAME, :PRICE, :STOCK)" );
         query.bindValue(":ID",        id);
-        query.bindValue(":TYPE",      type);
-        query.bindValue(":NAME",      name);
-        query.bindValue(":PRICE",     price);
-        query.bindValue(":STOCK",     stock);
+        query.bindValue(":TYPE",      QString::fromStdString(type));
+        query.bindValue(":NAME",      QString::fromStdString(name));
+        query.bindValue(":PRICE",     QString::fromStdString(price));
+        query.bindValue(":STOCK",     QString::fromStdString(stock));
         query.exec();
         productModel->select();
 
@@ -207,7 +207,7 @@ void ProductManagerForm::on_addPushButton_clicked()
 
         // status bar 메시지 출력
         emit sendStatusMessage(tr("Add completed (ID: %1, Name: %2)")\
-                               .arg(id).arg(name), 3000);
+                               .arg(id).arg(QString::fromStdString(name)), 3000);
     }
     else { // 비어있는 입력 창이 있을 때
         QMessageBox::warning(this, tr("Add error"),
@@ -228,21 +228,21 @@ void ProductManagerForm::on_modifyPushButton_clicked()
     if(index.isValid()) {
         // 입력 창에 입력된 정보 가져오기
         int id = productModel->data(index.siblingAtColumn(0)).toInt();
-        QString type, name, price, stock;
-        type = ui->typeComboBox->currentText();
-        name = ui->nameLineEdit->text();
-        price = ui->priceLineEdit->text();
-        stock = ui->stockLineEdit->text();
+        std::string type, name, price, stock;
+        type = ui->typeComboBox->currentText().toStdString();
+        name = ui->nameLineEdit->text().toStdString();
+        price = ui->priceLineEdit->text().toStdString();
+        stock = ui->stockLineEdit->text().toStdString();
 
         // 입력 창에 입력된 정보에 따라 제품 정보를 변경
         if(name.length() && price.length() && stock.length()) {
             QSqlQuery query(productModel->database());
             query.prepare("UPDATE Product_list SET type = ?, "
                           "name = ?, price = ?, stock = ? WHERE id = ?");
-            query.bindValue(0, type);
-            query.bindValue(1, name);
-            query.bindValue(2, price);
-            query.bindValue(3, stock);
+            query.bindValue(0, QString::fromStdString(type));
+            query.bindValue(1, QString::fromStdString(name));
+            query.bindValue(2, QString::fromStdString(price));
+            query.bindValue(3, QString::fromStdString(stock));
             query.bindValue(4, id);
             query.exec();
             productModel->select();
@@ -251,7 +251,7 @@ void ProductManagerForm::on_modifyPushButton_clicked()
 
             // status bar 메시지 출력
             emit sendStatusMessage(tr("Modify completed (ID: %1, Name: %2)") \
-                                   .arg(id).arg(name), 3000);
+                                   .arg(id).arg(QString::fromStdString(name)), 3000);
         }
         else { // 비어있는 입력 창이 있을 때
             QMessageBox::warning(this, tr("Modify error"), \
@@ -293,7 +293,7 @@ void ProductManagerForm::removeItem()
     if(index.isValid()) {
         // 삭제된 제품 정보를 status bar에 출력해주기 위해서 id와 이름 가져오기
         int id = productModel->data(index.siblingAtColumn(0)).toInt();
-        QString name = productModel->data(index.siblingAtColumn(2)).toString();
+        std::string name = productModel->data(index.siblingAtColumn(2)).toString().toStdString();
 
         // 제품 정보 삭제
         productModel->removeRow(index.row());
@@ -301,7 +301,7 @@ void ProductManagerForm::removeItem()
 
         // status bar 메시지 출력
         emit sendStatusMessage(tr("delete completed (ID: %1, Name: %2)") \
-                               .arg(id).arg(name), 3000);
+                               .arg(id).arg(QString::fromStdString(name)), 3000);
     }
 }
 
@@ -319,13 +319,13 @@ void ProductManagerForm::receiveId(int id)
     query.exec();
     while (query.next()) {
         int id = query.value(0).toInt();
-        QString type = query.value(1).toString();
-        QString name = query.value(2).toString();
+        std::string type = query.value(1).toString().toStdString();
+        std::string name = query.value(2).toString().toStdString();
         int price = query.value(3).toInt();
         int stock = query.value(4).toInt();
 
         // 검색 결과를 주문 정보 관리 객체로 보냄
-        emit sendProductToManager(id, type.toStdString(), name.toStdString(), price, stock);
+        emit sendProductToManager(id, type, name, price, stock);
     }
 }
 
@@ -344,13 +344,13 @@ void ProductManagerForm::receiveWord(std::string word)
     query.exec();
     while (query.next()) {
         int id = query.value(0).toInt();
-        QString type = query.value(1).toString();
-        QString name = query.value(2).toString();
+        std::string type = query.value(1).toString().toStdString();
+        std::string name = query.value(2).toString().toStdString();
         int price = query.value(3).toInt();
         int stock = query.value(4).toInt();
 
         // 검색 결과를 제품 검색 Dialog로 보냄
-        emit sendProductToDialog(id, type.toStdString(), name.toStdString(), price, stock);
+        emit sendProductToDialog(id, type, name, price, stock);
     }
 }
 
@@ -393,17 +393,17 @@ void ProductManagerForm::cleanInputLineEdit()
 void ProductManagerForm::on_treeView_clicked(const QModelIndex &index)
 {
     /* 클릭된 제품의 정보를 가져와서 입력 창에 표시해줌 */
-    QString id = productModel->data(index.siblingAtColumn(0)).toString();
-    QString type = productModel->data(index.siblingAtColumn(1)).toString();
-    QString name = productModel->data(index.siblingAtColumn(2)).toString();
-    QString price = productModel->data(index.siblingAtColumn(3)).toString();
-    QString stock = productModel->data(index.siblingAtColumn(4)).toString();
+    std::string id = productModel->data(index.siblingAtColumn(0)).toString().toStdString();
+    std::string type = productModel->data(index.siblingAtColumn(1)).toString().toStdString();
+    std::string name = productModel->data(index.siblingAtColumn(2)).toString().toStdString();
+    std::string price = productModel->data(index.siblingAtColumn(3)).toString().toStdString();
+    std::string stock = productModel->data(index.siblingAtColumn(4)).toString().toStdString();
 
-    ui->idLineEdit->setText(id);
-    ui->typeComboBox->setCurrentText(type);
-    ui->nameLineEdit->setText(name);
-    ui->priceLineEdit->setText(price);
-    ui->stockLineEdit->setText(stock);
+    ui->idLineEdit->setText(QString::fromStdString(id));
+    ui->typeComboBox->setCurrentText(QString::fromStdString(type));
+    ui->nameLineEdit->setText(QString::fromStdString(name));
+    ui->priceLineEdit->setText(QString::fromStdString(price));
+    ui->stockLineEdit->setText(QString::fromStdString(stock));
 }
 
 /**
