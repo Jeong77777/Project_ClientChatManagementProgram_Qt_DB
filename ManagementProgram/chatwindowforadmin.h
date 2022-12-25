@@ -17,8 +17,8 @@ public:
                                 std::string = "", QWidget *parent = nullptr);
     ~ChatWindowForAdmin();
 
-    void receiveMessage(std::string);           // 고객으로부터 온 메시지를 표시
-    void updateInfo(std::string, std::string);  // 고객의 상태 업데이트
+    void receiveMessage(const std::string) const;           // 고객으로부터 온 메시지를 표시
+    void updateInfo(const std::string, const std::string);  // 고객의 상태 업데이트
 
 private slots:
     void on_inputLineEdit_returnPressed(); // 입력 창에서 엔터키를 눌렀을 때의 슬롯
@@ -31,11 +31,11 @@ signals:
     void kickOutClient(std::string);        // 고객을 강퇴하도록 하는 시그널
 
 private:
-    void changeButtonAndEditState(std::string); // 고객의 상태에 따라 버튼과 입력 창을 변경
-    void loadChatLog();                     // 저장된 로그파일로부터 이전 채팅 내용을 불러옴
+    void changeButtonAndEditState(const std::string); // 고객의 상태에 따라 버튼과 입력 창을 변경
+    void loadChatLog() const;                     // 저장된 로그파일로부터 이전 채팅 내용을 불러옴
 
     Ui::ChatWindowForAdmin *ui;
-    std::string clientId;       // 고객 ID
+    const std::string clientId;       // 고객 ID
     std::string clientName;     // 고객 이름
     std::string clientState;    // 고객 상태
 };

@@ -37,7 +37,7 @@ ChatWindowForAdmin::~ChatWindowForAdmin()
 * @brief 고객으로부터 온 메시지를 표시
 * @Param std::string strData 고객으로부터 받은 메시지
 */
-void ChatWindowForAdmin::receiveMessage(std::string strData)
+void ChatWindowForAdmin::receiveMessage(const std::string strData) const
 {
     ui->messageTextEdit->append(QString::fromStdString\
                                 ("<font color=blue>" + clientName + "</font> : " + strData));
@@ -48,7 +48,7 @@ void ChatWindowForAdmin::receiveMessage(std::string strData)
 * @Param std::string name 변경할 이름
 * @Param std::string state 변경할 상태
 */
-void ChatWindowForAdmin::updateInfo(std::string name, std::string state)
+void ChatWindowForAdmin::updateInfo(const std::string name, const std::string state)
 {
     // 입력 값이 있을 때만 변경
     if(name.length())
@@ -112,7 +112,7 @@ void ChatWindowForAdmin::on_connectPushButton_clicked()
 * @brief 고객의 상태에 따라 버튼과 입력 창을 변경
 * @Param std::string state 고객의 상태
 */
-void ChatWindowForAdmin::changeButtonAndEditState(std::string state)
+void ChatWindowForAdmin::changeButtonAndEditState(const std::string state)
 {
     if(state == tr("Offline").toStdString()) {
         ui->sendPushButton->setDisabled(true);
@@ -137,7 +137,7 @@ void ChatWindowForAdmin::changeButtonAndEditState(std::string state)
 /**
 * @brief 저장된 로그파일로부터 이전 채팅 내용을 불러옴
 */
-void ChatWindowForAdmin::loadChatLog()
+void ChatWindowForAdmin::loadChatLog() const
 {
     // 로그 파일 검색
     std::string sPath = QDir::currentPath().toStdString();
