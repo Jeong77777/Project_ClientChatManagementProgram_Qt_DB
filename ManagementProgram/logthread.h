@@ -17,7 +17,7 @@ public:
     explicit LogThread(QObject *parent = nullptr);
 
 private:
-    void run(); // 1분마다 채팅 로그를 저장
+    void run() override; // 1분마다 채팅 로그를 저장
 
     std::vector<QTreeWidgetItem*> itemList; // 채팅 로그 tree widget
     std::string filename;                 // 로그를 저장하는 파일의 이름

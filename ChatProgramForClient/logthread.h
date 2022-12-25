@@ -16,7 +16,7 @@ public:
                        QObject *parent = nullptr);
 
 private:
-    void run();                     // 1분마다 채팅 로그를 저장
+    void run() override;                     // 1분마다 채팅 로그를 저장
 
     std::vector<std::string> chatList;  // 채팅 내용을 저장하는 list
     std::string filename;               // 로그를 저장하는 파일의 이름
