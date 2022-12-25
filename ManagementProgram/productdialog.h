@@ -21,12 +21,12 @@ public:
     explicit ProductDialog(QWidget *parent = nullptr);
     ~ProductDialog();
 
-    std::string getCurrentItem();           // 현재 선택된 제품ID와 이름을 반환
-    void clearDialog();                 // 검색 결과, 입력 창 초기화
+    std::string getCurrentItem() const;           // 현재 선택된 제품ID와 이름을 반환
+    void clearDialog() const;                 // 검색 결과, 입력 창 초기화
 
 private slots:
     void on_searchPushButton_clicked();                   // 검색 버튼에 대한 슬롯
-    void receiveProductInfo(int,std::string,std::string,int,int); // 제품 관리 객체로부터 검색 결과를 받는 슬롯
+    void receiveProductInfo(const int, const std::string, const std::string, const int, const int) const; // 제품 관리 객체로부터 검색 결과를 받는 슬롯
 
     // tree view에서 제품을 더블클릭 하였을 때의 슬롯
     void on_treeView_doubleClicked(const QModelIndex &index);

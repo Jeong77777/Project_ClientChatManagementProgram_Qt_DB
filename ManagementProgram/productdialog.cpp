@@ -49,7 +49,7 @@ ProductDialog::~ProductDialog()
 * @param int stock 재고수량
 */
 void ProductDialog::receiveProductInfo(int id, std::string type, \
-                                       std::string name, int price, int stock)
+                                       std::string name, int price, int stock) const
 {
     /* 검색 결과를 model에 추가 */
     std::vector<std::string> strings;
@@ -71,7 +71,7 @@ void ProductDialog::receiveProductInfo(int id, std::string type, \
 * @brief 현재 선택된 제품ID와 이름을 반환
 * @return 현재 선택된 제품ID(이름)
 */
-std::string ProductDialog::getCurrentItem()
+std::string ProductDialog::getCurrentItem() const
 {
     QModelIndex index = ui->treeView->currentIndex();
 
@@ -86,7 +86,7 @@ std::string ProductDialog::getCurrentItem()
 /**
 * @brief 검색 결과, 입력 창 초기화
 */
-void ProductDialog::clearDialog()
+void ProductDialog::clearDialog() const
 {
     productModel->removeRows(0, productModel->rowCount());
     ui->lineEdit->clear();
