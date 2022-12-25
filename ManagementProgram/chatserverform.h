@@ -41,28 +41,28 @@ public:
 
 private slots:
     // 고객 정보 관리 객체로부터 받은 고객 정보를 리스트에 추가(변경)하는 슬롯
-    void addClient(int, std::string);
+    void addClient(const int, const std::string);
 
     /* 파일 서버 */
-    void acceptConnection(); // 새로운 연결을 위한 슬롯
+    void acceptConnection() const; // 새로운 연결을 위한 슬롯
     void readClient();       // 파일을 수신하는 슬롯
 
     /* 채팅 서버 */
-    void clientConnect( ); // 새로운 연결을 위한 슬롯
+    void clientConnect( ) const; // 새로운 연결을 위한 슬롯
     void receiveData( );   // 메시지를 받는 슬롯
     void removeClient( );  // 고객과의 연결을 끊겼을 때의 슬롯
     void openChatWindow(); // 관리자의 채팅창을 여는 슬롯
     void inviteClient();   // 고객을 채팅방에 초대하는 슬롯
     // 관리자의 채팅창에서 고객을 채팅방에 초대하는 슬롯
-    void inviteClientInChatWindow(std::string);
+    void inviteClientInChatWindow(const std::string);
     void kickOut();        // 고객을 채팅방에서 강퇴하는 슬롯
     // 관리자의 채팅창에서 고객을 채팅방으로부터 강퇴하는 슬롯
-    void kickOutInChatWindow(std::string);
+    void kickOutInChatWindow(const std::string);
     // 관리자가 고객에게 채팅을 전송하기 위한 슬롯
-    void sendData(std::string, std::string);
+    void sendData(const std::string, const std::string);
 
     // 고객 리스트 tree widget의 context menu 슬롯
-    void on_clientTreeWidget_customContextMenuRequested(const QPoint &pos);
+    void on_clientTreeWidget_customContextMenuRequested(const QPoint &pos) const;
 
 private:
     const int BLOCK_SIZE;  // 블록 사이즈

@@ -117,7 +117,7 @@ ChatServerForm::~ChatServerForm()
 * @Param int indId 고객 ID
 * @Param std::string name 고객 이름
 */
-void ChatServerForm::addClient(int intId, std::string name)
+void ChatServerForm::addClient(const int intId, const std::string name)
 {
     std::string id = std::to_string(intId); // int->std::string 변환
 
@@ -143,7 +143,7 @@ void ChatServerForm::addClient(int intId, std::string name)
 /**
 * @brief 새로운 연결이 들어오면 파일 수신을 위한 소켓을 생성하는 슬롯
 */
-void ChatServerForm::acceptConnection()
+void ChatServerForm::acceptConnection() const
 {
     qDebug("Connected, preparing to receive files!");
 
@@ -239,7 +239,7 @@ void ChatServerForm::readClient()
 /**
 * @brief 새로운 연결이 들어오면 채팅을 위한 소켓을 생성하는 슬롯
 */
-void ChatServerForm::clientConnect( )
+void ChatServerForm::clientConnect( ) const
 {
     QTcpSocket *clientConnection = chatServer->nextPendingConnection();
     // 메시지가 오면 읽어들일 수 있도록 connect
@@ -277,7 +277,7 @@ void ChatServerForm::receiveData( )
     switch(type) {
     case Chat_Login: { // 로그인
         std::string delim = ", ";
-        int delimPos = strData.find(delim);
+        size_t delimPos = strData.find(delim);
         std::string id = strData.substr(0, delimPos);
         std::string name = strData.substr(delimPos + delim.size());
         /* 고객 리스트에서 ID와 이름을 확인 */
@@ -486,7 +486,7 @@ void ChatServerForm::inviteClient()
 * @brief 관리자의 채팅창에서 고객을 채팅방에 초대하는 슬롯
 * @Param std::string id 초대할 고객의 id
 */
-void ChatServerForm::inviteClientInChatWindow(std::string id)
+void ChatServerForm::inviteClientInChatWindow(const std::string id)
 {
     QByteArray sendArray;
     QDataStream out(&sendArray, QIODevice::WriteOnly);
@@ -537,7 +537,7 @@ void ChatServerForm::kickOut()
 * @brief 관리자의 채팅창에서 고객을 채팅방으로부터 강퇴하는 슬롯
 * @Param std::string id 강퇴할 고객의 id
 */
-void ChatServerForm::kickOutInChatWindow(std::string id)
+void ChatServerForm::kickOutInChatWindow(const std::string id)
 {
     /* 고객을 채팅방에서 강퇴 */
     QByteArray sendArray;
@@ -564,7 +564,7 @@ void ChatServerForm::kickOutInChatWindow(std::string id)
 * @Param std::string 메시지를 받을 고객의 id
 * @Param std::string str 전달할 메시지
 */
-void ChatServerForm::sendData(std::string id, std::string str)
+void ChatServerForm::sendData(const std::string id, const std::string str)
 {
 
     if(clientIdSocketHash.find(id) == clientIdSocketHash.end())
@@ -610,7 +610,7 @@ void ChatServerForm::sendData(std::string id, std::string str)
 * @brief 고객 리스트 tree widget의 context menu 슬롯
 * const QPoint &pos 우클릭한 위치
 */
-void ChatServerForm::on_clientTreeWidget_customContextMenuRequested(const QPoint &pos)
+void ChatServerForm::on_clientTreeWidget_customContextMenuRequested(const QPoint &pos) const
 {
     if(ui->clientTreeWidget->currentItem() == nullptr)
         return;
