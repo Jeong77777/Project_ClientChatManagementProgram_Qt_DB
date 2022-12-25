@@ -68,7 +68,7 @@ void ClientDialog::receiveClientInfo(int id, std::string name, \
 * @brief 현재 선택된 고객ID와 이름을 반환
 * @return 현재 선택된 고객ID(이름)
 */
-std::string ClientDialog::getCurrentItem()
+std::string ClientDialog::getCurrentItem() const
 {
     QModelIndex index = ui->treeView->currentIndex();
 
@@ -84,7 +84,7 @@ std::string ClientDialog::getCurrentItem()
 /**
 * @brief 검색 결과, 입력 창 초기화
 */
-void ClientDialog::clearDialog()
+void ClientDialog::clearDialog() const
 {
     clientModel->removeRows(0, clientModel->rowCount());
     ui->lineEdit->clear();
