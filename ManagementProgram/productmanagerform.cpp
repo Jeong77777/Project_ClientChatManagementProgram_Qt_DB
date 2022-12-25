@@ -98,7 +98,7 @@ ProductManagerForm::~ProductManagerForm()
 /**
 * @brief 전체 제품 리스트 출력 버튼 슬롯, tree view에 전체 제품 리스트를 출력해 준다.
 */
-void ProductManagerForm::on_showAllPushButton_clicked()
+void ProductManagerForm::on_showAllPushButton_clicked() const
 {
     productModel->setFilter(""); // 필터 초기화
     productModel->select();
@@ -109,7 +109,7 @@ void ProductManagerForm::on_showAllPushButton_clicked()
 * @brief 검색 항목 선택 콤보 박스에서 선택된 것이 변경되었을 때 실행되는 슬롯
 * @Param int index 선택된 항목의 index
 */
-void ProductManagerForm::on_searchComboBox_currentIndexChanged(int index)
+void ProductManagerForm::on_searchComboBox_currentIndexChanged(const int index) const
 {
     // 0. ID  1. Type  2. Name
     if(index == 1) { // 검색 항목으로 Type을 선택 했을 때
@@ -264,7 +264,7 @@ void ProductManagerForm::on_modifyPushButton_clicked()
 /**
 * @brief 입력 창 클리어 버튼 슬롯, 입력 창을 클리어 하는 함수 호출
 */
-void ProductManagerForm::on_cleanPushButton_clicked()
+void ProductManagerForm::on_cleanPushButton_clicked() const
 {
     cleanInputLineEdit();
 }
@@ -273,7 +273,7 @@ void ProductManagerForm::on_cleanPushButton_clicked()
 * @brief tree view의 context 메뉴 출력
 * @param const QPoint &pos 우클릭한 위치
 */
-void ProductManagerForm::showContextMenu(const QPoint &pos)
+void ProductManagerForm::showContextMenu(const QPoint &pos) const
 {
     /* tree view 위에서 우클릭한 위치에서 context menu 출력 */
     QPoint globalPos = ui->treeView->mapToGlobal(pos);
@@ -309,7 +309,7 @@ void ProductManagerForm::removeItem()
 * @brief 주문 정보 관리 객체에서 제품ID를 가지고 제품을 검색 하기 위한 슬롯
 * @Param int id 검색할 제품 id
 */
-void ProductManagerForm::receiveId(int id)
+void ProductManagerForm::receiveId(const int id)
 {    
     /* 제품 ID를 이용하여 제품 검색 */
     QSqlQuery query(QString("select * "
@@ -333,7 +333,7 @@ void ProductManagerForm::receiveId(int id)
 * @brief 제품 검색 Dialog에서 제품을 검색 하기 위한 슬롯
 * @Param std::string word 검색어(id 또는 이름)
 */
-void ProductManagerForm::receiveWord(std::string word)
+void ProductManagerForm::receiveWord(const std::string word)
 {
     /* 제품 ID 또는 이름을 이용하여 고객 검색 */
     QSqlQuery query(QString("select * "
@@ -358,7 +358,7 @@ void ProductManagerForm::receiveWord(std::string word)
 * @brief 신규 제품 추가 시 ID를 자동으로 생성
 * @return int 새로운 id 반환
 */
-int ProductManagerForm::makeId()
+int ProductManagerForm::makeId() const
 {
     // id의 최댓값 가져오기
     QSqlQuery query("select count(*), max(id) from Product_list;",
@@ -378,7 +378,7 @@ int ProductManagerForm::makeId()
 /**
 * @brief 입력 창 클리어
 */
-void ProductManagerForm::cleanInputLineEdit()
+void ProductManagerForm::cleanInputLineEdit() const
 {
     ui->idLineEdit->clear();
     ui->nameLineEdit->clear();
@@ -390,7 +390,7 @@ void ProductManagerForm::cleanInputLineEdit()
 * @brief tree view에서 제품을 클릭(선택)했을 때 실행되는 슬롯, 클릭된 제품의 정보를 입력 창에 표시
 * @param const QModelIndex &index 선택된 제품의 index
 */
-void ProductManagerForm::on_treeView_clicked(const QModelIndex &index)
+void ProductManagerForm::on_treeView_clicked(const QModelIndex &index) const
 {
     /* 클릭된 제품의 정보를 가져와서 입력 창에 표시해줌 */
     std::string id = productModel->data(index.siblingAtColumn(0)).toString().toStdString();
@@ -411,7 +411,7 @@ void ProductManagerForm::on_treeView_clicked(const QModelIndex &index)
 * @param int id 재고를 변경할 제품의 ID
 * @param int stock 변경할 재고수량
 */
-void ProductManagerForm::setStock(int id, int stock)
+void ProductManagerForm::setStock(const int id, const int stock) const
 {
     if(stock >= 0) {
         QSqlQuery query(productModel->database());
