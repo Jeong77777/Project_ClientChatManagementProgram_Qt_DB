@@ -24,10 +24,10 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_actionClient_triggered();
-    void on_actionProduct_triggered();
-    void on_actionOrder_triggered();
-    void on_actionChat_triggered();
+    void on_actionClient_triggered() const;
+    void on_actionProduct_triggered() const;
+    void on_actionOrder_triggered() const;
+    void on_actionChat_triggered() const;
 
 private:
     Ui::MainWindow *ui;

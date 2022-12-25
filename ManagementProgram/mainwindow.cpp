@@ -127,28 +127,28 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_actionClient_triggered()
+void MainWindow::on_actionClient_triggered() const
 {
     if(clientForm != nullptr) {
         clientForm->setFocus();
     }
 }
 
-void MainWindow::on_actionProduct_triggered()
+void MainWindow::on_actionProduct_triggered() const
 {
     if(productForm != nullptr) {
         productForm->setFocus();
     }
 }
 
-void MainWindow::on_actionOrder_triggered()
+void MainWindow::on_actionOrder_triggered() const
 {
     if(orderForm != nullptr) {
         orderForm->setFocus();
     }
 }
 
-void MainWindow::on_actionChat_triggered()
+void MainWindow::on_actionChat_triggered() const
 {
     if(chatForm != nullptr) {
         chatForm->setFocus();
