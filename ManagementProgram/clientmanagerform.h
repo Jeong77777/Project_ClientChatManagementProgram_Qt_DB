@@ -36,9 +36,9 @@ private slots:
     void showContextMenu(const QPoint &); // tree view의 context 메뉴 출력
     void removeItem();                    // 고객 정보 삭제
     // 주문 정보 관리 객체에서 고객ID를 가지고 고객을 검색 하기 위한 슬롯
-    void receiveId(int);
+    void receiveId(const int);
     // 고객 검색 Dialog에서 고객을 검색 하기 위한 슬롯
-    void receiveWord(std::string);
+    void receiveWord(const std::string);
 
 signals:
     // 고객 검색 Dialog로 검색된 고객 정보를 보내주는 시그널

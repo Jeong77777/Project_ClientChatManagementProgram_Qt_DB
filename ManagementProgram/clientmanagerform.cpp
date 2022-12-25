@@ -295,7 +295,7 @@ void ClientManagerForm::removeItem()
 * @brief 주문 정보 관리 객체에서 고객ID를 가지고 고객을 검색 하기 위한 슬롯
 * @Param int id 검색할 고객 id
 */
-void ClientManagerForm::receiveId(int id)
+void ClientManagerForm::receiveId(const int id)
 {
     /* 고객 ID를 이용하여 고객 검색 */
     QSqlQuery query(QString("select * "
@@ -318,7 +318,7 @@ void ClientManagerForm::receiveId(int id)
 * @brief 고객 검색 Dialog에서 고객을 검색 하기 위한 슬롯
 * @Param std::string word 검색어(id 또는 이름)
 */
-void ClientManagerForm::receiveWord(std::string word)
+void ClientManagerForm::receiveWord(const std::string word)
 {
     /* 고객 ID 또는 이름을 이용하여 고객 검색 */
     QSqlQuery query(QString("select * "
