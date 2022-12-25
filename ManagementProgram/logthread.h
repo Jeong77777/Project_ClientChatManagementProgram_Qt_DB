@@ -24,7 +24,7 @@ private:
 
 public slots:
     void appendData(QTreeWidgetItem*); // 새 채팅 기록 추가
-    void saveData();                   // 채팅 로그 저장
+    void saveData() const;                   // 채팅 로그 저장
 };
 
 #endif // LOGTHREAD_H

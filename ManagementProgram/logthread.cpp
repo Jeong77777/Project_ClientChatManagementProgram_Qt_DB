@@ -38,7 +38,7 @@ void LogThread::appendData(QTreeWidgetItem* item)
 /**
  * @brief 채팅 로그 저장
  */
-void LogThread::saveData()
+void LogThread::saveData() const
 {
     if(itemList.size() > 0) {
         QFile file(QString::fromStdString(filename));
