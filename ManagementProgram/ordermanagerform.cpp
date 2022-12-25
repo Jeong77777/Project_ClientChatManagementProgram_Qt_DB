@@ -124,7 +124,7 @@ OrderManagerForm::~OrderManagerForm()
 /**
 * @brief 전체 주문 리스트 출력 버튼 슬롯, tree view에 전체 주문 리스트를 출력해 준다.
 */
-void OrderManagerForm::on_showAllPushButton_clicked()
+void OrderManagerForm::on_showAllPushButton_clicked() const
 {
     orderModel->setFilter("");  // 필터 초기화
     orderModel->select();
@@ -139,7 +139,7 @@ void OrderManagerForm::on_showAllPushButton_clicked()
 * @brief 검색 항목 선택 콤보 박스에서 선택된 것이 변경되었을 때 실행되는 슬롯
 * @Param int index 선택된 항목의 index
 */
-void OrderManagerForm::on_searchComboBox_currentIndexChanged(int index)
+void OrderManagerForm::on_searchComboBox_currentIndexChanged(const int index) const
 {
     // 0. ID  1. Date  2. Client  3. Product
     if(index == 1) { // 검색 항목으로 Date를 선택 했을 때
@@ -215,7 +215,7 @@ void OrderManagerForm::on_searchPushButton_clicked()
 /**
 * @brief 고객 검색, 입력 버튼 슬롯 -> 다이얼로그 실행
 */
-void OrderManagerForm::on_inputClientPushButton_clicked()
+void OrderManagerForm::on_inputClientPushButton_clicked() const
 {
     /* 고객을 검색, 입력하기 위한 다이얼로그 실행 */
     clientDialog->show();
@@ -231,7 +231,7 @@ void OrderManagerForm::on_inputClientPushButton_clicked()
 /**
 * @brief 제품 검색, 입력 버튼 슬롯 -> 다이얼로그 실행
 */
-void OrderManagerForm::on_inputProductPushButton_clicked()
+void OrderManagerForm::on_inputProductPushButton_clicked() const
 {
     /* 제품을 검색, 입력하기 위한 다이얼로그 실행 */
     productDialog->show();
@@ -413,7 +413,7 @@ void OrderManagerForm::on_modifyPushButton_clicked()
 /**
 * @brief 입력 창 클리어 버튼 슬롯, 입력 창을 클리어 하는 함수 호출
 */
-void OrderManagerForm::on_cleanPushButton_clicked()
+void OrderManagerForm::on_cleanPushButton_clicked() const
 {
     cleanInputLineEdit();
 }
@@ -422,7 +422,7 @@ void OrderManagerForm::on_cleanPushButton_clicked()
 * @brief tree view의 context 메뉴 출력
 * @param const QPoint &pos 우클릭한 위치
 */
-void OrderManagerForm::showContextMenu(const QPoint &pos)
+void OrderManagerForm::showContextMenu(const QPoint &pos) const
 {
     /* tree view 위에서 우클릭한 위치에서 context menu 출력 */
     QPoint globalPos = ui->treeView->mapToGlobal(pos);
@@ -485,8 +485,8 @@ void OrderManagerForm::removeItem()
 * @param std::string phone 전화번호
 * @param std::string address 주소
 */
-void OrderManagerForm::receiveClientInfo(int id, std::string name, \
-                                         std::string phone, std::string address)
+void OrderManagerForm::receiveClientInfo(const int id, const std::string name, \
+                                         const std::string phone, const std::string address)
 {
     // 고객 상세 정보 model 초기화
     clientModel->removeRows(0, clientModel->rowCount());
@@ -516,8 +516,8 @@ void OrderManagerForm::receiveClientInfo(int id, std::string name, \
 * @param int price
 * @param int stock
 */
-void OrderManagerForm::receiveProductInfo(int id, std::string type, \
-                                          std::string name, int price, int stock)
+void OrderManagerForm::receiveProductInfo(const int id, const std::string type, \
+                                          const std::string name, const int price, const int stock)
 {
     // 제품 상세 정보 model 초기화
     productModel->removeRows(0, productModel->rowCount());
@@ -544,7 +544,7 @@ void OrderManagerForm::receiveProductInfo(int id, std::string type, \
 * @brief 신규 주문 추가 시 ID를 자동으로 생성
 * @return int 새로운 id 반환
 */
-int OrderManagerForm::makeId()
+int OrderManagerForm::makeId() const
 {
     // id의 최댓값 가져오기
     QSqlQuery query("select count(*), max(id) from Order_list;",
@@ -564,7 +564,7 @@ int OrderManagerForm::makeId()
 /**
 * @brief 입력 창 클리어
 */
-void OrderManagerForm::cleanInputLineEdit()
+void OrderManagerForm::cleanInputLineEdit() const
 {
     ui->idLineEdit->clear();
     ui->dateEdit->setDate(QDate::currentDate());

@@ -30,24 +30,24 @@ public:
     void loadData();  // 저장되어 있는 주문 리스트 불러오기
 
 private slots:
-    void on_showAllPushButton_clicked(); // 전체 주문 리스트 출력 버튼 슬롯
+    void on_showAllPushButton_clicked() const; // 전체 주문 리스트 출력 버튼 슬롯
     // 검색 항목 선택 콤보 박스에서 선택된 것이 변경되었을 때의 슬롯
-    void on_searchComboBox_currentIndexChanged(int index);
+    void on_searchComboBox_currentIndexChanged(const int index) const;
     void on_searchPushButton_clicked();       // 검색 버튼 슬롯
-    void on_inputClientPushButton_clicked();  // 고객 검색, 입력 버튼 슬롯
-    void on_inputProductPushButton_clicked(); // 제품 검색, 입력 버튼 슬롯
+    void on_inputClientPushButton_clicked() const;  // 고객 검색, 입력 버튼 슬롯
+    void on_inputProductPushButton_clicked() const; // 제품 검색, 입력 버튼 슬롯
     void on_addPushButton_clicked();          // 주문 추가 버튼 슬롯
     void on_modifyPushButton_clicked();       // 주문 정보 변경 버튼 슬롯
-    void on_cleanPushButton_clicked();        // 입력 창 클리어 버튼 슬롯
+    void on_cleanPushButton_clicked() const;        // 입력 창 클리어 버튼 슬롯
     // tree view에서 주문을 클릭(선택)했을 때의 슬롯
     void on_treeView_clicked(const QModelIndex &index);
 
-    void showContextMenu(const QPoint &); // tree view의 context 메뉴 출력
+    void showContextMenu(const QPoint &) const; // tree view의 context 메뉴 출력
     void removeItem();                    // 주문 정보 삭제
     // 고객 정보 관리 객체로부터 고객 정보를 받기 위한 슬롯
-    void receiveClientInfo(int, std::string, std::string, std::string);
+    void receiveClientInfo(const int, const std::string, const std::string, const std::string);
     // 제품 정보 관리 객체로부터 제품 정보를 받기 위한 슬롯
-    void receiveProductInfo(int, std::string, std::string, int, int);
+    void receiveProductInfo(const int, const std::string, const std::string, const int, const int);
 
 signals:
     // 고객 정보 관리 객체로 가져올 고객 정보에 대한 ID를 보내는 시그널
@@ -60,8 +60,8 @@ signals:
     void sendStock(int, int);
 
 private:
-    int makeId();              // Id를 자동으로 생성
-    void cleanInputLineEdit(); // 입력 창 클리어
+    int makeId() const;               // Id를 자동으로 생성
+    void cleanInputLineEdit() const; // 입력 창 클리어
 
     ClientDialog *clientDialog;   // 고객을 검색, 입력하기 위한 다이얼로그
     ProductDialog *productDialog; // 제품을 검색, 입력하기 위한 다이얼로그
