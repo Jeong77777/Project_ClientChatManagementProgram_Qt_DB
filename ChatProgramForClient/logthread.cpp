@@ -27,7 +27,7 @@ void LogThread::run()
  * @brief 새로운 채팅 추가
  * @Param std::string data 채팅 내용
  */
-void LogThread::appendData(std::string data)
+void LogThread::appendData(const std::string data)
 {
     chatList.push_back(data);
 }

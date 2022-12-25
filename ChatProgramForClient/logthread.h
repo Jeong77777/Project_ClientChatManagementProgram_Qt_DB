@@ -22,7 +22,7 @@ private:
     std::string filename;               // 로그를 저장하는 파일의 이름
 
 public slots:
-    void appendData(std::string);       // 새 채팅 내용 추가
+    void appendData(const std::string);       // 새 채팅 내용 추가
     void saveData();                // 채팅 로그 저장
 };
 

@@ -238,7 +238,7 @@ void Widget::receiveData( )
 /**
  * @brief 관리자(서버)로 메시지를 보내기 위한 슬롯
  */
-void Widget::sendData()
+void Widget::sendData() const
 {
     std::string str = ui->inputLine->text().toStdString();
     if(str.length()) {
@@ -286,7 +286,7 @@ void Widget::disconnect()
  * @param char* data 실제 전송할 데이터
  * @param int size
  */
-void Widget::sendProtocol(Chat_Status type, char* data, int size)
+void Widget::sendProtocol(const Chat_Status type, const char *data, const int size) const
 {
     /* 소켓으로 보낼 데이터를 채우고 서버로 전송 */
     QByteArray dataArray;
@@ -357,7 +357,7 @@ void Widget::sendFile()
  * @brief 파일을 여러 번 나눠서 전송하기 위한 슬롯
  * @param qint64 numBytes 이전에 보낸 데이터의 사이즈
  */
-void Widget::goOnSend(qint64 numBytes)
+void Widget::goOnSend(const qint64 numBytes)
 {
     byteToWrite -= numBytes; // 전송할 남은 데이터의 크기
 
@@ -380,7 +380,7 @@ void Widget::goOnSend(qint64 numBytes)
  * @param int id 고객ID
  * @param std::string name 이름
  */
-void Widget::loadData(int id, std::string name)
+void Widget::loadData(int id, std::string name) const
 {
     // 로그 파일 검색 log_(ID)_(이름).txt
     QFile file("log_" + QString::number(id)+"_"+QString::fromStdString(name)+".txt");

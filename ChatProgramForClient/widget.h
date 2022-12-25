@@ -40,18 +40,18 @@ public:
 
 private slots:
     void receiveData();	   // 관리자(서버)로부터 메시지를 받기 위한 슬롯
-    void sendData();       // 관리자(서버)로 메시지를 보내기 위한 슬롯
+    void sendData() const;       // 관리자(서버)로 메시지를 보내기 위한 슬롯
     void disconnect();     // 서버와의 연결이 끊어졌을 때의 슬롯
     // 프로토콜에 따라 서버로 데이터를 전송하기 위한 슬롯
-    void sendProtocol(Chat_Status, char*, int = 1020);
+    void sendProtocol(const Chat_Status, const char*, const int = 1020) const;
     void sendFile();       // 관리자(서버)로 파일을 보내기 위한 슬롯
-    void goOnSend(qint64); // 파일을 여러 번 나눠서 전송하기 위한 슬롯
+    void goOnSend(const qint64); // 파일을 여러 번 나눠서 전송하기 위한 슬롯
 
 private:
     Ui::Widget *ui;
 
     void closeEvent(QCloseEvent*) override;
-    void loadData(int, std::string);     // 이전 채팅 내용 불러오기
+    void loadData(int, std::string) const;     // 이전 채팅 내용 불러오기
 
     QTcpSocket *clientSocket;		 // 채팅을 위한 소켓
     QTcpSocket *fileClient;          // 파일 전송을 위한 소켓
