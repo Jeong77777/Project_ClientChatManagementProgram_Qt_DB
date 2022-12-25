@@ -102,7 +102,7 @@ ClientManagerForm::~ClientManagerForm()
 /**
 * @brief 전체 고객 리스트 출력 버튼 슬롯, tree view에 전체 고객 리스트를 출력해 준다.
 */
-void ClientManagerForm::on_showAllPushButton_clicked()
+void ClientManagerForm::on_showAllPushButton_clicked() const
 {
     clientModel->setFilter("");  // 필터 초기화
     clientModel->select();
@@ -250,7 +250,7 @@ void ClientManagerForm::on_modifyPushButton_clicked()
 /**
 * @brief 입력 창 클리어 버튼 슬롯, 입력 창을 클리어 하는 함수 호출
 */
-void ClientManagerForm::on_cleanPushButton_clicked()
+void ClientManagerForm::on_cleanPushButton_clicked() const
 {
     cleanInputLineEdit();
 }
@@ -344,7 +344,7 @@ void ClientManagerForm::receiveWord(std::string word)
 * @brief 신규 고객 추가 시 ID를 자동으로 생성
 * @return int 새로운 id 반환
 */
-int ClientManagerForm::makeId()
+int ClientManagerForm::makeId() const
 {
     // id의 최댓값 가져오기
     QSqlQuery query("select count(*), max(id) from Client_list;",
@@ -364,7 +364,7 @@ int ClientManagerForm::makeId()
 /**
 * @brief 입력 창 클리어
 */
-void ClientManagerForm::cleanInputLineEdit()
+void ClientManagerForm::cleanInputLineEdit() const
 {
     ui->idLineEdit->clear();
     ui->nameLineEdit->clear();
@@ -376,7 +376,7 @@ void ClientManagerForm::cleanInputLineEdit()
 * @brief tree view에서 고객을 클릭(선택)했을 때 실행되는 슬롯, 클릭된 고객의 정보를 입력 창에 표시
 * @param const QModelIndex &index 선택된 고객의 index
 */
-void ClientManagerForm::on_treeView_clicked(const QModelIndex &index)
+void ClientManagerForm::on_treeView_clicked(const QModelIndex &index) const
 {
     /* 클릭된 고객의 정보를 가져와서 입력 창에 표시해줌 */
     std::string id = clientModel->data(index.siblingAtColumn(0)).toString().toStdString();
