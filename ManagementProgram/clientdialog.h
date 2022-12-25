@@ -27,7 +27,7 @@ public:
 private slots:
     void on_searchPushButton_clicked(); // 검색 버튼에 대한 슬롯
     // 고객 관리 객체로부터 검색 결과를 받는 슬롯
-    void receiveClientInfo(int, std::string, std::string, std::string);
+    void receiveClientInfo(const int, const std::string, const std::string, const std::string);
 
     // tree view에서 고객을 더블클릭 하였을 때의 슬롯
     void on_treeView_doubleClicked(const QModelIndex &index);

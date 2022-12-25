@@ -46,8 +46,8 @@ ClientDialog::~ClientDialog()
 * @param std::string phone 전화번호
 * @param std::string address 주소
 */
-void ClientDialog::receiveClientInfo(int id, std::string name, \
-                                     std::string phone, std::string address)
+void ClientDialog::receiveClientInfo(const int id, const std::string name, \
+                                     const std::string phone, const std::string address)
 {
     /* 검색 결과를 model에 추가 */
     std::vector<std::string> strings;
