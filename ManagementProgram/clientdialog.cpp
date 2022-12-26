@@ -18,7 +18,7 @@ ClientDialog::ClientDialog(QWidget *parent) :
     setWindowModality(Qt::ApplicationModal);
 
     assert(connect(ui->lineEdit, SIGNAL(returnPressed()),
-            this, SLOT(on_searchPushButton_clicked())));
+                   this, SLOT(on_searchPushButton_clicked())));
 
     ui->searchPushButton->setDefault(true);
 
@@ -36,7 +36,15 @@ ClientDialog::ClientDialog(QWidget *parent) :
 */
 ClientDialog::~ClientDialog()
 {
-    delete ui;
+    int row = clientModel->rowCount();
+    for(int i = 0; i < row; i++) {
+        QList<QStandardItem *> itmes = clientModel->takeRow(0);
+        for(const auto& item : itmes)
+            delete item;
+    }
+
+    delete clientModel; clientModel = nullptr;
+    delete ui; ui = nullptr;
 }
 
 /**
@@ -86,7 +94,12 @@ std::string ClientDialog::getCurrentItem() const
 */
 void ClientDialog::clearDialog() const
 {
-    clientModel->removeRows(0, clientModel->rowCount());
+    int row = clientModel->rowCount();
+    for(int i = 0; i < row; i++) {
+        QList<QStandardItem *> itmes = clientModel->takeRow(0);
+        for(const auto& item : itmes)
+            delete item;
+    }
     ui->lineEdit->clear();
 }
 
@@ -96,7 +109,12 @@ void ClientDialog::clearDialog() const
 void ClientDialog::on_searchPushButton_clicked()
 {
     /* 검색을 위해 고객 관리 객체로 검색어를 전달하는 시그널 emit */
-    clientModel->removeRows(0, clientModel->rowCount());
+    int row = clientModel->rowCount();
+    for(int i = 0; i < row; i++) {
+        QList<QStandardItem *> itmes = clientModel->takeRow(0);
+        for(const auto& item : itmes)
+            delete item;
+    }
     emit sendWord(ui->lineEdit->text().toStdString());
 }
 
