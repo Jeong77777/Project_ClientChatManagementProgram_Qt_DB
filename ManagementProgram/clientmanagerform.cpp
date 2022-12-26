@@ -15,7 +15,8 @@
 ClientManagerForm::ClientManagerForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ClientManagerForm),
-    menu(nullptr), clientModel(nullptr)
+    menu(nullptr), removeAction(nullptr), clientModel(nullptr),
+    phoneNumberRegExpValidator(nullptr)
 {
     ui->setupUi(this);
 
