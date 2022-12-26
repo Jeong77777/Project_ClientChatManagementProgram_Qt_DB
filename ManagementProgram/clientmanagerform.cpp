@@ -93,7 +93,7 @@ ClientManagerForm::~ClientManagerForm()
     QSqlDatabase db = QSqlDatabase::database("clientConnection");
     if(db.isOpen()) {
         clientModel->submitAll();
-        delete clientModel;
+        delete clientModel; clientModel = nullptr;
         db.commit();
         db.close();
     }
