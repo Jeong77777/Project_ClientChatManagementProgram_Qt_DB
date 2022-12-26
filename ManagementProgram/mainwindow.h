@@ -11,6 +11,8 @@ class ClientManagerForm;
 class ProductManagerForm;
 class OrderManagerForm;
 class ChatServerForm;
+class ClientDialog;
+class ProductDialog;
 
 /**
  * @brief MainWindow 클래스
@@ -35,6 +37,10 @@ private:
     ProductManagerForm *productForm;    // 제품 정보 관리
     OrderManagerForm *orderForm;        // 주문 정보 관리
     ChatServerForm *chatForm;           // 채팅 서버
+
+    /* 고객, 제품 검색 기능을 제공하는 dialog */
+    ClientDialog *clientDialog;
+    ProductDialog *productDialog;
 
 };
 #endif // MAINWINDOW_H

@@ -15,15 +15,16 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow),
-      clientForm(nullptr), productForm(nullptr), orderForm(nullptr), chatForm(nullptr)
+      clientForm(nullptr), productForm(nullptr), orderForm(nullptr), chatForm(nullptr),
+      clientDialog(nullptr), productDialog(nullptr)
 {
     ui->setupUi(this);
 
     setWindowTitle(tr("Client/Product/Order/Chat Management Program"));
 
     /* 고객, 제품 검색 기능을 제공하는 dialog 생성 */
-    ClientDialog *clientDialog = new ClientDialog();    // 고객 검색
-    ProductDialog *productDialog = new ProductDialog(); // 제품 검색
+    clientDialog = new ClientDialog();    // 고객 검색
+    productDialog = new ProductDialog(); // 제품 검색
 
     // 고객 관리 객체 생성
     clientForm = new ClientManagerForm(this);
@@ -114,16 +115,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-    delete clientForm;
-    delete productForm;
-    delete orderForm;
-    delete chatForm;
-
     QStringList list = QSqlDatabase::connectionNames();
     for(int i = 0; i < list.count(); ++i) {
         QSqlDatabase::removeDatabase(list[i]);
-    }
+    }    
+
+    delete clientDialog; clientDialog = nullptr;
+    delete productDialog; productDialog = nullptr;
+    delete clientForm; clientForm = nullptr;
+    delete productForm; productForm = nullptr;
+    delete orderForm; orderForm = nullptr;
+    delete chatForm; chatForm = nullptr;
+    delete ui; ui = nullptr;
 }
 
 
