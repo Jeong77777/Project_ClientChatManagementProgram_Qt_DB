@@ -12,6 +12,7 @@ class QFile;
 class QProgressDialog;
 class LogThread;
 class ChatWindowForAdmin;
+class QAction;
 
 namespace Ui {
 class ChatServerForm;
@@ -93,6 +94,11 @@ private:
     QByteArray inBlock;              // 파일 수신을 위한 블록
 
     LogThread* logThread; // 채팅 로그를 저장하기 위한 thread
+
+    /* 고객 리스트 tree widget의 context 메뉴 */
+    QAction* openAction;
+    QAction* inviteAction;
+    QAction* kickOutAction;
 };
 
 #endif // CHATSERVERFORM_H
