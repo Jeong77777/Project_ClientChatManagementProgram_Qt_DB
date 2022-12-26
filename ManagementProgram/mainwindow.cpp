@@ -115,11 +115,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    QStringList list = QSqlDatabase::connectionNames();
-    for(int i = 0; i < list.count(); ++i) {
-        QSqlDatabase::removeDatabase(list[i]);
-    }    
-
     delete clientDialog; clientDialog = nullptr;
     delete productDialog; productDialog = nullptr;
     delete clientForm; clientForm = nullptr;
@@ -127,6 +122,11 @@ MainWindow::~MainWindow()
     delete orderForm; orderForm = nullptr;
     delete chatForm; chatForm = nullptr;
     delete ui; ui = nullptr;
+
+    QStringList list = QSqlDatabase::connectionNames();
+    for(int i = 0; i < list.count(); ++i) {
+        QSqlDatabase::removeDatabase(list[i]);
+    }
 }
 
 
