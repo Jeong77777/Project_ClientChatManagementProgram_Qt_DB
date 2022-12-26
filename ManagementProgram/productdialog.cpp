@@ -37,7 +37,15 @@ ProductDialog::ProductDialog(QWidget *parent) :
 */
 ProductDialog::~ProductDialog()
 {
-    delete ui;
+    int row = productModel->rowCount();
+    for(int i = 0; i < row; i++) {
+        QList<QStandardItem *> itmes = productModel->takeRow(0);
+        for(const auto& item : itmes)
+            delete item;
+    }
+
+    delete productModel; productModel = nullptr;
+    delete ui; ui = nullptr;
 }
 
 /**
@@ -88,9 +96,13 @@ std::string ProductDialog::getCurrentItem() const
 */
 void ProductDialog::clearDialog() const
 {
-    productModel->removeRows(0, productModel->rowCount());
+    int row = productModel->rowCount();
+    for(int i = 0; i < row; i++) {
+        QList<QStandardItem *> itmes = productModel->takeRow(0);
+        for(const auto& item : itmes)
+            delete item;
+    }
     ui->lineEdit->clear();
-    ui->searchPushButton->setFocus();
 }
 
 /**
@@ -99,7 +111,12 @@ void ProductDialog::clearDialog() const
 void ProductDialog::on_searchPushButton_clicked()
 {
     /* 검색을 위해 제품 관리 객체로 검색어를 전달하는 시그널 emit */
-    productModel->removeRows(0, productModel->rowCount());
+    int row = productModel->rowCount();
+    for(int i = 0; i < row; i++) {
+        QList<QStandardItem *> itmes = productModel->takeRow(0);
+        for(const auto& item : itmes)
+            delete item;
+    }
     emit sendWord(ui->lineEdit->text().toStdString());
 }
 
