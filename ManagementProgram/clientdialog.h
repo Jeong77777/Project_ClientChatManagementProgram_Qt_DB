@@ -37,8 +37,8 @@ signals:
     void sendWord(std::string);
 
 private:
-    Ui::ClientDialog *ui;
-    QStandardItemModel *clientModel;    // 검색된 고객을 저장하는 model
+    Ui::ClientDialog *m_ui;
+    QStandardItemModel *m_clientModel;    // 검색된 고객을 저장하는 model
 };
 
 #endif // CLIENTDIALOG_H

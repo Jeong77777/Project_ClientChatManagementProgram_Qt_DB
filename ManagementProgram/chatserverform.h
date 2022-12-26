@@ -72,33 +72,33 @@ private:
     // 고객에게 로그인 결과를 전송
     void sendLoginResult(QTcpSocket*, const char*);
 
-    Ui::ChatServerForm *ui; // ui
-    QTcpServer *chatServer; // 채팅을 위한 서버
-    QTcpServer *fileServer; // 파일 수신을 위한 서버
+    Ui::ChatServerForm *m_ui; // ui
+    QTcpServer *m_chatServer; // 채팅을 위한 서버
+    QTcpServer *m_fileServer; // 파일 수신을 위한 서버
 
     // <port, id>를 저장하는 unordered_map
-    std::unordered_map<unsigned short, std::string> portClientIdHash;
+    std::unordered_map<unsigned short, std::string> m_portClientMap;
     // <id, socket>을 저장하는 unordered_map
-    std::unordered_map<std::string, QTcpSocket*> clientIdSocketHash;
+    std::unordered_map<std::string, QTcpSocket*> m_clientIdSocketMap;
     // <id, name>을 저장하는 unordered_map
-    std::unordered_map<std::string, std::string> clientIdNameHash;
+    std::unordered_map<std::string, std::string> m_clientIdNameMap;
     // <id, chat window>을 저장하는 unordered_map
-    std::unordered_map<std::string, ChatWindowForAdmin*> clientIdWindowHash;
+    std::unordered_map<std::string, ChatWindowForAdmin*> m_clientIdWindowMap;
 
-    QMenu* menu; // 고객 리스트 tree widget context 메뉴
+    QMenu* m_menu; // 고객 리스트 tree widget context 메뉴
 
-    QFile* file;                     // 수신 받는 파일
-    QProgressDialog* progressDialog; // 파일 수신 진행 상태
-    long long totalSize;                // 총 데이터의 크기(파일 + 파일 정보)
-    long long byteReceived;             // 수신한 누적 데이터의 크기
-    QByteArray inBlock;              // 파일 수신을 위한 블록
+    QFile* m_file;                     // 수신 받는 파일
+    QProgressDialog* m_progressDialog; // 파일 수신 진행 상태
+    long long m_totalSize;                // 총 데이터의 크기(파일 + 파일 정보)
+    long long m_byteReceived;             // 수신한 누적 데이터의 크기
+    QByteArray m_inBlock;              // 파일 수신을 위한 블록
 
-    LogThread* logThread; // 채팅 로그를 저장하기 위한 thread
+    LogThread* m_logThread; // 채팅 로그를 저장하기 위한 thread
 
     /* 고객 리스트 tree widget의 context 메뉴 */
-    QAction* openAction;
-    QAction* inviteAction;
-    QAction* kickOutAction;
+    QAction* m_openAction;
+    QAction* m_inviteAction;
+    QAction* m_kickOutAction;
 };
 
 #endif // CHATSERVERFORM_H

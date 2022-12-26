@@ -19,8 +19,8 @@ public:
 private:
     void run() override; // 1분마다 채팅 로그를 저장
 
-    std::vector<QTreeWidgetItem*> itemList; // 채팅 로그 tree widget
-    std::string filename;                 // 로그를 저장하는 파일의 이름
+    std::vector<QTreeWidgetItem*> m_itemList; // 채팅 로그 tree widget
+    std::string m_filename;                 // 로그를 저장하는 파일의 이름
 
 public slots:
     void appendData(QTreeWidgetItem*); // 새 채팅 기록 추가

@@ -32,15 +32,15 @@ private slots:
     void on_actionChat_triggered() const;
 
 private:
-    Ui::MainWindow *ui;
-    ClientManagerForm *clientForm;      // 고객 정보 관리
-    ProductManagerForm *productForm;    // 제품 정보 관리
-    OrderManagerForm *orderForm;        // 주문 정보 관리
-    ChatServerForm *chatForm;           // 채팅 서버
+    Ui::MainWindow *m_ui;
+    ClientManagerForm *m_clientForm;      // 고객 정보 관리
+    ProductManagerForm *m_productForm;    // 제품 정보 관리
+    OrderManagerForm *m_orderForm;        // 주문 정보 관리
+    ChatServerForm *m_chatForm;           // 채팅 서버
 
     /* 고객, 제품 검색 기능을 제공하는 dialog */
-    ClientDialog *clientDialog;
-    ProductDialog *productDialog;
+    ClientDialog *m_clientDialog;
+    ProductDialog *m_productDialog;
 
 };
 #endif // MAINWINDOW_H

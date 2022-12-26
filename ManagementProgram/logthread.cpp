@@ -8,9 +8,9 @@
  * @brief 생성자, 로그를 저장하는 파일 이름 설정
  */
 LogThread::LogThread(QObject *parent)
-    : QThread{parent}, filename("")
+    : QThread{parent}, m_filename("")
 {
-    filename = std::string("log_.txt")\
+    m_filename = std::string("log_.txt")\
             .insert(4, QDateTime::currentDateTime()\
                     .toString("yyyyMMdd_hhmmss").toStdString());
 }
@@ -32,7 +32,7 @@ void LogThread::run()
  */
 void LogThread::appendData(QTreeWidgetItem* item)
 {
-    itemList.push_back(item);
+    m_itemList.push_back(item);
 }
 
 /**
@@ -40,13 +40,13 @@ void LogThread::appendData(QTreeWidgetItem* item)
  */
 void LogThread::saveData() const
 {
-    if(itemList.size() > 0) {
-        QFile file(QString::fromStdString(filename));
+    if(m_itemList.size() > 0) {
+        QFile file(QString::fromStdString(m_filename));
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
             return;
 
         QTextStream out(&file);
-        for(const auto& item : itemList) {
+        for(const auto& item : m_itemList) {
             out << item->text(0) << " | ";
             out << item->text(1) << " | ";
             out << item->text(2) << " | ";

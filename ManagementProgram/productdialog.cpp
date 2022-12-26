@@ -10,26 +10,26 @@
 */
 ProductDialog::ProductDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ProductDialog), productModel(nullptr)
+    m_ui(new Ui::ProductDialog), m_productModel(nullptr)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
     setWindowTitle(tr("Product Info"));
     setWindowModality(Qt::ApplicationModal);
 
-    assert(connect(ui->lineEdit, SIGNAL(returnPressed()),
+    assert(connect(m_ui->lineEdit, SIGNAL(returnPressed()),
             this, SLOT(on_searchPushButton_clicked())));
 
-    ui->searchPushButton->setDefault(true);
+    m_ui->searchPushButton->setDefault(true);
 
     /* 검색된 제품을 저장하는 model 초기화 */
-    productModel = new QStandardItemModel(0, 4);
-    productModel->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    productModel->setHeaderData(1, Qt::Horizontal, tr("Type"));
-    productModel->setHeaderData(2, Qt::Horizontal, tr("Name"));
-    productModel->setHeaderData(3, Qt::Horizontal, tr("Unit Price"));
-    productModel->setHeaderData(4, Qt::Horizontal, tr("Quantities in stock"));
-    ui->treeView->setModel(productModel);
+    m_productModel = new QStandardItemModel(0, 4);
+    m_productModel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    m_productModel->setHeaderData(1, Qt::Horizontal, tr("Type"));
+    m_productModel->setHeaderData(2, Qt::Horizontal, tr("Name"));
+    m_productModel->setHeaderData(3, Qt::Horizontal, tr("Unit Price"));
+    m_productModel->setHeaderData(4, Qt::Horizontal, tr("Quantities in stock"));
+    m_ui->treeView->setModel(m_productModel);
 }
 
 /**
@@ -37,15 +37,15 @@ ProductDialog::ProductDialog(QWidget *parent) :
 */
 ProductDialog::~ProductDialog()
 {
-    int row = productModel->rowCount();
+    int row = m_productModel->rowCount();
     for(int i = 0; i < row; i++) {
-        QList<QStandardItem *> itmes = productModel->takeRow(0);
+        QList<QStandardItem *> itmes = m_productModel->takeRow(0);
         for(const auto& item : itmes)
             delete item;
     }
 
-    delete productModel; productModel = nullptr;
-    delete ui; ui = nullptr;
+    delete m_productModel; m_productModel = nullptr;
+    delete m_ui; m_ui = nullptr;
 }
 
 /**
@@ -72,7 +72,7 @@ void ProductDialog::receiveProductInfo(int id, std::string type, \
         items.append(new QStandardItem(QString::fromStdString(i)));
     }
 
-    productModel->appendRow(items);
+    m_productModel->appendRow(items);
 }
 
 /**
@@ -81,11 +81,11 @@ void ProductDialog::receiveProductInfo(int id, std::string type, \
 */
 std::string ProductDialog::getCurrentItem() const
 {
-    QModelIndex index = ui->treeView->currentIndex();
+    QModelIndex index = m_ui->treeView->currentIndex();
 
     if(index.isValid()) {
-        int id = productModel->data(index.siblingAtColumn(0)).toInt();
-        std::string name = productModel->data(index.siblingAtColumn(2)).toString().toStdString();
+        int id = m_productModel->data(index.siblingAtColumn(0)).toInt();
+        std::string name = m_productModel->data(index.siblingAtColumn(2)).toString().toStdString();
         return std::to_string(id)+" ("+name+")";
     }
     return "";
@@ -96,13 +96,13 @@ std::string ProductDialog::getCurrentItem() const
 */
 void ProductDialog::clearDialog() const
 {
-    int row = productModel->rowCount();
+    int row = m_productModel->rowCount();
     for(int i = 0; i < row; i++) {
-        QList<QStandardItem *> itmes = productModel->takeRow(0);
+        QList<QStandardItem *> itmes = m_productModel->takeRow(0);
         for(const auto& item : itmes)
             delete item;
     }
-    ui->lineEdit->clear();
+    m_ui->lineEdit->clear();
 }
 
 /**
@@ -111,13 +111,13 @@ void ProductDialog::clearDialog() const
 void ProductDialog::on_searchPushButton_clicked()
 {
     /* 검색을 위해 제품 관리 객체로 검색어를 전달하는 시그널 emit */
-    int row = productModel->rowCount();
+    int row = m_productModel->rowCount();
     for(int i = 0; i < row; i++) {
-        QList<QStandardItem *> itmes = productModel->takeRow(0);
+        QList<QStandardItem *> itmes = m_productModel->takeRow(0);
         for(const auto& item : itmes)
             delete item;
     }
-    emit sendWord(ui->lineEdit->text().toStdString());
+    emit sendWord(m_ui->lineEdit->text().toStdString());
 }
 
 /**

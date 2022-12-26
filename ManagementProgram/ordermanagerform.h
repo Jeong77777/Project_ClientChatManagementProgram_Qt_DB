@@ -64,18 +64,18 @@ private:
     int makeId() const;               // Id를 자동으로 생성
     void cleanInputLineEdit() const; // 입력 창 클리어
 
-    ClientDialog *clientDialog;   // 고객을 검색, 입력하기 위한 다이얼로그
-    ProductDialog *productDialog; // 제품을 검색, 입력하기 위한 다이얼로그
+    ClientDialog *m_clientDialog;   // 고객을 검색, 입력하기 위한 다이얼로그
+    ProductDialog *m_productDialog; // 제품을 검색, 입력하기 위한 다이얼로그
 
-    Ui::OrderManagerForm *ui;       // ui
-    QMenu* menu;                    // tree view context 메뉴
-    QAction* removeAction;
-    QSqlTableModel* orderModel;     // 주문 정보 데이터베이스 모델
+    Ui::OrderManagerForm *m_ui;       // ui
+    QMenu* m_menu;                    // tree view context 메뉴
+    QAction* m_removeAction;
+    QSqlTableModel* m_orderModel;     // 주문 정보 데이터베이스 모델
 
-    QStandardItemModel *clientModel;    // 고객 정보 관리 객체로부터 가져온 고객을 저장하는 model
-    QStandardItemModel *productModel;   // 제품 정보 관리 객체로부터 가져온 제품을 저장하는 model
-    bool searchedClientFlag;            // 고객 검색 결과 (결과가 있으면 true, 없으면 false)
-    bool searchedProductFlag;           // 제품 검색 결과 (결과가 있으면 true, 없으면 false)
+    QStandardItemModel *m_clientModel;    // 고객 정보 관리 객체로부터 가져온 고객을 저장하는 model
+    QStandardItemModel *m_productModel;   // 제품 정보 관리 객체로부터 가져온 제품을 저장하는 model
+    bool m_searchedClientFlag;            // 고객 검색 결과 (결과가 있으면 true, 없으면 false)
+    bool m_searchedProductFlag;           // 제품 검색 결과 (결과가 있으면 true, 없으면 false)
 };
 
 #endif // ORDERMANAGERFORM_H

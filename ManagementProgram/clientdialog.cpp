@@ -10,25 +10,25 @@
 */
 ClientDialog::ClientDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ClientDialog), clientModel(nullptr)
+    m_ui(new Ui::ClientDialog), m_clientModel(nullptr)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
     setWindowTitle(tr("Client Info"));
     setWindowModality(Qt::ApplicationModal);
 
-    assert(connect(ui->lineEdit, SIGNAL(returnPressed()),
+    assert(connect(m_ui->lineEdit, SIGNAL(returnPressed()),
                    this, SLOT(on_searchPushButton_clicked())));
 
-    ui->searchPushButton->setDefault(true);
+    m_ui->searchPushButton->setDefault(true);
 
     /* 검색된 고객을 저장하는 model 초기화 */
-    clientModel = new QStandardItemModel(0, 4);
-    clientModel->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    clientModel->setHeaderData(1, Qt::Horizontal, tr("Name"));
-    clientModel->setHeaderData(2, Qt::Horizontal, tr("Phone Number"));
-    clientModel->setHeaderData(3, Qt::Horizontal, tr("Address"));
-    ui->treeView->setModel(clientModel);
+    m_clientModel = new QStandardItemModel(0, 4);
+    m_clientModel->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    m_clientModel->setHeaderData(1, Qt::Horizontal, tr("Name"));
+    m_clientModel->setHeaderData(2, Qt::Horizontal, tr("Phone Number"));
+    m_clientModel->setHeaderData(3, Qt::Horizontal, tr("Address"));
+    m_ui->treeView->setModel(m_clientModel);
 }
 
 /**
@@ -36,15 +36,15 @@ ClientDialog::ClientDialog(QWidget *parent) :
 */
 ClientDialog::~ClientDialog()
 {
-    int row = clientModel->rowCount();
+    int row = m_clientModel->rowCount();
     for(int i = 0; i < row; i++) {
-        QList<QStandardItem *> itmes = clientModel->takeRow(0);
+        QList<QStandardItem *> itmes = m_clientModel->takeRow(0);
         for(const auto& item : itmes)
             delete item;
     }
 
-    delete clientModel; clientModel = nullptr;
-    delete ui; ui = nullptr;
+    delete m_clientModel; m_clientModel = nullptr;
+    delete m_ui; m_ui = nullptr;
 }
 
 /**
@@ -69,7 +69,7 @@ void ClientDialog::receiveClientInfo(const int id, const std::string name, \
         items.append(new QStandardItem(QString::fromStdString(i)));
     }
 
-    clientModel->appendRow(items);
+    m_clientModel->appendRow(items);
 }
 
 /**
@@ -78,11 +78,11 @@ void ClientDialog::receiveClientInfo(const int id, const std::string name, \
 */
 std::string ClientDialog::getCurrentItem() const
 {
-    QModelIndex index = ui->treeView->currentIndex();
+    QModelIndex index = m_ui->treeView->currentIndex();
 
     if(index.isValid()) {
-        int id = clientModel->data(index.siblingAtColumn(0)).toInt();
-        std::string name = clientModel->data(index.siblingAtColumn(1)).toString().toStdString();
+        int id = m_clientModel->data(index.siblingAtColumn(0)).toInt();
+        std::string name = m_clientModel->data(index.siblingAtColumn(1)).toString().toStdString();
         return std::to_string(id)+" ("+name+")";
     }
 
@@ -94,13 +94,13 @@ std::string ClientDialog::getCurrentItem() const
 */
 void ClientDialog::clearDialog() const
 {
-    int row = clientModel->rowCount();
+    int row = m_clientModel->rowCount();
     for(int i = 0; i < row; i++) {
-        QList<QStandardItem *> itmes = clientModel->takeRow(0);
+        QList<QStandardItem *> itmes = m_clientModel->takeRow(0);
         for(const auto& item : itmes)
             delete item;
     }
-    ui->lineEdit->clear();
+    m_ui->lineEdit->clear();
 }
 
 /**
@@ -109,13 +109,13 @@ void ClientDialog::clearDialog() const
 void ClientDialog::on_searchPushButton_clicked()
 {
     /* 검색을 위해 고객 관리 객체로 검색어를 전달하는 시그널 emit */
-    int row = clientModel->rowCount();
+    int row = m_clientModel->rowCount();
     for(int i = 0; i < row; i++) {
-        QList<QStandardItem *> itmes = clientModel->takeRow(0);
+        QList<QStandardItem *> itmes = m_clientModel->takeRow(0);
         for(const auto& item : itmes)
             delete item;
     }
-    emit sendWord(ui->lineEdit->text().toStdString());
+    emit sendWord(m_ui->lineEdit->text().toStdString());
 }
 
 /**

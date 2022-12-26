@@ -56,11 +56,11 @@ private:
     int makeId() const;              // Id를 자동으로 생성
     void cleanInputLineEdit() const; // 입력 창 클리어
 
-    Ui::ClientManagerForm *ui;      // ui
-    QMenu* menu;                    // tree widget context 메뉴
-    QAction* removeAction;
-    QSqlTableModel* clientModel;    // 고객 정보 데이터베이스 모델
-    QRegularExpressionValidator* phoneNumberRegExpValidator;
+    Ui::ClientManagerForm *m_ui;      // ui
+    QMenu* m_menu;                    // tree widget context 메뉴
+    QAction* m_removeAction;
+    QSqlTableModel* m_clientModel;    // 고객 정보 데이터베이스 모델
+    QRegularExpressionValidator* m_phoneNumberRegExpValidator;
 };
 
 #endif // CLIENTMANAGERFORM_H

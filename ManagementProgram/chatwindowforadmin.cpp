@@ -9,17 +9,17 @@
 ChatWindowForAdmin::ChatWindowForAdmin(std::string id, std::string name, \
                                        std::string state, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ChatWindowForAdmin), \
-    clientId(id), clientName(name), clientState(state)
+    m_ui(new Ui::ChatWindowForAdmin), \
+    m_clientId(id), m_clientName(name), m_clientState(state)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
     // 버튼 초기화, 입력창 초기화
     changeButtonAndEditState(state);
 
     // 창 이름 설정
     setWindowTitle(QString::fromStdString\
-                   (clientId + " " + clientName + " | " + clientState));
+                   (m_clientId + " " + m_clientName + " | " + m_clientState));
 
     // 이전 채팅 내용 불러오기
     loadChatLog();
@@ -30,7 +30,7 @@ ChatWindowForAdmin::ChatWindowForAdmin(std::string id, std::string name, \
 */
 ChatWindowForAdmin::~ChatWindowForAdmin()
 {
-    delete ui; ui = nullptr;
+    delete m_ui; m_ui = nullptr;
 }
 
 /**
@@ -39,8 +39,8 @@ ChatWindowForAdmin::~ChatWindowForAdmin()
 */
 void ChatWindowForAdmin::receiveMessage(const std::string strData) const
 {
-    ui->messageTextEdit->append(QString::fromStdString\
-                                ("<font color=blue>" + clientName + "</font> : " + strData));
+    m_ui->messageTextEdit->append(QString::fromStdString\
+                                ("<font color=blue>" + m_clientName + "</font> : " + strData));
 }
 
 /**
@@ -52,16 +52,16 @@ void ChatWindowForAdmin::updateInfo(const std::string name, const std::string st
 {
     // 입력 값이 있을 때만 변경
     if(name.length())
-        clientName = name;
+        m_clientName = name;
     if(state.length())
-        clientState = state;
+        m_clientState = state;
 
     // 고객의 상태 변경에 따라서 버튼과 입력 창의 상태도 변경
     changeButtonAndEditState(state);
 
     // 창 이름 변경
     setWindowTitle(QString::fromStdString\
-                   (clientId + " " + clientName + " | " + clientState));
+                   (m_clientId + " " + m_clientName + " | " + m_clientState));
 }
 
 /**
@@ -70,13 +70,13 @@ void ChatWindowForAdmin::updateInfo(const std::string name, const std::string st
 void ChatWindowForAdmin::on_inputLineEdit_returnPressed()
 {
     /* 입력 창에 입력된 메시지가 채팅 서버를 통해서 전송되도록 한다. */
-    std::string str = ui->inputLineEdit->text().toStdString(); // 입력된 메시지
+    std::string str = m_ui->inputLineEdit->text().toStdString(); // 입력된 메시지
     if(str.length()) {
-        ui->messageTextEdit->append("<font color=red>" + \
+        m_ui->messageTextEdit->append("<font color=red>" + \
                                     tr("Admin") + "</font> : " + QString::fromStdString(str));
         // 고객에게 메시지를 보내도록 하는 시그널 emit
-        emit sendMessage(clientId, ui->inputLineEdit->text().toStdString());
-        ui->inputLineEdit->clear();
+        emit sendMessage(m_clientId, m_ui->inputLineEdit->text().toStdString());
+        m_ui->inputLineEdit->clear();
     }
 }
 
@@ -86,13 +86,13 @@ void ChatWindowForAdmin::on_inputLineEdit_returnPressed()
 void ChatWindowForAdmin::on_sendPushButton_clicked()
 {
     /* 입력 창에 입력된 메시지가 채팅 서버를 통해서 전송되도록 한다. */
-    std::string str = ui->inputLineEdit->text().toStdString(); // 입력된 메시지
+    std::string str = m_ui->inputLineEdit->text().toStdString(); // 입력된 메시지
     if(str.length()) {
-        ui->messageTextEdit->append("<font color=red>" + \
+        m_ui->messageTextEdit->append("<font color=red>" + \
                                     tr("Admin") + "</font> : " + QString::fromStdString(str));
         // 고객에게 메시지를 보내도록 하는 시그널 emit
-        emit sendMessage(clientId, ui->inputLineEdit->text().toStdString());
-        ui->inputLineEdit->clear();
+        emit sendMessage(m_clientId, m_ui->inputLineEdit->text().toStdString());
+        m_ui->inputLineEdit->clear();
     }
 }
 
@@ -102,10 +102,10 @@ void ChatWindowForAdmin::on_sendPushButton_clicked()
 void ChatWindowForAdmin::on_connectPushButton_clicked()
 {
     /* 고객을 초대/강퇴 하도록 하는 시그널 emit */
-    if(ui->connectPushButton->text() == tr("Invite")) // 초대
-        emit inviteClient(clientId);
+    if(m_ui->connectPushButton->text() == tr("Invite")) // 초대
+        emit inviteClient(m_clientId);
     else                                              // 강퇴
-        emit kickOutClient(clientId);
+        emit kickOutClient(m_clientId);
 }
 
 /**
@@ -115,22 +115,22 @@ void ChatWindowForAdmin::on_connectPushButton_clicked()
 void ChatWindowForAdmin::changeButtonAndEditState(const std::string state)
 {
     if(state == tr("Offline").toStdString()) {
-        ui->sendPushButton->setDisabled(true);
-        ui->inputLineEdit->setDisabled(true);
-        ui->connectPushButton->setDisabled(true);
-        ui->connectPushButton->setText(tr("Invite"));
+        m_ui->sendPushButton->setDisabled(true);
+        m_ui->inputLineEdit->setDisabled(true);
+        m_ui->connectPushButton->setDisabled(true);
+        m_ui->connectPushButton->setText(tr("Invite"));
     }
     else if(state == tr("Online").toStdString()) {
-        ui->sendPushButton->setDisabled(true);
-        ui->inputLineEdit->setDisabled(true);
-        ui->connectPushButton->setEnabled(true);
-        ui->connectPushButton->setText(tr("Invite"));
+        m_ui->sendPushButton->setDisabled(true);
+        m_ui->inputLineEdit->setDisabled(true);
+        m_ui->connectPushButton->setEnabled(true);
+        m_ui->connectPushButton->setText(tr("Invite"));
     }
     else { // Chat in
-        ui->sendPushButton->setEnabled(true);
-        ui->inputLineEdit->setEnabled(true);
-        ui->connectPushButton->setEnabled(true);
-        ui->connectPushButton->setText(tr("Kick out"));
+        m_ui->sendPushButton->setEnabled(true);
+        m_ui->inputLineEdit->setEnabled(true);
+        m_ui->connectPushButton->setEnabled(true);
+        m_ui->connectPushButton->setText(tr("Kick out"));
     }
 }
 
@@ -167,18 +167,18 @@ void ChatWindowForAdmin::loadChatLog() const
             QList<QString> row = line.split(" | ");
             if(row.size()) {
                 // 고객이 전송한 채팅
-                if(row[1].left(5) == QString::fromStdString(clientId)
+                if(row[1].left(5) == QString::fromStdString(m_clientId)
                         && row[3].contains("(8000)")) {
                     QString data = "<font color=blue>" \
-                            + QString::fromStdString(clientName) + "</font> : " + row[2];
-                    ui->messageTextEdit->append(data);
+                            + QString::fromStdString(m_clientName) + "</font> : " + row[2];
+                    m_ui->messageTextEdit->append(data);
                 }
                 // 관리자가 전송한 채팅
                 else if(row[1].left(5) == "10000" \
-                        && row[4].left(5) == QString::fromStdString(clientId)) {
+                        && row[4].left(5) == QString::fromStdString(m_clientId)) {
                     QString data = "<font color=red>" \
                             + tr("Admin") + "</font> : " + row[2];
-                    ui->messageTextEdit->append(data);
+                    m_ui->messageTextEdit->append(data);
                 }
             }
         }

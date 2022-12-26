@@ -34,10 +34,10 @@ private:
     void changeButtonAndEditState(const std::string); // 고객의 상태에 따라 버튼과 입력 창을 변경
     void loadChatLog() const;                     // 저장된 로그파일로부터 이전 채팅 내용을 불러옴
 
-    Ui::ChatWindowForAdmin *ui;
-    const std::string clientId;       // 고객 ID
-    std::string clientName;     // 고객 이름
-    std::string clientState;    // 고객 상태
+    Ui::ChatWindowForAdmin *m_ui;
+    const std::string m_clientId;       // 고객 ID
+    std::string m_clientName;     // 고객 이름
+    std::string m_clientState;    // 고객 상태
 };
 
 #endif // CHATWINDOWFORADMIN_H

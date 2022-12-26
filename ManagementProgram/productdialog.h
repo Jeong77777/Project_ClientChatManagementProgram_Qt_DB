@@ -36,8 +36,8 @@ signals:
     void sendWord(std::string);
 
 private:
-    Ui::ProductDialog *ui;
-    QStandardItemModel *productModel;    // 검색된 제품을 저장하는 model
+    Ui::ProductDialog *m_ui;
+    QStandardItemModel *m_productModel;    // 검색된 제품을 저장하는 model
 };
 
 #endif // PRODUCTDIALOG_H

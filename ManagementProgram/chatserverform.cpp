@@ -26,42 +26,42 @@
 */
 ChatServerForm::ChatServerForm(QWidget *parent) :
     QWidget(parent), BLOCK_SIZE(1024), PORT_NUMBER(8000),
-    ui(new Ui::ChatServerForm),
-    chatServer(nullptr), fileServer(nullptr),
-    menu(nullptr), file(nullptr), progressDialog(nullptr),
-    totalSize(0), byteReceived(0), inBlock(0), logThread(nullptr),
-    openAction(nullptr), inviteAction(nullptr), kickOutAction(nullptr)
+    m_ui(new Ui::ChatServerForm),
+    m_chatServer(nullptr), m_fileServer(nullptr),
+    m_menu(nullptr), m_file(nullptr), m_progressDialog(nullptr),
+    m_totalSize(0), m_byteReceived(0), m_inBlock(0), m_logThread(nullptr),
+    m_openAction(nullptr), m_inviteAction(nullptr), m_kickOutAction(nullptr)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
     /* split 사이즈 설정 */
     QList<int> sizes;
     sizes << 150 << 470;
-    ui->splitter->setSizes(sizes);
+    m_ui->splitter->setSizes(sizes);
 
     /* 고객 리스트 tree widget의 열 너비를 설정 */
-    ui->clientTreeWidget->QTreeView::setColumnWidth(0,90);
-    ui->clientTreeWidget->QTreeView::setColumnWidth(1,50);
-    ui->clientTreeWidget->QTreeView::setColumnWidth(2,50);
+    m_ui->clientTreeWidget->QTreeView::setColumnWidth(0,90);
+    m_ui->clientTreeWidget->QTreeView::setColumnWidth(1,50);
+    m_ui->clientTreeWidget->QTreeView::setColumnWidth(2,50);
 
     /* 채팅 서버 생성 */
-    chatServer = new QTcpServer(this); // tcpserver를 만들어줌
-    assert(connect(chatServer, SIGNAL(newConnection()), SLOT(clientConnect())));
-    if (!chatServer->listen(QHostAddress::Any, PORT_NUMBER)) {
+    m_chatServer = new QTcpServer(this); // tcpserver를 만들어줌
+    assert(connect(m_chatServer, SIGNAL(newConnection()), SLOT(clientConnect())));
+    if (!m_chatServer->listen(QHostAddress::Any, PORT_NUMBER)) {
         QMessageBox::critical(this, tr("Chatting Server"), \
                               tr("Unable to start the server: %1.") \
-                              .arg(chatServer->errorString()));
+                              .arg(m_chatServer->errorString()));
         close( );
         return;
     }
 
     /* 파일 서버 생성 */
-    fileServer = new QTcpServer(this);
-    assert(connect(fileServer, SIGNAL(newConnection()), SLOT(acceptConnection())));
-    if (!fileServer->listen(QHostAddress::Any, PORT_NUMBER+1)) {
+    m_fileServer = new QTcpServer(this);
+    assert(connect(m_fileServer, SIGNAL(newConnection()), SLOT(acceptConnection())));
+    if (!m_fileServer->listen(QHostAddress::Any, PORT_NUMBER+1)) {
         QMessageBox::critical(this, tr("Chatting Server"), \
                               tr("Unable to start the server: %1.") \
-                              .arg(fileServer->errorString( )));
+                              .arg(m_fileServer->errorString( )));
         close( );
         return;
     }
@@ -69,35 +69,35 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
     qDebug("Start listening ...");
 
     /* 고객 리스트 tree widget의 context 메뉴 설정 */
-    openAction = new QAction(tr("Open chat window"));
-    openAction->setObjectName("Open");
-    assert(connect(openAction, SIGNAL(triggered()), SLOT(openChatWindow())));
+    m_openAction = new QAction(tr("Open chat window"));
+    m_openAction->setObjectName("Open");
+    assert(connect(m_openAction, SIGNAL(triggered()), SLOT(openChatWindow())));
 
-    inviteAction = new QAction(tr("Invite"));
-    inviteAction->setObjectName("Invite");
-    assert(connect(inviteAction, SIGNAL(triggered()), SLOT(inviteClient())));
+    m_inviteAction = new QAction(tr("Invite"));
+    m_inviteAction->setObjectName("Invite");
+    assert(connect(m_inviteAction, SIGNAL(triggered()), SLOT(inviteClient())));
 
-    kickOutAction = new QAction(tr("Kick out"));
-    assert(connect(kickOutAction, SIGNAL(triggered()), SLOT(kickOut())));
+    m_kickOutAction = new QAction(tr("Kick out"));
+    assert(connect(m_kickOutAction, SIGNAL(triggered()), SLOT(kickOut())));
 
-    menu = new QMenu;
-    menu->addAction(openAction);
-    menu->addAction(inviteAction);
-    menu->addAction(kickOutAction);
-    ui->clientTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_menu = new QMenu;
+    m_menu->addAction(m_openAction);
+    m_menu->addAction(m_inviteAction);
+    m_menu->addAction(m_kickOutAction);
+    m_ui->clientTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
     /* 파일 수신 진행 상태를 보여주는 progress dialog 설정 */
-    progressDialog = new QProgressDialog(0);
-    progressDialog->setAutoClose(true);
-    progressDialog->reset();
+    m_progressDialog = new QProgressDialog(0);
+    m_progressDialog->setAutoClose(true);
+    m_progressDialog->reset();
 
     /* 채팅 로그를 저장하기 위한 thread 생성 */
-    logThread = new LogThread(this);
-    logThread->start();
+    m_logThread = new LogThread(this);
+    m_logThread->start();
     // save 버튼을 누르면 logThread에서 로그가 저장되도록 connect
-    assert(connect(ui->savePushButton, SIGNAL(clicked()), logThread, SLOT(saveData())));
+    assert(connect(m_ui->savePushButton, SIGNAL(clicked()), m_logThread, SLOT(saveData())));
 
-    qDebug() << tr("The server is running on port %1.").arg(chatServer->serverPort( ));
+    qDebug() << tr("The server is running on port %1.").arg(m_chatServer->serverPort( ));
 }
 
 /**
@@ -105,41 +105,41 @@ ChatServerForm::ChatServerForm(QWidget *parent) :
 */
 ChatServerForm::~ChatServerForm()
 {
-    logThread->saveData();
-    logThread->terminate();
-    chatServer->close( );
-    fileServer->close( );
+    m_logThread->saveData();
+    m_logThread->terminate();
+    m_chatServer->close( );
+    m_fileServer->close( );
 
-    chatServer->deleteLater(); chatServer = nullptr;
-    fileServer->deleteLater(); fileServer = nullptr;
-    delete openAction; openAction = nullptr;
-    delete inviteAction; inviteAction = nullptr;
-    delete kickOutAction; kickOutAction = nullptr;
-    delete menu; menu = nullptr;
-    delete progressDialog; progressDialog = nullptr;
-    logThread->deleteLater(); logThread = nullptr;
+    m_chatServer->deleteLater(); m_chatServer = nullptr;
+    m_fileServer->deleteLater(); m_fileServer = nullptr;
+    delete m_openAction; m_openAction = nullptr;
+    delete m_inviteAction; m_inviteAction = nullptr;
+    delete m_kickOutAction; m_kickOutAction = nullptr;
+    delete m_menu; m_menu = nullptr;
+    delete m_progressDialog; m_progressDialog = nullptr;
+    m_logThread->deleteLater(); m_logThread = nullptr;
 
     int row;
 
-    row = ui->clientTreeWidget->topLevelItemCount();
+    row = m_ui->clientTreeWidget->topLevelItemCount();
     for(int i = 0; i < row; i++) {
-        auto item = ui->clientTreeWidget->itemAt(0, 0);
-        ui->clientTreeWidget->takeTopLevelItem(ui->clientTreeWidget->indexOfTopLevelItem(item));
+        auto item = m_ui->clientTreeWidget->itemAt(0, 0);
+        m_ui->clientTreeWidget->takeTopLevelItem(m_ui->clientTreeWidget->indexOfTopLevelItem(item));
         delete item;
     }
-    row = ui->messageTreeWidget->topLevelItemCount();
+    row = m_ui->messageTreeWidget->topLevelItemCount();
     for(int i = 0; i < row; i++) {
-        auto item = ui->messageTreeWidget->itemAt(0, 0);
-        ui->messageTreeWidget->takeTopLevelItem(ui->messageTreeWidget->indexOfTopLevelItem(item));
+        auto item = m_ui->messageTreeWidget->itemAt(0, 0);
+        m_ui->messageTreeWidget->takeTopLevelItem(m_ui->messageTreeWidget->indexOfTopLevelItem(item));
         delete item;
     }
 
-    std::unordered_map<std::string, ChatWindowForAdmin*>::iterator iter = clientIdWindowHash.begin();
-    for(; iter != clientIdWindowHash.end(); iter++) {
+    std::unordered_map<std::string, ChatWindowForAdmin*>::iterator iter = m_clientIdWindowMap.begin();
+    for(; iter != m_clientIdWindowMap.end(); iter++) {
         delete iter->second; iter->second = nullptr;
     }
 
-    delete ui; ui = nullptr;
+    delete m_ui; m_ui = nullptr;
 
 }
 
@@ -153,22 +153,22 @@ void ChatServerForm::addClient(const int intId, const std::string name)
     std::string id = std::to_string(intId); // int->std::string 변환
 
     /* 리스트에 이미 등록된 고객이면 정보를 변경 */
-    for(const auto& c : ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
+    for(const auto& c : m_ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
         c->setText(2, QString::fromStdString(name));
-        clientIdNameHash[id] = name;
-        if(clientIdWindowHash.find(id) != clientIdWindowHash.end())
-            clientIdWindowHash[id]->updateInfo(name, "");
+        m_clientIdNameMap[id] = name;
+        if(m_clientIdWindowMap.find(id) != m_clientIdWindowMap.end())
+            m_clientIdWindowMap[id]->updateInfo(name, "");
         return;
     }
 
     /* 리스트에 등록되지 않은 고객이면 새로 추가 */
-    QTreeWidgetItem* item = new QTreeWidgetItem(ui->clientTreeWidget);
+    QTreeWidgetItem* item = new QTreeWidgetItem(m_ui->clientTreeWidget);
     item->setText(0, tr("Offline"));
     item->setIcon(0, QIcon(":/images/Red-Circle.png"));
     item->setText(1, QString::fromStdString(id));
     item->setText(2, QString::fromStdString(name));
-    ui->clientTreeWidget->addTopLevelItem(item);
-    clientIdNameHash[id] = name;
+    m_ui->clientTreeWidget->addTopLevelItem(item);
+    m_clientIdNameMap[id] = name;
 }
 
 /**
@@ -178,7 +178,7 @@ void ChatServerForm::acceptConnection() const
 {
     qDebug("Connected, preparing to receive files!");
 
-    QTcpSocket* receivedSocket = fileServer->nextPendingConnection();
+    QTcpSocket* receivedSocket = m_fileServer->nextPendingConnection();
     // 파일을 수신하면 읽어들일 수 있도록 connect
     assert(connect(receivedSocket, SIGNAL(readyRead()), this, SLOT(readClient())));
 }
@@ -193,30 +193,30 @@ void ChatServerForm::readClient()
     QString filename, id;
 
     /* 파일 수신 시작 */
-    if (byteReceived == 0) {
-        progressDialog->reset(); // 파일 수신 진행 상태를 나타내는 progress dialog 초기화
-        progressDialog->show();  // progress dialog 보여주기
+    if (m_byteReceived == 0) {
+        m_progressDialog->reset(); // 파일 수신 진행 상태를 나타내는 progress dialog 초기화
+        m_progressDialog->show();  // progress dialog 보여주기
 
         std::string ip = receivedSocket->peerAddress().toString().toStdString();
         unsigned short port = receivedSocket->peerPort();
         qDebug() << QString::fromStdString(ip) << " : " << port;
 
         QDataStream in(receivedSocket);
-        in >> totalSize >> byteReceived >> filename >> id;
+        in >> m_totalSize >> m_byteReceived >> filename >> id;
         // progressDialog의 최대값을 총 데이터의 크기(파일 + 파일 정보)로 설정
-        progressDialog->setMaximum(totalSize);
+        m_progressDialog->setMaximum(m_totalSize);
 
         /* 로그 tree widget에 채팅 로그 기록 */
-        QTreeWidgetItem* item = new QTreeWidgetItem(ui->messageTreeWidget);
+        QTreeWidgetItem* item = new QTreeWidgetItem(m_ui->messageTreeWidget);
         // Sender IP(Port)
         item->setText(0, QString::fromStdString(ip)+"("+QString::number(port)+")");
         // Sende ID(Name)
         item->setText(1, id+"("+ \
-                      QString::fromStdString(clientIdNameHash[id.toStdString()]) +")");
+                      QString::fromStdString(m_clientIdNameMap[id.toStdString()]) +")");
         // filename
         item->setText(2, filename);
         // Receiver IP(Port)
-        item->setText(3, fileServer->serverAddress().toString()+ \
+        item->setText(3, m_fileServer->serverAddress().toString()+ \
                       "("+QString::number(PORT_NUMBER+1)+")" );
         // Receiver ID(name) = 10000(Admin)
         item->setText(4, QString("10000")+"("+tr("Admin")+")");
@@ -225,45 +225,45 @@ void ChatServerForm::readClient()
         item->setToolTip(2, filename);
 
         // 컨텐츠의 길이로 채팅 로그 tree widget의 헤더의 크기를 조정
-        for(int i = 0; i < ui->messageTreeWidget->columnCount(); i++)
-            ui->messageTreeWidget->resizeColumnToContents(i);
+        for(int i = 0; i < m_ui->messageTreeWidget->columnCount(); i++)
+            m_ui->messageTreeWidget->resizeColumnToContents(i);
 
-        ui->messageTreeWidget->addTopLevelItem(item);
-        logThread->appendData(item);
+        m_ui->messageTreeWidget->addTopLevelItem(item);
+        m_logThread->appendData(item);
 
         QFileInfo info(filename);                  // 파일의 정보를 가져옴
         std::string currentFileName = info.fileName().toStdString(); // 파일의 경로에서 이름만 뽑아옴
-        file = new QFile(QString::fromStdString(currentFileName));         // 파일 생성
-        file->open(QFile::WriteOnly|QFile::Truncate);
+        m_file = new QFile(QString::fromStdString(currentFileName));         // 파일 생성
+        m_file->open(QFile::WriteOnly|QFile::Truncate);
     }
     /* 파일 수신 중 */
     else {
         // 파일 데이터를 읽어서 저장
-        inBlock = receivedSocket->readAll();
-        byteReceived += inBlock.size(); // 수신한 누적 데이터의 크기
-        file->write(inBlock);
-        file->flush();
+        m_inBlock = receivedSocket->readAll();
+        m_byteReceived += m_inBlock.size(); // 수신한 누적 데이터의 크기
+        m_file->write(m_inBlock);
+        m_file->flush();
     }
 
     // progress dialog를 수신한 누적 데이터의 크기로 설정
-    progressDialog->setValue(byteReceived);
+    m_progressDialog->setValue(m_byteReceived);
 
     /* 파일을 다 수신하면 QFile 객체를 닫고 삭제 */
-    if (byteReceived == totalSize) {
+    if (m_byteReceived == m_totalSize) {
         qDebug() << QString("%1 receive completed").arg(filename);
 
         // 파일 수신 관련 변수 초기화
-        inBlock.clear();
-        byteReceived = 0;
-        totalSize = 0;
+        m_inBlock.clear();
+        m_byteReceived = 0;
+        m_totalSize = 0;
 
         // progress dialog 닫기
-        progressDialog->reset();
-        progressDialog->hide();
+        m_progressDialog->reset();
+        m_progressDialog->hide();
 
         // file 객체 닫고 삭제
-        file->close();
-        delete file;
+        m_file->close();
+        delete m_file;
     }
 }
 
@@ -272,7 +272,7 @@ void ChatServerForm::readClient()
 */
 void ChatServerForm::clientConnect( ) const
 {
-    QTcpSocket *clientConnection = chatServer->nextPendingConnection();
+    QTcpSocket *clientConnection = m_chatServer->nextPendingConnection();
     // 메시지가 오면 읽어들일 수 있도록 connect
     assert(connect(clientConnection, SIGNAL(readyRead()), SLOT(receiveData())));
     // 연결이 끊어지면 고객의 상태를 offline으로 변경하도록 connect
@@ -312,7 +312,7 @@ void ChatServerForm::receiveData( )
         std::string id = strData.substr(0, delimPos);
         std::string name = strData.substr(delimPos + delim.size());
         /* 고객 리스트에서 ID와 이름을 확인 */
-        for(const auto& item : ui->clientTreeWidget-> \
+        for(const auto& item : m_ui->clientTreeWidget-> \
                 findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
 
             // 고객 리스트에 ID와 이름이 있으면 로그인 허가
@@ -323,19 +323,19 @@ void ChatServerForm::receiveData( )
                     item->setIcon(0, QIcon(":/images/Blue-Circle.png"));
 
                     // clientIdSocketHash에 <id, socket> 추가
-                    clientIdSocketHash[id] = clientConnection;
-                    portClientIdHash[port] = id;
+                    m_clientIdSocketMap[id] = clientConnection;
+                    m_portClientMap[port] = id;
 
                     // 로그인을 허가한다는 메시지 전송
                     sendLoginResult(clientConnection, "permit");
 
                     // 관리자의 채팅창에서 고객의 상태를 online 변경
-                    if(clientIdWindowHash.find(item->text(1).toStdString()) != clientIdWindowHash.end())
+                    if(m_clientIdWindowMap.find(item->text(1).toStdString()) != m_clientIdWindowMap.end())
                         // 채팅창이 이미 만들어져 있으면 고객 상태 변경
-                        clientIdWindowHash[item->text(1).toStdString()]->updateInfo("", tr("Online").toStdString());
+                        m_clientIdWindowMap[item->text(1).toStdString()]->updateInfo("", tr("Online").toStdString());
                     else { // 채팅창이 만들어져 있지 않으면 새로 만들고 설정
                         ChatWindowForAdmin* w = new ChatWindowForAdmin(id, name, tr("Online").toStdString());
-                        clientIdWindowHash[id] = w;
+                        m_clientIdWindowMap[id] = w;
                         assert(connect(w, SIGNAL(sendMessage(std::string,std::string)), this, SLOT(sendData(std::string,std::string))));
                         assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
                         assert(connect(w, SIGNAL(kickOutClient(std::string)), this, SLOT(kickOutInChatWindow(std::string))));
@@ -353,80 +353,80 @@ void ChatServerForm::receiveData( )
 
 
     case Chat_In: // 고객이 채팅에 참여
-        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
+        for(const auto& item : m_ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
 
             /* 고객 리스트와 관리자 채팅창에서 고객의 상태를 chat in으로 변경 */
             if(item->text(0) != tr("Chat in")) {
                 item->setText(0, tr("Chat in"));
                 item->setIcon(0, QIcon(":/images/Green-Circle.png"));
 
-                if(clientIdWindowHash.find(item->text(1).toStdString()) != clientIdWindowHash.end())
-                    clientIdWindowHash[item->text(1).toStdString()]->updateInfo("", tr("Chat in").toStdString());
+                if(m_clientIdWindowMap.find(item->text(1).toStdString()) != m_clientIdWindowMap.end())
+                    m_clientIdWindowMap[item->text(1).toStdString()]->updateInfo("", tr("Chat in").toStdString());
             }
-            clientIdSocketHash[strData] = clientConnection;
+            m_clientIdSocketMap[strData] = clientConnection;
         }
         break;
 
 
     case Chat_Talk: { // 채팅 주고 받기
-        if(clientIdWindowHash.find(portClientIdHash[port]) != clientIdWindowHash.end())
-            clientIdWindowHash[portClientIdHash[port]]->receiveMessage(strData);
+        if(m_clientIdWindowMap.find(m_portClientMap[port]) != m_clientIdWindowMap.end())
+            m_clientIdWindowMap[m_portClientMap[port]]->receiveMessage(strData);
 
         /* 로그 tree widget에 채팅 로그 기록 */
-        QTreeWidgetItem* item = new QTreeWidgetItem(ui->messageTreeWidget);
+        QTreeWidgetItem* item = new QTreeWidgetItem(m_ui->messageTreeWidget);
         // Sender IP(Port)
         item->setText(0, QString::fromStdString(ip)+"("+QString::number(port)+")");
         // Sende ID(Name)
-        item->setText(1, QString::fromStdString(portClientIdHash[port])+ \
-                      "("+ QString::fromStdString(clientIdNameHash[portClientIdHash[port]])+")");
+        item->setText(1, QString::fromStdString(m_portClientMap[port])+ \
+                      "("+ QString::fromStdString(m_clientIdNameMap[m_portClientMap[port]])+")");
         // message
         item->setText(2, QString(data));
         // Receiver IP(Port)
-        item->setText(3, chatServer->serverAddress().toString()+ \
+        item->setText(3, m_chatServer->serverAddress().toString()+ \
                       "("+QString::number(PORT_NUMBER)+")" );
         // Receiver ID(name) = 10000(Admin)
         item->setText(4, QString("10000")+"("+tr("Admin")+")");
         // Time
         item->setText(5, QDateTime::currentDateTime().toString());
         item->setToolTip(2, QString(data));
-        ui->messageTreeWidget->addTopLevelItem(item);
+        m_ui->messageTreeWidget->addTopLevelItem(item);
 
-        for(int i = 0; i < ui->messageTreeWidget->columnCount(); i++)
-            ui->messageTreeWidget->resizeColumnToContents(i);
+        for(int i = 0; i < m_ui->messageTreeWidget->columnCount(); i++)
+            m_ui->messageTreeWidget->resizeColumnToContents(i);
 
-        logThread->appendData(item);
+        m_logThread->appendData(item);
     }
         break;
 
 
     case Chat_Out: // 고객이 채팅에서 나감
-        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
+        for(const auto& item : m_ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
 
             /* 고객 리스트와 관리자 채팅창에서 고객의 상태를 online으로 변경 */
             if(item->text(0) != tr("Online")) {
                 item->setText(0, tr("Online"));
                 item->setIcon(0, QIcon(":/images/Blue-Circle.png"));
 
-                if(clientIdWindowHash.find(item->text(1).toStdString()) != clientIdWindowHash.end())
-                    clientIdWindowHash[item->text(1).toStdString()]->updateInfo("", tr("Online").toStdString());
+                if(m_clientIdWindowMap.find(item->text(1).toStdString()) != m_clientIdWindowMap.end())
+                    m_clientIdWindowMap[item->text(1).toStdString()]->updateInfo("", tr("Online").toStdString());
             }
         }
         break;
 
 
     case Chat_LogOut: // 고객이 log out
-        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
+        for(const auto& item : m_ui->clientTreeWidget->findItems(QString::fromStdString(strData), Qt::MatchFixedString, 1)) {
 
             /* 고객 리스트와 관리자 채팅창에서 고객의 상태를 offline으로 변경 */
             if(item->text(0) != tr("Offline")) {
                 item->setText(0, tr("Offline"));
                 item->setIcon(0, QIcon(":/images/Red-Circle.png"));
 
-                if(clientIdWindowHash.find(item->text(1).toStdString()) != clientIdWindowHash.end())
-                    clientIdWindowHash[item->text(1).toStdString()]->updateInfo("", tr("Offline").toStdString());
+                if(m_clientIdWindowMap.find(item->text(1).toStdString()) != m_clientIdWindowMap.end())
+                    m_clientIdWindowMap[item->text(1).toStdString()]->updateInfo("", tr("Offline").toStdString());
             }
-            clientIdSocketHash.erase(portClientIdHash[port]);
-            portClientIdHash.erase(port);
+            m_clientIdSocketMap.erase(m_portClientMap[port]);
+            m_portClientMap.erase(port);
             clientConnection->disconnectFromHost();
         }
         break;
@@ -446,17 +446,17 @@ void ChatServerForm::removeClient()
     if(clientConnection != nullptr) {
 
         // 고객 리스트와 관리자 채팅창에서 고객의 상태를 offline으로 변경
-        std::string id = portClientIdHash[clientConnection->peerPort()];
-        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
+        std::string id = m_portClientMap[clientConnection->peerPort()];
+        for(const auto& item : m_ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
             qDebug() << item->text(2);
             item->setText(0, tr("Offline"));
             item->setIcon(0, QIcon(":/images/Red-Circle.png"));
-            if(clientIdWindowHash.find(id) != clientIdWindowHash.end())
-                clientIdWindowHash[id]->updateInfo("", tr("Offline").toStdString());
+            if(m_clientIdWindowMap.find(id) != m_clientIdWindowMap.end())
+                m_clientIdWindowMap[id]->updateInfo("", tr("Offline").toStdString());
         }
 
         /* 소켓 삭제 */
-        clientIdSocketHash.erase(id);
+        m_clientIdSocketMap.erase(id);
         clientConnection->deleteLater();
     }
 }
@@ -466,24 +466,24 @@ void ChatServerForm::removeClient()
 */
 void ChatServerForm::openChatWindow()
 {
-    std::string id = ui->clientTreeWidget->currentItem()->text(1).toStdString();
+    std::string id = m_ui->clientTreeWidget->currentItem()->text(1).toStdString();
     std::string state;
 
 
-    if(clientIdWindowHash.find(id) == clientIdWindowHash.end()) { // 채팅창이 만들어져 있지 않으면 새로 만듦
-        for(const auto& item : ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
+    if(m_clientIdWindowMap.find(id) == m_clientIdWindowMap.end()) { // 채팅창이 만들어져 있지 않으면 새로 만듦
+        for(const auto& item : m_ui->clientTreeWidget->findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
             state = item->text(0).toStdString();
         }
-        ChatWindowForAdmin* w = new ChatWindowForAdmin(id, clientIdNameHash[id], state);
-        clientIdWindowHash[id] = w;
+        ChatWindowForAdmin* w = new ChatWindowForAdmin(id, m_clientIdNameMap[id], state);
+        m_clientIdWindowMap[id] = w;
         w->show();
         assert(connect(w, SIGNAL(sendMessage(std::string,std::string)), this, SLOT(sendData(std::string,std::string))));
         assert(connect(w, SIGNAL(inviteClient(std::string)), this, SLOT(inviteClientInChatWindow(std::string))));
         assert(connect(w, SIGNAL(kickOutClient(std::string)), this, SLOT(kickOutInChatWindow(std::string))));
     }
     else {                                         // 채팅창이 이미 만들어져 있으면 열기만 함
-        clientIdWindowHash[id]->showNormal();
-        clientIdWindowHash[id]->activateWindow();
+        m_clientIdWindowMap[id]->showNormal();
+        m_clientIdWindowMap[id]->activateWindow();
     }
 }
 
@@ -492,7 +492,7 @@ void ChatServerForm::openChatWindow()
 */
 void ChatServerForm::inviteClient()
 {
-    if(ui->clientTreeWidget->currentItem() == nullptr)
+    if(m_ui->clientTreeWidget->currentItem() == nullptr)
         return;
 
     /* 고객을 채팅방에 초대 */
@@ -502,15 +502,15 @@ void ChatServerForm::inviteClient()
     out.writeRawData("", 1020);
 
     // 현재 선택된 item에 표시된 ID와 해쉬로 부터 소켓을 가져옴
-    std::string id = ui->clientTreeWidget->currentItem()->text(1).toStdString();
-    QTcpSocket* sock = clientIdSocketHash[id];
+    std::string id = m_ui->clientTreeWidget->currentItem()->text(1).toStdString();
+    QTcpSocket* sock = m_clientIdSocketMap[id];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 chat in으로 변경
-    ui->clientTreeWidget->currentItem()->setText(0, tr("Chat in"));
-    ui->clientTreeWidget->currentItem()->setIcon(0, QIcon(":/images/Green-Circle.png"));
-    if(clientIdWindowHash.find(id) != clientIdWindowHash.end())
-        clientIdWindowHash[id]->updateInfo("", tr("Chat in").toStdString());
+    m_ui->clientTreeWidget->currentItem()->setText(0, tr("Chat in"));
+    m_ui->clientTreeWidget->currentItem()->setIcon(0, QIcon(":/images/Green-Circle.png"));
+    if(m_clientIdWindowMap.find(id) != m_clientIdWindowMap.end())
+        m_clientIdWindowMap[id]->updateInfo("", tr("Chat in").toStdString());
 }
 
 /**
@@ -525,17 +525,17 @@ void ChatServerForm::inviteClientInChatWindow(const std::string id)
     out.writeRawData("", 1020);
 
     // ID와 해쉬로 부터 소켓을 가져옴
-    QTcpSocket* sock = clientIdSocketHash[id];
+    QTcpSocket* sock = m_clientIdSocketMap[id];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 chat in으로 변경
-    for(const auto& item : ui->clientTreeWidget-> \
+    for(const auto& item : m_ui->clientTreeWidget-> \
             findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
         item->setText(0, tr("Chat in"));
         item->setIcon(0, QIcon(":/images/Green-Circle.png"));
     }
-    if(clientIdWindowHash.find(id) != clientIdWindowHash.end())
-        clientIdWindowHash[id]->updateInfo("", tr("Chat in").toStdString());
+    if(m_clientIdWindowMap.find(id) != m_clientIdWindowMap.end())
+        m_clientIdWindowMap[id]->updateInfo("", tr("Chat in").toStdString());
 }
 
 /**
@@ -543,7 +543,7 @@ void ChatServerForm::inviteClientInChatWindow(const std::string id)
 */
 void ChatServerForm::kickOut()
 {
-    if(ui->clientTreeWidget->currentItem() == nullptr)
+    if(m_ui->clientTreeWidget->currentItem() == nullptr)
         return;
 
     /* 고객을 채팅방에서 강퇴 */
@@ -553,15 +553,15 @@ void ChatServerForm::kickOut()
     out.writeRawData("", 1020);
 
     // 현재 선택된 item에 표시된 ID와 해쉬로 부터 소켓을 가져옴
-    std::string id = ui->clientTreeWidget->currentItem()->text(1).toStdString();
-    QTcpSocket* sock = clientIdSocketHash[id];
+    std::string id = m_ui->clientTreeWidget->currentItem()->text(1).toStdString();
+    QTcpSocket* sock = m_clientIdSocketMap[id];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 online으로 변경
-    ui->clientTreeWidget->currentItem()->setText(0, tr("Online"));
-    ui->clientTreeWidget->currentItem()->setIcon(0, QIcon(":/images/Blue-Circle.png"));
-    if(clientIdWindowHash.find(id) != clientIdWindowHash.end())
-        clientIdWindowHash[id]->updateInfo("", tr("Online").toStdString());
+    m_ui->clientTreeWidget->currentItem()->setText(0, tr("Online"));
+    m_ui->clientTreeWidget->currentItem()->setIcon(0, QIcon(":/images/Blue-Circle.png"));
+    if(m_clientIdWindowMap.find(id) != m_clientIdWindowMap.end())
+        m_clientIdWindowMap[id]->updateInfo("", tr("Online").toStdString());
 }
 
 /**
@@ -577,17 +577,17 @@ void ChatServerForm::kickOutInChatWindow(const std::string id)
     out.writeRawData("", 1020);
 
     // ID와 해쉬로 부터 소켓을 가져옴
-    QTcpSocket* sock = clientIdSocketHash[id];
+    QTcpSocket* sock = m_clientIdSocketMap[id];
     sock->write(sendArray);
 
     // 고객 리스트와 관리자 채팅창에서 고객의 상태를 online으로 변경
-    for(const auto& item : ui->clientTreeWidget-> \
+    for(const auto& item : m_ui->clientTreeWidget-> \
             findItems(QString::fromStdString(id), Qt::MatchFixedString, 1)) {
         item->setText(0, tr("Online"));
         item->setIcon(0, QIcon(":/images/Blue-Circle.png"));
     }
-    if(clientIdWindowHash.find(id) != clientIdWindowHash.end())
-        clientIdWindowHash[id]->updateInfo("", tr("Online").toStdString());
+    if(m_clientIdWindowMap.find(id) != m_clientIdWindowMap.end())
+        m_clientIdWindowMap[id]->updateInfo("", tr("Online").toStdString());
 }
 
 /**
@@ -598,11 +598,11 @@ void ChatServerForm::kickOutInChatWindow(const std::string id)
 void ChatServerForm::sendData(const std::string id, const std::string str)
 {
 
-    if(clientIdSocketHash.find(id) == clientIdSocketHash.end())
+    if(m_clientIdSocketMap.find(id) == m_clientIdSocketMap.end())
         return;
 
     /* 메시지 전송 */
-    QTcpSocket* sock = clientIdSocketHash[id];
+    QTcpSocket* sock = m_clientIdSocketMap[id];
     std::string data;
     QByteArray sendArray;
     sendArray.clear();
@@ -613,9 +613,9 @@ void ChatServerForm::sendData(const std::string id, const std::string str)
     sock->write(sendArray);
 
     /* 로그 tree widget에 채팅 로그 기록 */
-    QTreeWidgetItem* item = new QTreeWidgetItem(ui->messageTreeWidget);
+    QTreeWidgetItem* item = new QTreeWidgetItem(m_ui->messageTreeWidget);
     // Sender IP(Port)
-    item->setText(0, chatServer->serverAddress().toString()+\
+    item->setText(0, m_chatServer->serverAddress().toString()+\
                   "("+QString::number(PORT_NUMBER)+")" );
     // Sender ID(name) = 10000(Admin)
     item->setText(1, QString("10000")+"("+tr("Admin")+")");
@@ -625,16 +625,16 @@ void ChatServerForm::sendData(const std::string id, const std::string str)
     item->setText(3, sock->peerAddress().toString()+ \
                   "("+QString::number(sock->peerPort())+")");
     // Receiver ID(name)
-    item->setText(4, QString::fromStdString(id)+"("+ QString::fromStdString(clientIdNameHash[id])+")");
+    item->setText(4, QString::fromStdString(id)+"("+ QString::fromStdString(m_clientIdNameMap[id])+")");
     // Time
     item->setText(5, QDateTime::currentDateTime().toString());
     item->setToolTip(2, QString::fromStdString(str));
-    ui->messageTreeWidget->addTopLevelItem(item);
+    m_ui->messageTreeWidget->addTopLevelItem(item);
 
-    for(int i = 0; i < ui->messageTreeWidget->columnCount(); i++)
-        ui->messageTreeWidget->resizeColumnToContents(i);
+    for(int i = 0; i < m_ui->messageTreeWidget->columnCount(); i++)
+        m_ui->messageTreeWidget->resizeColumnToContents(i);
 
-    logThread->appendData(item);
+    m_logThread->appendData(item);
 }
 
 /**
@@ -643,20 +643,20 @@ void ChatServerForm::sendData(const std::string id, const std::string str)
 */
 void ChatServerForm::on_clientTreeWidget_customContextMenuRequested(const QPoint &pos) const
 {
-    if(ui->clientTreeWidget->currentItem() == nullptr)
+    if(m_ui->clientTreeWidget->currentItem() == nullptr)
         return;
 
     /* 고객 리스트 tree widget 위에서 우클릭한 위치에서 context menu 출력 */
-    for(auto const& action : menu->actions()) {
+    for(auto const& action : m_menu->actions()) {
         if(action->objectName() == "Open")        // 관리자 채팅창 열기(항상 활성화)
             action->setEnabled(true);
         else if(action->objectName() == "Invite") // 초대(고객이 online 일때만 활성화)
-            action->setEnabled(ui->clientTreeWidget->currentItem()->text(0) == tr("Online"));
+            action->setEnabled(m_ui->clientTreeWidget->currentItem()->text(0) == tr("Online"));
         else                                      // 강퇴(고객이 chat in 일때만 활성화)
-            action->setEnabled(ui->clientTreeWidget->currentItem()->text(0) == tr("Chat in"));
+            action->setEnabled(m_ui->clientTreeWidget->currentItem()->text(0) == tr("Chat in"));
     }
-    QPoint globalPos = ui->clientTreeWidget->mapToGlobal(pos);
-    menu->exec(globalPos);
+    QPoint globalPos = m_ui->clientTreeWidget->mapToGlobal(pos);
+    m_menu->exec(globalPos);
 }
 
 /**
