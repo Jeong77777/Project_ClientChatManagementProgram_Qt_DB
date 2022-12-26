@@ -14,8 +14,8 @@
 */
 ProductManagerForm::ProductManagerForm(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ProductManagerForm),
-    menu(nullptr), productModel(nullptr)
+    ui(new Ui::ProductManagerForm), intValidator(nullptr),
+    menu(nullptr), removeAction(nullptr), productModel(nullptr)
 {
     ui->setupUi(this);
 
@@ -25,12 +25,13 @@ ProductManagerForm::ProductManagerForm(QWidget *parent) :
     ui->splitter->setSizes(sizes);
 
     /* 가격, 재고 입력 칸에 숫자만 입력 되도록 설정 */
-    ui->priceLineEdit->setValidator( new QIntValidator(0, 999999999, this) );
-    ui->stockLineEdit->setValidator( new QIntValidator(0, 999999999, this) );
+    intValidator = new QIntValidator(0, 999999999, this);
+    ui->priceLineEdit->setValidator(intValidator);
+    ui->stockLineEdit->setValidator(intValidator);
 
     /* tree widget의 context 메뉴 설정 */
     // tree widget에서 고객을 삭제하는 action
-    QAction* removeAction = new QAction(tr("Remove"));
+    removeAction = new QAction(tr("Remove"));
     assert(connect(removeAction, SIGNAL(triggered()), SLOT(removeItem())));
     menu = new QMenu; // context 메뉴
     menu->addAction(removeAction);
@@ -85,14 +86,18 @@ void ProductManagerForm::loadData()
 */
 ProductManagerForm::~ProductManagerForm()
 {
-    delete ui;
     QSqlDatabase db = QSqlDatabase::database("productConnection");
     if(db.isOpen()) {
         productModel->submitAll();
-        delete productModel;
+        delete productModel; productModel = nullptr;
         db.commit();
         db.close();
     }
+
+    delete intValidator; intValidator = nullptr;
+    delete removeAction; removeAction = nullptr;
+    delete menu; menu = nullptr;
+    delete ui; ui = nullptr;
 }
 
 /**

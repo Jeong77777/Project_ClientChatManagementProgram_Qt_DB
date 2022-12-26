@@ -6,6 +6,8 @@
 
 class QMenu;
 class QSqlTableModel;
+class QIntValidator;
+class QAction;
 
 namespace Ui {
 class ProductManagerForm;
@@ -57,7 +59,9 @@ private:
     void cleanInputLineEdit() const; // 입력 창 클리어
 
     Ui::ProductManagerForm *ui;     // ui
+    QIntValidator* intValidator;
     QMenu* menu;                    // tree widget context 메뉴
+    QAction* removeAction;
     QSqlTableModel* productModel;   // 제품 정보 데이터베이스 모델
 };
 
