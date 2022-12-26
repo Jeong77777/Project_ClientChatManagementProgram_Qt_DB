@@ -6,6 +6,8 @@
 
 class QMenu;
 class QSqlTableModel;
+class QAction;
+class QRegularExpressionValidator;
 
 namespace Ui {
 class ClientManagerForm;
@@ -56,7 +58,9 @@ private:
 
     Ui::ClientManagerForm *ui;      // ui
     QMenu* menu;                    // tree widget context 메뉴
+    QAction* removeAction;
     QSqlTableModel* clientModel;    // 고객 정보 데이터베이스 모델
+    QRegularExpressionValidator* phoneNumberRegExpValidator;
 };
 
 #endif // CLIENTMANAGERFORM_H

@@ -25,7 +25,7 @@ ClientManagerForm::ClientManagerForm(QWidget *parent) :
     ui->splitter->setSizes(sizes);
 
     /* 핸드폰 번호 입력 칸에 대한 정규 표현식 설정 */
-    QRegularExpressionValidator* phoneNumberRegExpValidator \
+    phoneNumberRegExpValidator \
             = new QRegularExpressionValidator(this);
     phoneNumberRegExpValidator\
             ->setRegularExpression(QRegularExpression("^\\d{2,3}-\\d{3,4}-\\d{4}$"));
@@ -33,7 +33,7 @@ ClientManagerForm::ClientManagerForm(QWidget *parent) :
 
     /* tree widget의 context 메뉴 설정 */
     // tree widget에서 고객을 삭제하는 action
-    QAction* removeAction = new QAction(tr("Remove"));
+    removeAction = new QAction(tr("Remove"));
     assert(connect(removeAction, SIGNAL(triggered()), SLOT(removeItem())));
     menu = new QMenu; // context 메뉴
     menu->addAction(removeAction);
@@ -89,7 +89,6 @@ void ClientManagerForm::loadData()
 */
 ClientManagerForm::~ClientManagerForm()
 {
-    delete ui;
     QSqlDatabase db = QSqlDatabase::database("clientConnection");
     if(db.isOpen()) {
         clientModel->submitAll();
@@ -97,6 +96,13 @@ ClientManagerForm::~ClientManagerForm()
         db.commit();
         db.close();
     }
+
+    delete phoneNumberRegExpValidator;
+    phoneNumberRegExpValidator = nullptr;
+
+    delete removeAction; removeAction = nullptr;
+    delete menu; menu = nullptr;
+    delete ui; ui = nullptr;
 }
 
 /**
