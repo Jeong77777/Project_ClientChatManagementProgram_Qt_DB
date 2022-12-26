@@ -7,9 +7,9 @@
  * @brief 생성자, 로그를 저장하는 파일 이름 설정
  */
 LogThread::LogThread(int id, std::string name, QObject *parent)
-    : QThread{parent}, filename("")
+    : QThread{parent}, m_filename("")
 {
-    filename = "log_" + std::to_string(id) + "_" + name + ".txt";
+    m_filename = "log_" + std::to_string(id) + "_" + name + ".txt";
 }
 
 /**
@@ -29,7 +29,7 @@ void LogThread::run()
  */
 void LogThread::appendData(const std::string data)
 {
-    chatList.push_back(data);
+    m_chatList.push_back(data);
 }
 
 /**
@@ -37,16 +37,16 @@ void LogThread::appendData(const std::string data)
  */
 void LogThread::saveData()
 {
-    if(chatList.size() > 0) {
-        QFile file(QString::fromStdString(filename));
+    if(m_chatList.size() > 0) {
+        QFile file(QString::fromStdString(m_filename));
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
             return;
 
         QTextStream out(&file);
-        for(const auto& data : chatList) {
+        for(const auto& data : m_chatList) {
             out << QString::fromStdString(data) << "\n";
         }
         file.close();
-        chatList.clear();
+        m_chatList.clear();
     }
 }

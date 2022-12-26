@@ -48,21 +48,21 @@ private slots:
     void goOnSend(const qint64); // 파일을 여러 번 나눠서 전송하기 위한 슬롯
 
 private:
-    Ui::Widget *ui;
+    Ui::Widget *m_ui;
 
     void closeEvent(QCloseEvent*) override;
     void loadData(int, std::string) const;     // 이전 채팅 내용 불러오기
 
-    QTcpSocket *clientSocket;		 // 채팅을 위한 소켓
-    QTcpSocket *fileClient;          // 파일 전송을 위한 소켓
-    QProgressDialog* progressDialog; // 파일 전송 진행 상태
-    QFile* file;                     // 관리자(서버)로 보내는 파일
-    long long loadSize;                 // 데이터 전송 단위 크기
-    long long byteToWrite;              // 전송할 남은 데이터의 크기
-    long long totalSize;                // 총 데이터의 크기(파일 + 파일 정보)
-    QByteArray outBlock;             // 파일 전송을 위한 블록
-    bool isSent;                     // 파일 서버와의 연결 flag
+    QTcpSocket *m_clientSocket;		 // 채팅을 위한 소켓
+    QTcpSocket *m_fileClient;          // 파일 전송을 위한 소켓
+    QProgressDialog* m_progressDialog; // 파일 전송 진행 상태
+    QFile* m_file;                     // 관리자(서버)로 보내는 파일
+    long long m_loadSize;                 // 데이터 전송 단위 크기
+    long long m_byteToWrite;              // 전송할 남은 데이터의 크기
+    long long m_totalSize;                // 총 데이터의 크기(파일 + 파일 정보)
+    QByteArray m_outBlock;             // 파일 전송을 위한 블록
+    bool m_isSent;                     // 파일 서버와의 연결 flag
 
-    LogThread* logThread; // 채팅 로그를 저장하기 위한 thread
+    LogThread* m_logThread; // 채팅 로그를 저장하기 위한 thread
 };
 #endif // WIDGET_H
