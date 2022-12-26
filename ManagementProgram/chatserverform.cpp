@@ -119,12 +119,16 @@ ChatServerForm::~ChatServerForm()
     delete progressDialog; progressDialog = nullptr;
     logThread->deleteLater(); logThread = nullptr;
 
-    for(int i = 0; i < ui->clientTreeWidget->topLevelItemCount(); i++) {
+    int row;
+
+    row = ui->clientTreeWidget->topLevelItemCount();
+    for(int i = 0; i < row; i++) {
         auto item = ui->clientTreeWidget->itemAt(0, 0);
         ui->clientTreeWidget->takeTopLevelItem(ui->clientTreeWidget->indexOfTopLevelItem(item));
         delete item;
     }
-    for(int i = 0; i < ui->messageTreeWidget->topLevelItemCount(); i++) {
+    row = ui->messageTreeWidget->topLevelItemCount();
+    for(int i = 0; i < row; i++) {
         auto item = ui->messageTreeWidget->itemAt(0, 0);
         ui->messageTreeWidget->takeTopLevelItem(ui->messageTreeWidget->indexOfTopLevelItem(item));
         delete item;
