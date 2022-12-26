@@ -30,7 +30,7 @@ ChatWindowForAdmin::ChatWindowForAdmin(std::string id, std::string name, \
 */
 ChatWindowForAdmin::~ChatWindowForAdmin()
 {
-    delete ui;
+    delete ui; ui = nullptr;
 }
 
 /**
