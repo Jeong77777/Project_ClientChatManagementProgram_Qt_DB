@@ -36,7 +36,7 @@ OrderManagerForm::OrderManagerForm(QWidget *parent, \
     ui->splitter->setSizes(sizes);
 
     /* tree widget의 context 메뉴 설정 */
-    QAction* removeAction = new QAction(tr("Remove"));
+    removeAction = new QAction(tr("Remove"));
     assert(connect(removeAction, SIGNAL(triggered()), SLOT(removeItem())));
     menu = new QMenu; // context 메뉴
     menu->addAction(removeAction);
@@ -110,14 +110,19 @@ void OrderManagerForm::loadData()
 */
 OrderManagerForm::~OrderManagerForm()
 {
-    delete ui;
     QSqlDatabase db = QSqlDatabase::database("orderConnection");
     if(db.isOpen()) {
         orderModel->submitAll();
-        delete orderModel;
+        delete orderModel; orderModel = nullptr;
         db.commit();
         db.close();
     }
+
+    delete removeAction; removeAction = nullptr;
+    delete menu; menu = nullptr;
+    delete clientModel; clientModel = nullptr;
+    delete productModel; productModel = nullptr;
+    delete ui; ui = nullptr;
 }
 
 

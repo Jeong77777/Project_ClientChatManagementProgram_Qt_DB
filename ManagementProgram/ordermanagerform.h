@@ -9,6 +9,7 @@ class ClientDialog;
 class ProductDialog;
 class QSqlTableModel;
 class QStandardItemModel;
+class QAction;
 
 namespace Ui {
 class OrderManagerForm;
@@ -68,6 +69,7 @@ private:
 
     Ui::OrderManagerForm *ui;       // ui
     QMenu* menu;                    // tree view context 메뉴
+    QAction* removeAction;
     QSqlTableModel* orderModel;     // 주문 정보 데이터베이스 모델
 
     QStandardItemModel *clientModel;    // 고객 정보 관리 객체로부터 가져온 고객을 저장하는 model
