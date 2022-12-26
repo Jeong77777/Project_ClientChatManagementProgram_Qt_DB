@@ -140,8 +140,16 @@ Widget::Widget(QWidget *parent)
 
 Widget::~Widget()
 {
-    clientSocket->close( );
-    delete ui;
+    clientSocket->close();
+    fileClient->close();
+    logThread->saveData();
+    logThread->terminate();
+
+    clientSocket->deleteLater(); clientSocket = nullptr;
+    fileClient->deleteLater(); fileClient = nullptr;
+    delete progressDialog; progressDialog = nullptr;
+    logThread->deleteLater(); logThread = nullptr;
+    delete ui; ui = nullptr;
 }
 
 /**
@@ -372,6 +380,8 @@ void Widget::goOnSend(const qint64 numBytes)
     if (byteToWrite == 0) { // 파일 전송이 완료 되었을 때
         qDebug("File sending completed!");
         progressDialog->reset();
+        file->close();
+        delete file; file = nullptr;
     }
 }
 
