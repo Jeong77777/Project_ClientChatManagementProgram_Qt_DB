@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication ManagementProgram(argc, argv);
+    QApplication managementProgram(argc, argv);
 
     QTranslator translator;
     if(translator.load(":/ManagementProgram_ko_KR.qm"))
@@ -14,5 +14,5 @@ int main(int argc, char *argv[])
 
     MainWindow mainWindow;
     mainWindow.show();
-    return ManagementProgram.exec();
+    return managementProgram.exec();
 }
