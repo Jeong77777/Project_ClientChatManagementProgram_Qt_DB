@@ -17,7 +17,7 @@ LogThread::LogThread(int id, std::string name, QObject *parent)
  */
 void LogThread::run()
 {
-    Q_FOREVER {
+    while(true) {
         saveData();
         sleep(60);      // 1분마다 저장
     }
