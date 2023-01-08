@@ -21,12 +21,13 @@ public:
 private:
     void run() override;                     // 1분마다 채팅 로그를 저장
 
-    std::vector<std::string> m_chatList;  // 채팅 내용을 저장하는 list
-    std::string m_filename;               // 로그를 저장하는 파일의 이름
-
 public slots:
     void appendData(const std::string);       // 새 채팅 내용 추가
     void saveData();                // 채팅 로그 저장
+
+private:
+    std::vector<std::string> m_chatList;  // 채팅 내용을 저장하는 list
+    std::string m_filename;               // 로그를 저장하는 파일의 이름
 };
 
 #endif // LOGTHREAD_H

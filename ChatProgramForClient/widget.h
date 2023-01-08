@@ -40,6 +40,10 @@ public:
     Widget(const Widget&) = delete;
     Widget& operator=(const Widget&) = delete;
 
+private:
+    void closeEvent(QCloseEvent*) override;
+    void loadData(int, std::string) const;     // 이전 채팅 내용 불러오기
+
 private slots:
     void receiveData();	   // 관리자(서버)로부터 메시지를 받기 위한 슬롯
     void sendData() const;       // 관리자(서버)로 메시지를 보내기 위한 슬롯
@@ -51,9 +55,6 @@ private slots:
 
 private:
     Ui::Widget *m_ui;
-
-    void closeEvent(QCloseEvent*) override;
-    void loadData(int, std::string) const;     // 이전 채팅 내용 불러오기
 
     QTcpSocket *m_clientSocket;		 // 채팅을 위한 소켓
     QTcpSocket *m_fileClient;          // 파일 전송을 위한 소켓
