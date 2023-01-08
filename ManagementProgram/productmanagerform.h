@@ -28,6 +28,14 @@ public:
 
     void loadData(); // 저장되어 있는 제품 리스트 불러오기
 
+signals:
+    // 제품 검색 Dialog로 검색된 제품 정보를 보내주는 시그널
+    void sendProductToDialog(int,std::string,std::string,int,int);
+    // 주문 정보 관리 객체로 검색된 제품 정보를 보내주는 시그널
+    void sendProductToManager(int, std::string, std::string, int, int);
+    // status bar에 표시될 메시지를 보내주는 시그널
+    void sendStatusMessage(QString, int);
+
 private slots:
     void on_showAllPushButton_clicked() const; // 전체 제품 리스트 출력 버튼 슬롯
     // 검색 항목 선택 콤보 박스에서 선택된 것이 변경되었을 때의 슬롯
@@ -48,18 +56,11 @@ private slots:
     // 주문 정보 관리 객체를 통해서 재고량을 변경하기 위한 슬롯
     void setStock(const int, const int) const;
 
-signals:
-    // 제품 검색 Dialog로 검색된 제품 정보를 보내주는 시그널
-    void sendProductToDialog(int,std::string,std::string,int,int);
-    // 주문 정보 관리 객체로 검색된 제품 정보를 보내주는 시그널
-    void sendProductToManager(int, std::string, std::string, int, int);
-    // status bar에 표시될 메시지를 보내주는 시그널
-    void sendStatusMessage(QString, int);
-
 private:
     int makeId() const;              // Id를 자동으로 생성
     void cleanInputLineEdit() const; // 입력 창 클리어
 
+private:
     Ui::ProductManagerForm *ui;     // ui
     QIntValidator* intValidator;
     QMenu* menu;                    // tree widget context 메뉴

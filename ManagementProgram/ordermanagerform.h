@@ -32,6 +32,16 @@ public:
 
     void loadData();  // 저장되어 있는 주문 리스트 불러오기
 
+signals:
+    // 고객 정보 관리 객체로 가져올 고객 정보에 대한 ID를 보내는 시그널
+    void sendClientId(int);
+    // 제품 정보 관리 객체로 가져올 제품 정보에 대한 ID를 보내는 시그널
+    void sendProductId(int);
+    // status bar에 표시될 메시지를 보내주는 시그널
+    void sendStatusMessage(QString, int);
+    // 제품 정보 관리 객체를 통해서 재고량을 변경하기 위한 시그널
+    void sendStock(int, int);
+
 private slots:
     void on_showAllPushButton_clicked() const; // 전체 주문 리스트 출력 버튼 슬롯
     // 검색 항목 선택 콤보 박스에서 선택된 것이 변경되었을 때의 슬롯
@@ -52,20 +62,11 @@ private slots:
     // 제품 정보 관리 객체로부터 제품 정보를 받기 위한 슬롯
     void receiveProductInfo(const int, const std::string, const std::string, const int, const int);
 
-signals:
-    // 고객 정보 관리 객체로 가져올 고객 정보에 대한 ID를 보내는 시그널
-    void sendClientId(int);
-    // 제품 정보 관리 객체로 가져올 제품 정보에 대한 ID를 보내는 시그널
-    void sendProductId(int);
-    // status bar에 표시될 메시지를 보내주는 시그널
-    void sendStatusMessage(QString, int);
-    // 제품 정보 관리 객체를 통해서 재고량을 변경하기 위한 시그널
-    void sendStock(int, int);
-
 private:
     int makeId() const;               // Id를 자동으로 생성
     void cleanInputLineEdit() const; // 입력 창 클리어
 
+private:
     ClientDialog *m_clientDialog;   // 고객을 검색, 입력하기 위한 다이얼로그
     ProductDialog *m_productDialog; // 제품을 검색, 입력하기 위한 다이얼로그
 

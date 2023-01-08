@@ -42,6 +42,10 @@ public:
     ChatServerForm(const ChatServerForm&) = delete;
     ChatServerForm& operator=(const ChatServerForm&) = delete;
 
+private:
+    // 고객에게 로그인 결과를 전송
+    void sendLoginResult(QTcpSocket*, const char*);
+
 private slots:
     // 고객 정보 관리 객체로부터 받은 고객 정보를 리스트에 추가(변경)하는 슬롯
     void addClient(const int, const std::string);
@@ -70,9 +74,6 @@ private slots:
 private:
     const int BLOCK_SIZE;  // 블록 사이즈
     const int PORT_NUMBER; // 채팅을 위한 port number
-
-    // 고객에게 로그인 결과를 전송
-    void sendLoginResult(QTcpSocket*, const char*);
 
     Ui::ChatServerForm *m_ui; // ui
     QTcpServer *m_chatServer; // 채팅을 위한 서버
