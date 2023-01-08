@@ -123,9 +123,9 @@ MainWindow::~MainWindow()
     delete m_chatForm; m_chatForm = nullptr;
     delete m_ui; m_ui = nullptr;
 
-    QStringList list = QSqlDatabase::connectionNames();
-    for(int i = 0; i < list.count(); ++i) {
-        QSqlDatabase::removeDatabase(list[i]);
+    QStringList list = QSqlDatabase::connectionNames();    
+    for(const auto& name : list) {
+        QSqlDatabase::removeDatabase(name);
     }
 }
 
