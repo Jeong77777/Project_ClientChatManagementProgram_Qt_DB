@@ -16,6 +16,8 @@ public:
     explicit ChatWindowForAdmin(std::string = "0", std::string = "", \
                                 std::string = "", QWidget *parent = nullptr);
     ~ChatWindowForAdmin();
+    ChatWindowForAdmin(const ChatWindowForAdmin&) = delete;
+    ChatWindowForAdmin& operator=(const ChatWindowForAdmin&) = delete;
 
     void receiveMessage(const std::string) const;           // 고객으로부터 온 메시지를 표시
     void updateInfo(const std::string, const std::string);  // 고객의 상태 업데이트

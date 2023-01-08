@@ -20,6 +20,8 @@ class ClientDialog : public QDialog
 public:
     explicit ClientDialog(QWidget *parent = nullptr);
     ~ClientDialog();
+    ClientDialog(const ClientDialog&) = delete;
+    ClientDialog& operator=(const ClientDialog&) = delete;
 
     std::string getCurrentItem() const;       // 현재 선택된 고객ID와 이름을 반환
     void clearDialog() const;                 // 검색 결과, 입력 창 초기화

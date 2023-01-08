@@ -23,6 +23,8 @@ class ClientManagerForm : public QWidget
 public:
     explicit ClientManagerForm(QWidget *parent = nullptr);
     ~ClientManagerForm();
+    ClientManagerForm(const ClientManagerForm&) = delete;
+    ClientManagerForm& operator=(const ClientManagerForm&) = delete;
 
     void loadData(); // 저장되어 있는 고객 리스트 불러오기
 

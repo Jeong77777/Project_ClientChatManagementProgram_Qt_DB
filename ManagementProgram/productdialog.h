@@ -20,6 +20,8 @@ class ProductDialog : public QDialog
 public:
     explicit ProductDialog(QWidget *parent = nullptr);
     ~ProductDialog();
+    ProductDialog(const ProductDialog&) = delete;
+    ProductDialog& operator=(const ProductDialog&) = delete;
 
     std::string getCurrentItem() const;           // 현재 선택된 제품ID와 이름을 반환
     void clearDialog() const;                 // 검색 결과, 입력 창 초기화

@@ -23,6 +23,8 @@ class ProductManagerForm : public QWidget
 public:
     explicit ProductManagerForm(QWidget *parent = nullptr);
     ~ProductManagerForm();
+    ProductManagerForm(const ProductManagerForm&) = delete;
+    ProductManagerForm& operator=(const ProductManagerForm&) = delete;
 
     void loadData(); // 저장되어 있는 제품 리스트 불러오기
 

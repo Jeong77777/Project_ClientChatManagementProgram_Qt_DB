@@ -13,8 +13,12 @@ class QTreeWidgetItem;
 class LogThread : public QThread
 {
     Q_OBJECT
+
 public:
     explicit LogThread(QObject *parent = nullptr);
+    ~LogThread() = default;
+    LogThread(const LogThread&) = delete;
+    LogThread& operator=(const LogThread&) = delete;
 
 private:
     void run() override; // 1분마다 채팅 로그를 저장

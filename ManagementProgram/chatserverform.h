@@ -39,6 +39,8 @@ class ChatServerForm : public QWidget
 public:
     explicit ChatServerForm(QWidget *parent = nullptr);
     ~ChatServerForm();
+    ChatServerForm(const ChatServerForm&) = delete;
+    ChatServerForm& operator=(const ChatServerForm&) = delete;
 
 private slots:
     // 고객 정보 관리 객체로부터 받은 고객 정보를 리스트에 추가(변경)하는 슬롯

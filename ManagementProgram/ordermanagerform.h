@@ -27,6 +27,8 @@ public:
                               ClientDialog *clientDialog = nullptr,
                               ProductDialog *productDialog = nullptr);
     ~OrderManagerForm();
+    OrderManagerForm(const OrderManagerForm&) = delete;
+    OrderManagerForm& operator=(const OrderManagerForm&) = delete;
 
     void loadData();  // 저장되어 있는 주문 리스트 불러오기
 
