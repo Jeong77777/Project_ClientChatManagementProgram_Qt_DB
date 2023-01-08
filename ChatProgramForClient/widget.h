@@ -37,6 +37,8 @@ public:
 
     Widget(QWidget *parent = nullptr);
     ~Widget();
+    Widget(const Widget&) = delete;
+    Widget& operator=(const Widget&) = delete;
 
 private slots:
     void receiveData();	   // 관리자(서버)로부터 메시지를 받기 위한 슬롯

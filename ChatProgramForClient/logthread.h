@@ -14,6 +14,9 @@ class LogThread : public QThread
 public:
     explicit LogThread(int id = 0, std::string name = "",
                        QObject *parent = nullptr);
+    ~LogThread() = default;
+    LogThread(const LogThread&) = delete;
+    LogThread& operator=(const LogThread&) = delete;
 
 private:
     void run() override;                     // 1분마다 채팅 로그를 저장
